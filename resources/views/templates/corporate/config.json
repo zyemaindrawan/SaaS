@@ -1,0 +1,797 @@
+{
+  "name": "Corporate Template",
+  "slug": "corporate",
+  "description": "Template profesional untuk website company profile dengan desain modern dan responsif",
+  "category": "Company Profile",
+  "version": "1.0.0",
+  "author": "SaaS Builder Team",
+  "preview_image": "templates/corporate/preview.png",
+  "thumbnail": "templates/corporate/thumbnail.jpg",
+  "price": 250000,
+  "tags": ["corporate", "business", "company-profile", "professional", "modern"],
+  
+  "sections": [
+    {
+      "id": "seo",
+      "name": "SEO Settings",
+      "description": "Pengaturan untuk optimasi mesin pencari",
+      "icon": "fas fa-search",
+      "required": false,
+      "order": 1
+    },
+    {
+      "id": "branding",
+      "name": "Branding",
+      "description": "Logo, nama perusahaan, dan identitas visual",
+      "icon": "fas fa-palette",
+      "required": true,
+      "order": 2
+    },
+    {
+      "id": "hero",
+      "name": "Hero Section",
+      "description": "Bagian utama yang pertama dilihat pengunjung",
+      "icon": "fas fa-star",
+      "required": true,
+      "order": 3
+    },
+    {
+      "id": "services",
+      "name": "Services",
+      "description": "Layanan atau produk yang ditawarkan",
+      "icon": "fas fa-cogs",
+      "required": false,
+      "order": 4
+    },
+    {
+      "id": "about",
+      "name": "About Us",
+      "description": "Tentang perusahaan atau organisasi",
+      "icon": "fas fa-info-circle",
+      "required": false,
+      "order": 5
+    },
+    {
+      "id": "gallery",
+      "name": "Gallery",
+      "description": "Foto dan media visual",
+      "icon": "fas fa-images",
+      "required": false,
+      "order": 6
+    },
+    {
+      "id": "testimonials",
+      "name": "Testimonials",
+      "description": "Testimoni dan review dari klien",
+      "icon": "fas fa-quote-right",
+      "required": false,
+      "order": 7
+    },
+    {
+      "id": "contact",
+      "name": "Contact",
+      "description": "Informasi kontak dan WhatsApp",
+      "icon": "fas fa-phone",
+      "required": true,
+      "order": 8
+    },
+    {
+      "id": "social",
+      "name": "Social Media",
+      "description": "Link media sosial dan integrasi",
+      "icon": "fas fa-share-alt",
+      "required": false,
+      "order": 9
+    },
+    {
+      "id": "theme",
+      "name": "Theme & Colors",
+      "description": "Warna dan tema visual website",
+      "icon": "fas fa-paint-brush",
+      "required": false,
+      "order": 10
+    }
+  ],
+
+  "fields": [
+    {
+      "key": "seo_title",
+      "label": "SEO Title",
+      "type": "text",
+      "section": "seo",
+      "required": false,
+      "max_length": 60,
+      "placeholder": "Masukkan judul untuk SEO (maks 60 karakter)",
+      "description": "Judul halaman yang akan muncul di hasil pencarian Google",
+      "validation": {
+        "max": 60
+      },
+      "order": 1
+    },
+    {
+      "key": "seo_description",
+      "label": "Meta Description",
+      "type": "textarea",
+      "section": "seo",
+      "required": false,
+      "max_length": 160,
+      "rows": 3,
+      "placeholder": "Deskripsi singkat website (maks 160 karakter)",
+      "description": "Deskripsi yang akan muncul di hasil pencarian Google",
+      "validation": {
+        "max": 160
+      },
+      "order": 2
+    },
+    {
+      "key": "seo_keywords",
+      "label": "Meta Keywords",
+      "type": "text",
+      "section": "seo",
+      "required": false,
+      "placeholder": "keyword1, keyword2, keyword3",
+      "description": "Kata kunci dipisahkan dengan koma (maksimal 10)",
+      "validation": {
+        "pattern": "^[a-zA-Z0-9\\s,]+$"
+      },
+      "order": 3
+    },
+    {
+      "key": "favicon",
+      "label": "Favicon",
+      "type": "image",
+      "section": "seo",
+      "required": false,
+      "accept": ".ico,.png,.jpg",
+      "max_size": "100KB",
+      "dimensions": "32x32",
+      "description": "Icon website yang muncul di tab browser (32x32px)",
+      "order": 4
+    },
+    {
+      "key": "og_image",
+      "label": "Open Graph Image",
+      "type": "image",
+      "section": "seo",
+      "required": false,
+      "accept": ".jpg,.png",
+      "max_size": "1MB",
+      "dimensions": "1200x630",
+      "description": "Gambar untuk social media sharing (1200x630px)",
+      "order": 5
+    },
+    {
+      "key": "robots_meta",
+      "label": "Robots Meta",
+      "type": "select",
+      "section": "seo",
+      "default": "index,follow",
+      "options": [
+        {"value": "index,follow", "label": "Index, Follow (Default - Direkomendasikan)"},
+        {"value": "noindex,nofollow", "label": "No Index, No Follow"},
+        {"value": "index,nofollow", "label": "Index, No Follow"},
+        {"value": "noindex,follow", "label": "No Index, Follow"}
+      ],
+      "description": "Pengaturan untuk mesin pencari",
+      "order": 6
+    },
+    {
+      "key": "google_analytics",
+      "label": "Google Analytics ID",
+      "type": "text",
+      "section": "seo",
+      "required": false,
+      "placeholder": "G-XXXXXXXXXX",
+      "description": "Google Analytics Measurement ID untuk tracking pengunjung",
+      "validation": {
+        "pattern": "^G-[A-Z0-9]+$"
+      },
+      "order": 7
+    },
+    {
+      "key": "google_tag_manager",
+      "label": "Google Tag Manager ID",
+      "type": "text",
+      "section": "seo",
+      "required": false,
+      "placeholder": "GTM-XXXXXXX",
+      "description": "Google Tag Manager Container ID",
+      "validation": {
+        "pattern": "^GTM-[A-Z0-9]+$"
+      },
+      "order": 8
+    },
+
+    {
+      "key": "company_name",
+      "label": "Nama Perusahaan",
+      "type": "text",
+      "section": "branding",
+      "required": true,
+      "placeholder": "PT. Nama Perusahaan",
+      "description": "Nama lengkap perusahaan atau organisasi",
+      "validation": {
+        "min": 2,
+        "max": 100
+      },
+      "order": 1
+    },
+    {
+      "key": "company_tagline",
+      "label": "Tagline/Slogan",
+      "type": "text",
+      "section": "branding",
+      "required": false,
+      "placeholder": "Slogan perusahaan yang menarik",
+      "description": "Slogan atau tagline singkat perusahaan",
+      "validation": {
+        "max": 100
+      },
+      "order": 2
+    },
+    {
+      "key": "company_logo",
+      "label": "Logo Perusahaan",
+      "type": "image",
+      "section": "branding",
+      "required": false,
+      "accept": ".png,.jpg,.svg",
+      "max_size": "2MB",
+      "dimensions": "300x100",
+      "description": "Logo perusahaan (format PNG/JPG/SVG, ukuran optimal 300x100px)",
+      "order": 3
+    },
+
+    {
+      "key": "hero_title",
+      "label": "Judul Utama",
+      "type": "text",
+      "section": "hero",
+      "required": true,
+      "default": "Solusi Bisnis Terbaik",
+      "placeholder": "Judul yang menarik perhatian",
+      "description": "Judul utama yang akan ditampilkan di bagian hero",
+      "validation": {
+        "min": 5,
+        "max": 100
+      },
+      "order": 1
+    },
+    {
+      "key": "hero_subtitle",
+      "label": "Sub Judul",
+      "type": "textarea",
+      "section": "hero",
+      "required": false,
+      "default": "Kami memberikan layanan terbaik untuk mengembangkan bisnis Anda",
+      "rows": 3,
+      "placeholder": "Deskripsi singkat yang menjelaskan value proposition",
+      "description": "Deskripsi pendukung judul utama",
+      "validation": {
+        "max": 200
+      },
+      "order": 2
+    },
+    {
+      "key": "hero_background",
+      "label": "Background Hero",
+      "type": "image",
+      "section": "hero",
+      "required": false,
+      "accept": ".jpg,.png",
+      "max_size": "5MB",
+      "dimensions": "1920x1080",
+      "description": "Gambar background untuk hero section (1920x1080px)",
+      "order": 3
+    },
+    {
+      "key": "hero_cta_text",
+      "label": "Teks Call-to-Action",
+      "type": "text",
+      "section": "hero",
+      "required": false,
+      "default": "Pelajari Lebih Lanjut",
+      "placeholder": "Teks tombol CTA",
+      "description": "Teks untuk tombol call-to-action utama",
+      "order": 4
+    },
+    {
+      "key": "hero_cta_link",
+      "label": "Link Call-to-Action",
+      "type": "text",
+      "section": "hero",
+      "required": false,
+      "placeholder": "#services",
+      "description": "Link tujuan tombol CTA (gunakan #section untuk scroll ke bagian tertentu)",
+      "order": 5
+    },
+
+    {
+      "key": "services_title",
+      "label": "Judul Layanan",
+      "type": "text",
+      "section": "services",
+      "required": false,
+      "default": "Layanan Kami",
+      "placeholder": "Judul untuk section layanan",
+      "order": 1
+    },
+    {
+      "key": "services_subtitle",
+      "label": "Sub Judul Layanan",
+      "type": "textarea",
+      "section": "services",
+      "required": false,
+      "default": "Kami menyediakan berbagai layanan profesional untuk membantu mengembangkan bisnis Anda",
+      "rows": 2,
+      "placeholder": "Deskripsi singkat tentang layanan",
+      "order": 2
+    },
+    {
+      "key": "services",
+      "label": "Daftar Layanan",
+      "type": "repeater",
+      "section": "services",
+      "required": false,
+      "max_items": 6,
+      "description": "Tambahkan layanan yang ditawarkan perusahaan",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Nama Layanan",
+          "type": "text",
+          "required": true,
+          "placeholder": "Konsultasi Bisnis"
+        },
+        {
+          "key": "description",
+          "label": "Deskripsi",
+          "type": "textarea",
+          "required": false,
+          "rows": 3,
+          "placeholder": "Deskripsi detail layanan"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "type": "icon",
+          "required": false,
+          "description": "Pilih icon dari Font Awesome"
+        },
+        {
+          "key": "link",
+          "label": "Link Detail",
+          "type": "text",
+          "required": false,
+          "placeholder": "#",
+          "description": "Link ke halaman detail layanan"
+        }
+      ],
+      "order": 3
+    },
+
+    {
+      "key": "about_title",
+      "label": "Judul Tentang Kami",
+      "type": "text",
+      "section": "about",
+      "required": false,
+      "default": "Tentang Kami",
+      "order": 1
+    },
+    {
+      "key": "about_content",
+      "label": "Konten Tentang Kami",
+      "type": "rich_text",
+      "section": "about",
+      "required": false,
+      "description": "Ceritakan tentang perusahaan, visi misi, dan nilai-nilai",
+      "order": 2
+    },
+    {
+      "key": "about_image",
+      "label": "Gambar Tentang Kami",
+      "type": "image",
+      "section": "about",
+      "required": false,
+      "accept": ".jpg,.png",
+      "max_size": "3MB",
+      "order": 3
+    },
+    {
+      "key": "company_stats",
+      "label": "Statistik Perusahaan",
+      "type": "repeater",
+      "section": "about",
+      "required": false,
+      "max_items": 4,
+      "fields": [
+        {
+          "key": "number",
+          "label": "Angka",
+          "type": "text",
+          "required": true,
+          "placeholder": "100+"
+        },
+        {
+          "key": "label",
+          "label": "Label",
+          "type": "text",
+          "required": true,
+          "placeholder": "Klien Puas"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "type": "icon",
+          "required": false
+        }
+      ],
+      "order": 4
+    },
+
+    {
+      "key": "gallery_title",
+      "label": "Judul Gallery",
+      "type": "text",
+      "section": "gallery",
+      "required": false,
+      "default": "Gallery",
+      "order": 1
+    },
+    {
+      "key": "gallery_photos",
+      "label": "Foto Gallery",
+      "type": "image_multiple",
+      "section": "gallery",
+      "required": false,
+      "max_files": 12,
+      "accept": ".jpg,.png",
+      "max_size": "2MB",
+      "description": "Upload maksimal 12 foto untuk gallery",
+      "order": 2
+    },
+
+    {
+      "key": "testimonials_title",
+      "label": "Judul Testimoni",
+      "type": "text",
+      "section": "testimonials",
+      "required": false,
+      "default": "Testimoni Klien",
+      "order": 1
+    },
+    {
+      "key": "testimonials",
+      "label": "Daftar Testimoni",
+      "type": "repeater",
+      "section": "testimonials",
+      "required": false,
+      "max_items": 6,
+      "fields": [
+        {
+          "key": "name",
+          "label": "Nama Klien",
+          "type": "text",
+          "required": true,
+          "placeholder": "John Doe"
+        },
+        {
+          "key": "position",
+          "label": "Posisi/Perusahaan",
+          "type": "text",
+          "required": false,
+          "placeholder": "CEO, PT. Example"
+        },
+        {
+          "key": "content",
+          "label": "Isi Testimoni",
+          "type": "textarea",
+          "required": true,
+          "rows": 4,
+          "placeholder": "Testimoni dari klien..."
+        },
+        {
+          "key": "photo",
+          "label": "Foto Klien",
+          "type": "image",
+          "required": false,
+          "accept": ".jpg,.png",
+          "max_size": "500KB",
+          "dimensions": "150x150"
+        },
+        {
+          "key": "rating",
+          "label": "Rating",
+          "type": "select",
+          "required": false,
+          "default": "5",
+          "options": [
+            {"value": "5", "label": "5 Bintang"},
+            {"value": "4", "label": "4 Bintang"},
+            {"value": "3", "label": "3 Bintang"}
+          ]
+        }
+      ],
+      "order": 2
+    },
+
+    {
+      "key": "contact_title",
+      "label": "Judul Kontak",
+      "type": "text",
+      "section": "contact",
+      "required": false,
+      "default": "Hubungi Kami",
+      "order": 1
+    },
+    {
+      "key": "contact_email",
+      "label": "Email Kontak",
+      "type": "email",
+      "section": "contact",
+      "required": false,
+      "placeholder": "info@perusahaan.com",
+      "description": "Email utama untuk kontak",
+      "order": 2
+    },
+    {
+      "key": "contact_phone",
+      "label": "Nomor Telepon",
+      "type": "text",
+      "section": "contact",
+      "required": false,
+      "placeholder": "+62 812-3456-7890",
+      "description": "Nomor telepon yang bisa dihubungi",
+      "order": 3
+    },
+    {
+      "key": "contact_address",
+      "label": "Alamat",
+      "type": "textarea",
+      "section": "contact",
+      "required": false,
+      "rows": 3,
+      "placeholder": "Jl. Contoh No. 123, Jakarta",
+      "description": "Alamat lengkap perusahaan",
+      "order": 4
+    },
+
+    {
+      "key": "whatsapp_enabled",
+      "label": "Aktifkan WhatsApp Chat",
+      "type": "checkbox",
+      "section": "contact",
+      "default": false,
+      "description": "Tampilkan tombol floating WhatsApp",
+      "order": 5
+    },
+    {
+      "key": "whatsapp_number",
+      "label": "Nomor WhatsApp",
+      "type": "text",
+      "section": "contact",
+      "required": false,
+      "placeholder": "628123456789",
+      "description": "Format: 628123456789 (tanpa tanda + atau spasi)",
+      "depends_on": "whatsapp_enabled",
+      "validation": {
+        "pattern": "^62[0-9]{8,13}$"
+      },
+      "order": 6
+    },
+    {
+      "key": "whatsapp_message",
+      "label": "Pesan Default WhatsApp",
+      "type": "textarea",
+      "section": "contact",
+      "required": false,
+      "default": "Halo {company_name}, saya tertarik dengan layanan Anda",
+      "rows": 3,
+      "placeholder": "Pesan yang akan muncul saat membuka WhatsApp",
+      "description": "Gunakan {company_name} untuk nama perusahaan",
+      "depends_on": "whatsapp_enabled",
+      "order": 7
+    },
+    {
+      "key": "whatsapp_position",
+      "label": "Posisi Tombol WhatsApp",
+      "type": "select",
+      "section": "contact",
+      "default": "bottom-right",
+      "options": [
+        {"value": "bottom-right", "label": "Kanan Bawah"},
+        {"value": "bottom-left", "label": "Kiri Bawah"}
+      ],
+      "depends_on": "whatsapp_enabled",
+      "order": 8
+    },
+    {
+      "key": "whatsapp_color",
+      "label": "Warna Tombol WhatsApp",
+      "type": "color",
+      "section": "contact",
+      "default": "#25D366",
+      "description": "Warna background tombol WhatsApp",
+      "depends_on": "whatsapp_enabled",
+      "order": 9
+    },
+    {
+      "key": "whatsapp_greeting_text",
+      "label": "Teks Sapaan WhatsApp",
+      "type": "text",
+      "section": "contact",
+      "required": false,
+      "default": "Butuh bantuan? Chat dengan kami!",
+      "placeholder": "Teks yang muncul saat hover",
+      "depends_on": "whatsapp_enabled",
+      "order": 10
+    },
+
+    {
+      "key": "social_links",
+      "label": "Link Media Sosial",
+      "type": "repeater",
+      "section": "social",
+      "required": false,
+      "max_items": 8,
+      "fields": [
+        {
+          "key": "platform",
+          "label": "Platform",
+          "type": "select",
+          "required": true,
+          "options": [
+            {"value": "facebook", "label": "Facebook", "icon": "fab fa-facebook-f"},
+            {"value": "instagram", "label": "Instagram", "icon": "fab fa-instagram"},
+            {"value": "twitter", "label": "Twitter", "icon": "fab fa-twitter"},
+            {"value": "linkedin", "label": "LinkedIn", "icon": "fab fa-linkedin-in"},
+            {"value": "youtube", "label": "YouTube", "icon": "fab fa-youtube"},
+            {"value": "tiktok", "label": "TikTok", "icon": "fab fa-tiktok"},
+            {"value": "telegram", "label": "Telegram", "icon": "fab fa-telegram"},
+            {"value": "website", "label": "Website", "icon": "fas fa-globe"}
+          ]
+        },
+        {
+          "key": "url",
+          "label": "URL",
+          "type": "url",
+          "required": true,
+          "placeholder": "https://facebook.com/username"
+        },
+        {
+          "key": "label",
+          "label": "Label",
+          "type": "text",
+          "required": false,
+          "placeholder": "Nama akun atau label custom"
+        }
+      ],
+      "order": 1
+    },
+
+    {
+      "key": "primary_color",
+      "label": "Warna Utama",
+      "type": "color",
+      "section": "theme",
+      "default": "#2563eb",
+      "description": "Warna utama untuk tombol, link, dan elemen penting",
+      "order": 1
+    },
+    {
+      "key": "secondary_color",
+      "label": "Warna Sekunder",
+      "type": "color",
+      "section": "theme",
+      "default": "#64748b",
+      "description": "Warna untuk teks dan elemen pendukung",
+      "order": 2
+    },
+    {
+      "key": "accent_color",
+      "label": "Warna Aksen",
+      "type": "color",
+      "section": "theme",
+      "default": "#f59e0b",
+      "description": "Warna untuk highlight dan call-to-action",
+      "order": 3
+    },
+    {
+      "key": "font_family",
+      "label": "Font Family",
+      "type": "select",
+      "section": "theme",
+      "default": "inter",
+      "options": [
+        {"value": "inter", "label": "Inter (Modern & Clean)"},
+        {"value": "roboto", "label": "Roboto (Google Font)"},
+        {"value": "open-sans", "label": "Open Sans (Friendly)"},
+        {"value": "montserrat", "label": "Montserrat (Geometric)"},
+        {"value": "poppins", "label": "Poppins (Rounded)"},
+        {"value": "playfair", "label": "Playfair Display (Elegant)"}
+      ],
+      "description": "Pilih jenis font untuk website",
+      "order": 4
+    },
+    {
+      "key": "border_radius",
+      "label": "Border Radius",
+      "type": "select",
+      "section": "theme",
+      "default": "medium",
+      "options": [
+        {"value": "none", "label": "Sharp (0px)"},
+        {"value": "small", "label": "Small (4px)"},
+        {"value": "medium", "label": "Medium (8px)"},
+        {"value": "large", "label": "Large (12px)"},
+        {"value": "rounded", "label": "Very Rounded (20px)"}
+      ],
+      "description": "Tingkat kebulatan sudut elemen",
+      "order": 5
+    }
+  ],
+
+  "validation_rules": {
+    "company_name": "required|string|min:2|max:100",
+    "hero_title": "required|string|min:5|max:100",
+    "seo_title": "nullable|string|max:60",
+    "seo_description": "nullable|string|max:160",
+    "contact_email": "nullable|email",
+    "whatsapp_number": "nullable|regex:/^62[0-9]{8,13}$/",
+    "google_analytics": "nullable|regex:/^G-[A-Z0-9]+$/",
+    "google_tag_manager": "nullable|regex:/^GTM-[A-Z0-9]+$/"
+  },
+
+  "default_data": {
+    "company_name": "Your Company Name",
+    "hero_title": "Solusi Bisnis Terbaik",
+    "hero_subtitle": "Kami memberikan layanan terbaik untuk mengembangkan bisnis Anda",
+    "primary_color": "#2563eb",
+    "secondary_color": "#64748b",
+    "accent_color": "#f59e0b",
+    "font_family": "inter",
+    "border_radius": "medium",
+    "robots_meta": "index,follow",
+    "whatsapp_color": "#25D366",
+    "whatsapp_position": "bottom-right",
+    "services_title": "Layanan Kami",
+    "gallery_title": "Gallery",
+    "testimonials_title": "Testimoni Klien",
+    "contact_title": "Hubungi Kami",
+    "about_title": "Tentang Kami"
+  },
+
+  "required_assets": [
+    "images/placeholder.jpg",
+    "images/default-og-image.jpg",
+    "icons/default-favicon.ico"
+  ],
+
+  "supported_features": [
+    "responsive_design",
+    "seo_optimization",
+    "whatsapp_integration",
+    "social_media_links",
+    "google_analytics",
+    "image_gallery",
+    "testimonials",
+    "contact_forms",
+    "custom_colors",
+    "font_selection"
+  ],
+
+  "browser_support": [
+    "Chrome 90+",
+    "Firefox 88+",
+    "Safari 14+",
+    "Edge 90+"
+  ],
+
+  "performance": {
+    "lighthouse_score": 95,
+    "page_speed": "A+",
+    "mobile_friendly": true,
+    "seo_ready": true
+  }
+}

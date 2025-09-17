@@ -1,0 +1,411 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\WebsiteContent;
+use App\Services\TemplateService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
+use Inertia\Inertia;
+
+class PreviewController extends Controller
+{
+    public function __construct(
+        private TemplateService $templateService
+    ) {}
+
+    /**
+     * Show website preview in Inertia component by slug
+     */
+    public function showBySlug(string $slug)
+    {
+        // First try to find website content by slug
+        $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
+        
+        // If not found, try to find by template_slug
+        if (!$websiteContent) {
+            $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
+        }
+        
+        // If still not found, create a default preview for the template
+        if (!$websiteContent && $this->templateService->getTemplateBySlug($slug)) {
+            $websiteContent = new WebsiteContent([
+                'template_slug' => $slug,
+                'content_data' => $this->getDefaultContent($slug),
+                'status' => 'preview',
+                'user_id' => auth()->id() ?? 1, // Default to user 1 for demo
+                'title' => ucfirst(str_replace('-', ' ', $slug)) . ' Preview'
+            ]);
+        }
+            
+        if (!$websiteContent) {
+            abort(404, 'Website content or template not found');
+        }
+        
+        // Only authorize if it's a saved record and user is authenticated
+        if ($websiteContent->exists && auth()->check()) {
+            try {
+                $this->authorize('view', $websiteContent);
+            } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+                // If no policy exists or authorization fails, allow for demo purposes
+                // In production, you might want to handle this differently
+            }
+        }
+        
+        return $this->showPreview($websiteContent, $slug);
+    }
+
+    /**
+     * Render website preview using Blade template by slug
+     */
+    public function renderBySlug(string $slug)
+    {
+        // First try to find website content by slug
+        $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
+        
+        // If not found, try to find by template_slug
+        if (!$websiteContent) {
+            $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
+        }
+        
+        // If still not found, create a default preview for the template
+        if (!$websiteContent && $this->templateService->getTemplateBySlug($slug)) {
+            $websiteContent = new WebsiteContent([
+                'template_slug' => $slug,
+                'content_data' => $this->getDefaultContent($slug),
+                'status' => 'preview',
+                'user_id' => auth()->id() ?? 1, // Default to user 1 for demo
+                'title' => ucfirst(str_replace('-', ' ', $slug)) . ' Preview'
+            ]);
+        }
+            
+        if (!$websiteContent) {
+            abort(404, 'Website content or template not found');
+        }
+        
+        // Only authorize if it's a saved record and user is authenticated
+        if ($websiteContent->exists && auth()->check()) {
+            try {
+                $this->authorize('view', $websiteContent);
+            } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+                // If no policy exists or authorization fails, allow for demo purposes
+                // In production, you might want to handle this differently
+            }
+        }
+        
+        return $this->render($websiteContent);
+    }
+
+    /**
+     * Get preview data as JSON by slug (for real-time updates)
+     */
+    public function dataBySlug(string $slug)
+    {
+        // First try to find website content by slug
+        $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
+        
+        // If not found, create a default preview for the template
+        if (!$websiteContent && $this->templateService->getTemplateBySlug($slug)) {
+            $websiteContent = new WebsiteContent([
+                'template_slug' => $slug,
+                'content_data' => $this->getDefaultContent($slug),
+                'status' => 'preview',
+                'user_id' => auth()->id() ?? 1, // Default to user 1 for demo
+                'title' => ucfirst(str_replace('-', ' ', $slug)) . ' Preview'
+            ]);
+        }
+            
+        if (!$websiteContent) {
+            abort(404, 'Website content or template not found');
+        }
+        
+        // Only authorize if it's a saved record and user is authenticated
+        if ($websiteContent->exists && auth()->check()) {
+            try {
+                $this->authorize('view', $websiteContent);
+            } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+                // Allow viewing for demo purposes
+            }
+        }
+        
+        $template = $this->templateService->getTemplateBySlug($websiteContent->template_slug);
+        $config = $this->templateService->getTemplateConfig($websiteContent->template_slug);
+        $processedContent = $this->processContentData($websiteContent->content_data, $config);
+        
+        return response()->json([
+            'websiteContent' => $websiteContent,
+            'template' => $template,
+            'config' => $config,
+            'processedContent' => $processedContent,
+            'lastUpdated' => $websiteContent->updated_at ? $websiteContent->updated_at->toISOString() : now()->toISOString()
+        ]);
+    }
+
+    /**
+     * Show website preview in Inertia component (for slug-based URLs)
+     */
+    private function showPreview(WebsiteContent $websiteContent, string $slug = null)
+    {
+        // Get template configuration
+        $template = $this->templateService->getTemplateBySlug($websiteContent->template_slug);
+        $config = $this->templateService->getTemplateConfig($websiteContent->template_slug);
+        
+        if (!$template) {
+            abort(404, 'Template not found');
+        }
+        
+        // Get processed content data
+        $processedContent = $this->processContentData($websiteContent->content_data, $config);
+        
+        // Determine the correct preview URL based on whether we have an ID or slug
+        // If we have a slug parameter, always use slug-based URLs
+        if ($slug) {
+            $previewUrl = route('preview.render.slug', $slug);
+        } else {
+            $previewUrl = $websiteContent->exists && $websiteContent->id 
+                ? route('preview.render', $websiteContent->id)
+                : route('preview.render.slug', $websiteContent->template_slug);
+        }
+        
+        return Inertia::render('Preview/Show', [
+            'websiteContent' => $websiteContent->exists ? $websiteContent->load('user') : $websiteContent->makeHidden(['id']),
+            'template' => $template,
+            'config' => $config,
+            'processedContent' => $processedContent,
+            'previewUrl' => $previewUrl,
+            'slug' => $slug,
+            // 'editUrl' => route('website-builder.edit', $websiteContent->id),
+            // 'canEdit' => auth()->user()->can('update', $websiteContent)
+        ]);
+    }
+
+    /**
+     * Show website preview in Inertia component
+     */
+    public function show(WebsiteContent $websiteContent)
+    {
+        try {
+            $this->authorize('view', $websiteContent);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            // Allow viewing for demo purposes
+        }
+        
+        return $this->showPreview($websiteContent);
+    }
+
+    /**
+     * Render website preview using Blade template (for iframe/popup)
+     */
+    public function render(WebsiteContent $websiteContent)
+    {
+        try {
+            $this->authorize('view', $websiteContent);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            // Allow viewing for demo purposes
+        }
+        
+        // Get template and configuration
+        $template = $this->templateService->getTemplateBySlug($websiteContent->template_slug);
+        $config = $this->templateService->getTemplateConfig($websiteContent->template_slug);
+        
+        if (!$template) {
+            abort(404, 'Template not found');
+        }
+        
+        // Process content data with fallbacks
+        $processedContent = $this->processContentData($websiteContent->content_data, $config);
+        
+        // Check if template view exists
+        $templateView = "templates.{$websiteContent->template_slug}.index";
+        
+        if (!View::exists($templateView)) {
+            abort(404, 'Template view not found');
+        }
+        
+        try {
+            return view($templateView, [
+                'website' => $websiteContent,
+                'content' => $processedContent,
+                'config' => $config,
+                'template' => $template,
+                'preview_mode' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->view('errors.template-error', [
+                'error' => $e->getMessage(),
+                'template' => $template,
+                'websiteContent' => $websiteContent
+            ], 500);
+        }
+    }
+
+    /**
+     * Get preview data as JSON (for real-time updates)
+     */
+    public function data(WebsiteContent $websiteContent)
+    {
+        try {
+            $this->authorize('view', $websiteContent);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            // Allow viewing for demo purposes
+        }
+        
+        $template = $this->templateService->getTemplateBySlug($websiteContent->template_slug);
+        $config = $this->templateService->getTemplateConfig($websiteContent->template_slug);
+        $processedContent = $this->processContentData($websiteContent->content_data, $config);
+        
+        return response()->json([
+            'websiteContent' => $websiteContent,
+            'template' => $template,
+            'config' => $config,
+            'processedContent' => $processedContent,
+            'lastUpdated' => $websiteContent->updated_at->toISOString()
+        ]);
+    }
+
+    /**
+     * Update preview content (for real-time editing)
+     */
+    public function update(Request $request, WebsiteContent $websiteContent)
+    {
+        try {
+            $this->authorize('update', $websiteContent);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // Validate content data
+        $contentData = $request->validate([
+            'content_data' => 'required|array',
+            'content_data.*' => 'nullable'
+        ]);
+        
+        // Validate against template config
+        $errors = $this->templateService->validateContentData(
+            $websiteContent->template_slug,
+            $contentData['content_data']
+        );
+        
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => $errors
+            ], 422);
+        }
+        
+        // Update content data
+        $websiteContent->update([
+            'content_data' => $contentData['content_data'],
+            'status' => 'previewed'
+        ]);
+        
+        // Get updated processed content
+        $config = $this->templateService->getTemplateConfig($websiteContent->template_slug);
+        $processedContent = $this->processContentData($websiteContent->content_data, $config);
+        
+        return response()->json([
+            'success' => true,
+            'websiteContent' => $websiteContent->fresh(),
+            'processedContent' => $processedContent
+        ]);
+    }
+
+    /**
+     * Process content data with fallbacks and transformations
+     */
+    private function processContentData(array $contentData, array $config): array
+    {
+        $processed = [];
+        
+        if (empty($config['fields'])) {
+            return $contentData;
+        }
+        
+        foreach ($config['fields'] as $field) {
+            $key = $field['key'];
+            $value = $contentData[$key] ?? null;
+            $type = $field['type'] ?? 'text';
+            
+            // Apply transformations based on field type
+            switch ($type) {
+                case 'image':
+                    $processed[$key] = $value ? asset("storage/{$value}") : ($field['default'] ?? null);
+                    break;
+                    
+                case 'image_multiple':
+                    if (is_array($value)) {
+                        $processed[$key] = array_map(fn($img) => asset("storage/{$img}"), $value);
+                    } else {
+                        $processed[$key] = [];
+                    }
+                    break;
+                    
+                case 'color':
+                    $processed[$key] = $value ?: ($field['default'] ?? '#000000');
+                    break;
+                    
+                case 'url':
+                    if ($value && !str_starts_with($value, 'http')) {
+                        $processed[$key] = "https://{$value}";
+                    } else {
+                        $processed[$key] = $value ?: ($field['default'] ?? '');
+                    }
+                    break;
+                    
+                case 'rich_text':
+                    $processed[$key] = $value ? clean($value) : ($field['default'] ?? '');
+                    break;
+                    
+                default:
+                    $processed[$key] = $value ?: ($field['default'] ?? '');
+                    break;
+            }
+        }
+        
+        return array_merge($contentData, $processed);
+    }
+
+    /**
+     * Get default content for a template
+     */
+    private function getDefaultContent(string $slug): array
+    {
+        if ($slug === 'corporate') {
+            return [
+                'company_name' => 'Demo Company',
+                'company_tagline' => 'Your Business Solution Partner',
+                'hero_title' => 'Solusi Bisnis Terbaik',
+                'hero_subtitle' => 'Kami memberikan layanan terbaik untuk mengembangkan bisnis Anda dengan teknologi modern dan tim profesional',
+                'primary_color' => '#2563eb',
+                'secondary_color' => '#64748b',
+                'accent_color' => '#f59e0b',
+                'contact_email' => 'info@democompany.com',
+                'contact_phone' => '+62 812-3456-7890',
+                'contact_address' => 'Jl. Contoh No. 123, Jakarta Pusat, DKI Jakarta 10010',
+                'whatsapp_enabled' => true,
+                'whatsapp_number' => '6281234567890',
+                'whatsapp_message' => 'Halo {company_name}, saya tertarik dengan layanan Anda dan ingin konsultasi lebih lanjut.',
+                'whatsapp_greeting_text' => 'Butuh bantuan? Chat dengan kami!',
+                'services' => [
+                    [
+                        'title' => 'Konsultasi Bisnis',
+                        'description' => 'Strategi dan perencanaan bisnis yang tepat sasaran untuk mengembangkan usaha Anda',
+                        'icon' => 'fas fa-chart-line'
+                    ],
+                    [
+                        'title' => 'Digital Marketing',
+                        'description' => 'Solusi digital marketing terpadu untuk meningkatkan penjualan dan brand awareness',
+                        'icon' => 'fas fa-laptop-code'
+                    ],
+                    [
+                        'title' => 'Pengembangan Website',
+                        'description' => 'Pembuatan website profesional dan responsif sesuai kebutuhan bisnis Anda',
+                        'icon' => 'fas fa-globe'
+                    ]
+                ]
+            ];
+        }
+        
+        return [];
+    }
+}
