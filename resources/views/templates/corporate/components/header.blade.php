@@ -469,18 +469,18 @@
     <div class="header-container">
         <div class="header-content">
             <!-- Brand/Logo -->
-            <a href="#home" class="brand" aria-label="Go to homepage">
+            <a href="#" class="brand" aria-label="Go to homepage">
                 @if($companyLogo)
                     <img 
-                        src="{{ asset('storage/' . $companyLogo) }}" 
-                        alt="{{ $companyName }} Logo"
+                        src="{{ $companyLogo }}" 
+                        alt="{{ $companyName }}"
                         class="brand-logo"
                         loading="eager"
                         decoding="async"
+                        style="max-width:80%"
                     >
                 @endif
-                
-                <span class="brand-text">{{ $companyName }}</span>
+                <!-- <span class="brand-text">{{ $companyName }}</span> -->
             </a>
 
             <!-- Desktop Navigation -->
@@ -492,7 +492,6 @@
                             class="nav-link {{ $item['active'] ? 'active' : '' }}"
                             {{ ($item['external'] ?? false) ? 'target="_blank" rel="noopener noreferrer"' : '' }}
                             data-nav-item="{{ $index }}"
-                            onclick="trackNavClick('{{ $item['label'] }}', '{{ $item['href'] }}')"
                         >
                             {{ $item['label'] }}
                             @if($item['external'] ?? false)
@@ -552,7 +551,7 @@
                             class="nav-mobile-link {{ $item['active'] ? 'active' : '' }}"
                             {{ ($item['external'] ?? false) ? 'target="_blank" rel="noopener noreferrer"' : '' }}
                             data-nav-item="mobile-{{ $index }}"
-                            onclick="closeMobileMenu(); trackNavClick('{{ $item['label'] }}', '{{ $item['href'] }}', 'mobile')"
+                            onclick="closeMobileMenu()"
                         >
                             <span>{{ $item['label'] }}</span>
                             @if($item['external'] ?? false)
@@ -685,11 +684,6 @@
                 mobileToggle.focus();
             }
 
-            // Track menu toggle
-            trackCustomEvent('mobile_menu_toggle', {
-                action: isMenuOpen ? 'open' : 'close',
-                company_name: '{{ $companyName }}'
-            });
         }
 
         // Close mobile menu
@@ -786,39 +780,6 @@
         // Initialize active navigation
         updateActiveNavigation();
     });
-
-    // Analytics tracking functions
-    function trackNavClick(label, href, device = 'desktop') {
-        if (typeof trackCustomEvent !== 'undefined') {
-            trackCustomEvent('navigation_click', {
-                nav_label: label,
-                nav_href: href,
-                device_type: device,
-                company_name: '{{ $companyName }}'
-            });
-        }
-    }
-
-    function trackCTAClick(location, text) {
-        if (typeof trackCustomEvent !== 'undefined') {
-            trackCustomEvent('cta_click', {
-                cta_location: location,
-                cta_text: text,
-                company_name: '{{ $companyName }}'
-            });
-        }
-    }
-
-    function trackContactClick(type, value) {
-        if (typeof trackCustomEvent !== 'undefined') {
-            trackCustomEvent('contact_click', {
-                contact_type: type,
-                contact_value: value,
-                source: 'header',
-                company_name: '{{ $companyName }}'
-            });
-        }
-    }
 
     // Resize handler for responsive behavior
     window.addEventListener('resize', function() {

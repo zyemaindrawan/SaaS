@@ -41,6 +41,11 @@
         'config' => $config
     ])
 
+    @include('templates.corporate.components.footer', [
+        'content' => $content,
+        'config' => $config
+    ])
+
     @include('templates.corporate.components.whatsapp-float', [
         'content' => $content,
         'config' => $config

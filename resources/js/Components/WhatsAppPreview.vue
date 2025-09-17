@@ -92,7 +92,7 @@ const phoneNumber = ref(props.modelValue?.whatsapp_number || '')
 const message = ref(props.modelValue?.whatsapp_message || 'Halo {company_name}, saya tertarik dengan layanan Anda')
 const position = ref(props.modelValue?.whatsapp_position || 'bottom-right')
 const color = ref(props.modelValue?.whatsapp_color || '#25D366')
-const greetingText = ref(props.modelValue?.whatsapp_greeting_text || 'Butuh bantuan? Chat dengan kami!')
+const greetingText = ref(props.modelValue?.whatsapp_greeting_text || 'Chat Us')
 
 // Update parent component
 const updateConfig = () => {

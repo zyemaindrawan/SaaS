@@ -329,12 +329,28 @@ class PreviewController extends Controller
             // Apply transformations based on field type
             switch ($type) {
                 case 'image':
-                    $processed[$key] = $value ? asset("storage/{$value}") : ($field['default'] ?? null);
+                    if ($value) {
+                        // Check if it's an external URL (starts with http/https)
+                        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                            $processed[$key] = $value; // Use external URL as-is
+                        } else {
+                            $processed[$key] = asset("storage/{$value}"); // Local storage file
+                        }
+                    } else {
+                        $processed[$key] = $field['default'] ?? null;
+                    }
                     break;
                     
                 case 'image_multiple':
                     if (is_array($value)) {
-                        $processed[$key] = array_map(fn($img) => asset("storage/{$img}"), $value);
+                        $processed[$key] = array_map(function($img) {
+                            // Check if it's an external URL (starts with http/https)
+                            if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
+                                return $img; // Use external URL as-is
+                            } else {
+                                return asset("storage/{$img}"); // Local storage file
+                            }
+                        }, $value);
                     } else {
                         $processed[$key] = [];
                     }
@@ -353,7 +369,7 @@ class PreviewController extends Controller
                     break;
                     
                 case 'rich_text':
-                    $processed[$key] = $value ? clean($value) : ($field['default'] ?? '');
+                    $processed[$key] = $value ? strip_tags($value, '<p><br><strong><em><ul><ol><li><a><h1><h2><h3><h4><h5><h6>') : ($field['default'] ?? '');
                     break;
                     
                 default:

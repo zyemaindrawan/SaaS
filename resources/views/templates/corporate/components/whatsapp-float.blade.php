@@ -15,7 +15,7 @@
     // Styling and positioning
     $position = $content['whatsapp_position'] ?? 'bottom-right';
     $whatsappColor = $content['whatsapp_color'] ?? '#25D366';
-    $greetingText = $content['whatsapp_greeting_text'] ?? 'Butuh bantuan? Chat dengan kami!';
+    $greetingText = $content['whatsapp_greeting_text'] ?? 'Chat Us';
     $showGreeting = $content['whatsapp_show_greeting'] ?? true;
     $autoShow = $content['whatsapp_auto_show'] ?? false;
     $autoShowDelay = $content['whatsapp_auto_show_delay'] ?? 30; // seconds
@@ -857,34 +857,4 @@
         startChat: startWhatsAppChat,
         showGreeting: showGreeting
     };
-</script>
-
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "CustomerService",
-    "serviceType": "WhatsApp Customer Support",
-    "provider": {
-        "@type": "Organization",
-        "name": "{{ $companyName }}"
-    },
-    "availableChannel": {
-        "@type": "ServiceChannel",
-        "serviceUrl": "{{ $whatsappUrl }}",
-        "serviceName": "WhatsApp Chat",
-        "servicePhone": "{{ $whatsappNumber }}"
-    }
-    @if(!empty($workingHours))
-    ,"hoursAvailable": [
-        @foreach($workingHours as $day => $hours)
-            {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": "{{ ucfirst($day) }}",
-                "opens": "{{ explode('-', $hours)[0] ?? '09:00' }}",
-                "closes": "{{ explode('-', $hours)[1] ?? '17:00' }}"
-            }{{ !$loop->last ? ',' : '' }}
-        @endforeach
-    ]
-    @endif
-}
 </script>

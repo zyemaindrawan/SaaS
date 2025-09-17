@@ -1,682 +1,1255 @@
 @php
-    // Get hero configuration from content
-    $heroTitle = $content['hero_title'] ?? 'Solusi Bisnis Terbaik';
-    $heroSubtitle = $content['hero_subtitle'] ?? 'Kami memberikan layanan terbaik untuk mengembangkan bisnis Anda';
-    $heroBackground = $content['hero_background'] ?? null;
-    $heroCtaText = $content['hero_cta_text'] ?? 'Pelajari Lebih Lanjut';
-    $heroCtaLink = $content['hero_cta_link'] ?? '#services';
-    $heroSecondaryCtaText = $content['hero_secondary_cta_text'] ?? '';
-    $heroSecondaryCtaLink = $content['hero_secondary_cta_link'] ?? '';
+    // Get analytics configuration from content
+    $googleAnalytics = $content['google_analytics'] ?? '';
+    $googleTagManager = $content['google_tag_manager'] ?? '';
+    $facebookPixel = $content['facebook_pixel'] ?? '';
+    $hotjarId = $content['hotjar_id'] ?? '';
+    $microsoftClarity = $content['microsoft_clarity'] ?? '';
+    $linkedInInsight = $content['linkedin_insight'] ?? '';
+    $tiktokPixel = $content['tiktok_pixel'] ?? '';
+    $snapchatPixel = $content['snapchat_pixel'] ?? '';
+    $pinterestPixel = $content['pinterest_pixel'] ?? '';
     
-    // Colors and styling
-    $primaryColor = $content['primary_color'] ?? '#2563eb';
-    $accentColor = $content['accent_color'] ?? '#f59e0b';
-    $secondaryColor = $content['secondary_color'] ?? '#64748b';
-    
-    // Hero style options
-    $heroStyle = $content['hero_style'] ?? 'gradient'; // gradient, image, video, particles
-    $heroHeight = $content['hero_height'] ?? 'fullscreen'; // fullscreen, large, medium, small
-    $heroAlignment = $content['hero_alignment'] ?? 'center'; // left, center, right
-    $heroOverlay = $content['hero_overlay'] ?? true;
-    $heroParallax = $content['hero_parallax'] ?? false;
-    
-    // Animation settings
-    $heroAnimation = $content['hero_animation'] ?? 'fade-up'; // fade-up, slide-left, slide-right, none
-    
-    // Company info for dynamic content
+    // Website and company information
     $companyName = $content['company_name'] ?? 'Your Company';
-    $contactPhone = $content['contact_phone'] ?? '';
+    $websiteId = $websiteContent->id ?? null;
+    $userId = $websiteContent->user_id ?? null;
+    $templateSlug = $websiteContent->template_slug ?? 'corporate';
+    $currentUrl = url()->current();
+    $pageTitle = $content['seo_title'] ?? ($content['hero_title'] ?? $companyName);
+    $pageCategory = 'SaaS Website';
+    $contentGroup = $templateSlug;
     
-    // Statistics/numbers to display (optional)
-    $heroStats = $content['hero_stats'] ?? [];
+    // Enhanced tracking settings
+    $enableEcommerce = $content['enable_ecommerce_tracking'] ?? false;
+    $enableScrollTracking = $content['enable_scroll_tracking'] ?? true;
+    $enableClickTracking = $content['enable_click_tracking'] ?? true;
+    $enableFormTracking = $content['enable_form_tracking'] ?? true;
+    $enableFileDownloadTracking = $content['enable_download_tracking'] ?? true;
+    $enableVideoTracking = $content['enable_video_tracking'] ?? true;
+    $enableSearchTracking = $content['enable_search_tracking'] ?? true;
+    $enableCustomDimensions = $content['enable_custom_dimensions'] ?? true;
     
-    // Determine height class
-    $heightClass = match($heroHeight) {
-        'fullscreen' => 'min-h-screen',
-        'large' => 'min-h-[80vh]',
-        'medium' => 'min-h-[60vh]',
-        'small' => 'min-h-[40vh]',
-        default => 'min-h-screen'
-    };
+    // Performance and debugging
+    $debugMode = app()->environment(['local', 'development']) && ($preview_mode ?? false);
+    $analyticsConsent = 'granted'; // This should come from cookie consent
     
-    // Determine text alignment class
-    $alignmentClass = match($heroAlignment) {
-        'left' => 'text-left items-start',
-        'right' => 'text-right items-end',
-        default => 'text-center items-center'
-    };
+    // Custom events configuration
+    $customEvents = $content['custom_tracking_events'] ?? [];
+    
+    // A/B testing
+    $enableAbTesting = $content['enable_ab_testing'] ?? false;
+    $abTestingVariant = $content['ab_testing_variant'] ?? 'A';
 @endphp
 
-<!-- Hero Section Styles -->
-<style>
-    .hero-section {
-        position: relative;
-        overflow: hidden;
-        background-attachment: {{ $heroParallax ? 'fixed' : 'scroll' }};
-    }
-
-    .hero-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 0;
-    }
-
-    .hero-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 1;
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 2;
-    }
-
-    /* Background Styles */
-    .hero-gradient {
-        background: linear-gradient(135deg, {{ $primaryColor }}, {{ $accentColor }});
-    }
-
-    .hero-image {
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        @if($heroBackground)
-            background-image: url('{{ asset('storage/' . $heroBackground) }}');
-        @endif
-    }
-
-    /* Overlay Styles */
-    .hero-overlay-dark {
-        background: rgba(0, 0, 0, 0.5);
-    }
-
-    .hero-overlay-gradient {
-        background: linear-gradient(
-            135deg,
-            rgba(37, 99, 235, 0.8) 0%,
-            rgba(249, 158, 11, 0.6) 100%
-        );
-    }
-
-    /* Animation Classes */
-    .animate-fade-up {
-        opacity: 0;
-        transform: translateY(30px);
-        animation: fadeUp 0.8s ease-out 0.2s forwards;
-    }
-
-    .animate-fade-up-delay {
-        opacity: 0;
-        transform: translateY(30px);
-        animation: fadeUp 0.8s ease-out 0.6s forwards;
-    }
-
-    .animate-slide-left {
-        opacity: 0;
-        transform: translateX(-50px);
-        animation: slideLeft 0.8s ease-out 0.4s forwards;
-    }
-
-    .animate-slide-right {
-        opacity: 0;
-        transform: translateX(50px);
-        animation: slideRight 0.8s ease-out 0.4s forwards;
-    }
-
-    @keyframes fadeUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes slideLeft {
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes slideRight {
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    /* Hero Title Styling */
-    .hero-title {
-        font-size: clamp(2.5rem, 6vw, 4.5rem);
-        line-height: 1.1;
-        font-weight: 800;
-        color: white;
-        margin-bottom: 1.5rem;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .hero-subtitle {
-        font-size: clamp(1.125rem, 3vw, 1.5rem);
-        line-height: 1.6;
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 2.5rem;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* CTA Button Styles */
-    .hero-cta-primary {
-        display: inline-flex;
-        align-items: center;
-        padding: 1rem 2rem;
-        background: white;
-        color: {{ $primaryColor }};
-        font-weight: 600;
-        font-size: 1.1rem;
-        border-radius: 0.75rem;
-        text-decoration: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        transform: translateY(0);
-    }
-
-    .hero-cta-primary:hover {
-        color: {{ $primaryColor }};
-        text-decoration: none;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    .hero-cta-secondary {
-        display: inline-flex;
-        align-items: center;
-        padding: 1rem 2rem;
-        background: transparent;
-        color: white;
-        font-weight: 600;
-        font-size: 1.1rem;
-        border: 2px solid white;
-        border-radius: 0.75rem;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        margin-left: 1rem;
-    }
-
-    .hero-cta-secondary:hover {
-        background: white;
-        color: {{ $primaryColor }};
-        text-decoration: none;
-    }
-
-    /* Stats Styling */
-    .hero-stats {
-        display: flex;
-        justify-content: center;
-        gap: 3rem;
-        margin-top: 3rem;
-        flex-wrap: wrap;
-    }
-
-    .hero-stat-item {
-        text-align: center;
-        color: white;
-    }
-
-    .hero-stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        line-height: 1;
-        margin-bottom: 0.5rem;
-        color: {{ $accentColor }};
-    }
-
-    .hero-stat-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        opacity: 0.9;
-    }
-
-    /* Scroll Indicator */
-    .scroll-indicator {
-        position: absolute;
-        bottom: 2rem;
-        left: 50%;
-        transform: translateX(-50%);
-        color: white;
-        opacity: 0.8;
-        animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {
-            transform: translateX(-50%) translateY(0);
-        }
-        40% {
-            transform: translateX(-50%) translateY(-10px);
-        }
-        60% {
-            transform: translateX(-50%) translateY(-5px);
-        }
-    }
-
-    /* Floating Elements */
-    .hero-floating-element {
-        position: absolute;
-        opacity: 0.1;
-        pointer-events: none;
-    }
-
-    .hero-floating-1 {
-        top: 20%;
-        left: 10%;
-        width: 100px;
-        height: 100px;
-        background: white;
-        border-radius: 50%;
-        animation: float 6s ease-in-out infinite;
-    }
-
-    .hero-floating-2 {
-        top: 60%;
-        right: 15%;
-        width: 150px;
-        height: 150px;
-        background: {{ $accentColor }};
-        border-radius: 50%;
-        animation: float 8s ease-in-out infinite reverse;
-    }
-
-    .hero-floating-3 {
-        bottom: 30%;
-        left: 20%;
-        width: 80px;
-        height: 80px;
-        background: white;
-        border-radius: 30%;
-        animation: float 7s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(0) rotate(0deg);
-        }
-        50% {
-            transform: translateY(-20px) rotate(180deg);
-        }
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        .hero-subtitle {
-            margin-bottom: 2rem;
-        }
-
-        .hero-cta-secondary {
-            margin-left: 0;
-            margin-top: 1rem;
-        }
-
-        .hero-stats {
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .hero-stat-number {
-            font-size: 2rem;
-        }
-
-        .hero-section {
-            background-attachment: scroll;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .hero-cta-primary,
-        .hero-cta-secondary {
-            padding: 0.875rem 1.5rem;
-            font-size: 1rem;
-            display: block;
-            text-align: center;
-            width: 100%;
-            max-width: 280px;
-        }
-
-        .hero-stats {
-            gap: 1.5rem;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .hero-stat-item {
-            min-width: 120px;
-        }
-    }
-
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-        .hero-title {
-            color: #f9fafb;
-        }
+{{-- Google Analytics 4 (if enabled and no GTM) --}}
+@if(!empty($googleAnalytics) && empty($googleTagManager))
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $googleAnalytics }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
         
-        .hero-subtitle {
-            color: rgba(249, 250, 251, 0.8);
-        }
-    }
-
-    /* High contrast mode */
-    @media (prefers-contrast: high) {
-        .hero-title,
-        .hero-subtitle {
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-        }
-
-        .hero-cta-primary,
-        .hero-cta-secondary {
-            border: 3px solid;
-        }
-    }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-        .animate-fade-up,
-        .animate-fade-up-delay,
-        .animate-slide-left,
-        .animate-slide-right,
-        .scroll-indicator,
-        .hero-floating-element {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-        }
-    }
-</style>
-
-<!-- Hero Section -->
-<section 
-    id="home" 
-    class="hero-section {{ $heightClass }} relative flex {{ $alignmentClass }} justify-center"
-    role="banner"
-    aria-labelledby="hero-title"
->
-    <!-- Background -->
-    <div class="hero-background">
-        @if($heroStyle === 'image' && $heroBackground)
-            <div class="hero-image absolute inset-0"></div>
-        @elseif($heroStyle === 'gradient' || !$heroBackground)
-            <div class="hero-gradient absolute inset-0"></div>
-        @endif
+        // Set default consent state
+        gtag('consent', 'default', {
+            'analytics_storage': '{{ $analyticsConsent }}',
+            'ad_storage': '{{ $analyticsConsent }}',
+            'ad_user_data': '{{ $analyticsConsent }}',
+            'ad_personalization': '{{ $analyticsConsent }}',
+            'personalization_storage': '{{ $analyticsConsent }}',
+            'functionality_storage': 'granted',
+            'security_storage': 'granted'
+        });
         
-        <!-- Floating Elements -->
-        <div class="hero-floating-element hero-floating-1"></div>
-        <div class="hero-floating-element hero-floating-2"></div>
-        <div class="hero-floating-element hero-floating-3"></div>
-    </div>
-
-    <!-- Overlay -->
-    @if($heroOverlay)
-        <div class="hero-overlay {{ $heroBackground ? 'hero-overlay-dark' : 'hero-overlay-gradient' }}"></div>
-    @endif
-
-    <!-- Content -->
-    <div class="hero-content container mx-auto px-6 lg:px-8 flex flex-col {{ $alignmentClass }} justify-center {{ $heightClass }}">
-        <div class="max-w-4xl {{ $heroAlignment === 'center' ? 'mx-auto' : '' }}">
-            <!-- Title -->
-            <h1 
-                id="hero-title"
-                class="hero-title {{ $heroAnimation === 'fade-up' ? 'animate-fade-up' : ($heroAnimation === 'slide-left' ? 'animate-slide-left' : ($heroAnimation === 'slide-right' ? 'animate-slide-right' : '')) }}"
-            >
-                {{ $heroTitle }}
-            </h1>
-
-            <!-- Subtitle -->
-            @if($heroSubtitle)
-                <p class="hero-subtitle {{ $heroAnimation === 'fade-up' ? 'animate-fade-up-delay' : ($heroAnimation === 'slide-left' ? 'animate-slide-left' : ($heroAnimation === 'slide-right' ? 'animate-slide-right' : '')) }}">
-                    {{ $heroSubtitle }}
-                </p>
+        gtag('js', new Date());
+        gtag('config', '{{ $googleAnalytics }}', {
+            page_title: '{{ $pageTitle }}',
+            page_location: '{{ $currentUrl }}',
+            send_page_view: true,
+            
+            // Enhanced measurement settings
+            enhanced_measurements: {
+                scrolls: {{ $enableScrollTracking ? 'true' : 'false' }},
+                outbound_clicks: {{ $enableClickTracking ? 'true' : 'false' }},
+                site_search: {{ $enableSearchTracking ? 'true' : 'false' }},
+                video_engagement: {{ $enableVideoTracking ? 'true' : 'false' }},
+                file_downloads: {{ $enableFileDownloadTracking ? 'true' : 'false' }}
+            },
+            
+            @if($enableCustomDimensions)
+            // Custom dimensions
+            custom_map: {
+                'custom_parameter_1': 'company_name',
+                'custom_parameter_2': 'template_name',
+                'custom_parameter_3': 'website_id',
+                'custom_parameter_4': 'user_id',
+                'custom_parameter_5': 'page_category',
+                'custom_parameter_6': 'ab_variant'
+            },
             @endif
-
-            <!-- Call to Action Buttons -->
-            <div class="flex flex-col sm:flex-row {{ $heroAlignment === 'center' ? 'justify-center' : ($heroAlignment === 'right' ? 'justify-end' : 'justify-start') }} gap-4 mb-8 {{ $heroAnimation === 'fade-up' ? 'animate-fade-up-delay' : '' }}">
-                <!-- Primary CTA -->
-                <a 
-                    href="{{ $heroCtaLink }}"
-                    class="hero-cta-primary group"
-                    onclick="trackHeroCTA('primary', '{{ $heroCtaText }}', '{{ $heroCtaLink }}')"
-                    @if(str_starts_with($heroCtaLink, 'http'))
-                        target="_blank" rel="noopener noreferrer"
-                    @endif
-                >
-                    <span>{{ $heroCtaText }}</span>
-                    <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                    </svg>
-                </a>
-
-                <!-- Secondary CTA -->
-                @if($heroSecondaryCtaText && $heroSecondaryCtaLink)
-                    <a 
-                        href="{{ $heroSecondaryCtaLink }}"
-                        class="hero-cta-secondary group"
-                        onclick="trackHeroCTA('secondary', '{{ $heroSecondaryCtaText }}', '{{ $heroSecondaryCtaLink }}')"
-                        @if(str_starts_with($heroSecondaryCtaLink, 'http'))
-                            target="_blank" rel="noopener noreferrer"
-                        @endif
-                    >
-                        <span>{{ $heroSecondaryCtaText }}</span>
-                        <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h6m-3-3v6"></path>
-                        </svg>
-                    </a>
-                @elseif($contactPhone)
-                    <a 
-                        href="tel:{{ $contactPhone }}"
-                        class="hero-cta-secondary group"
-                        onclick="trackHeroCTA('phone', 'Hubungi Kami', 'tel:{{ $contactPhone }}')"
-                    >
-                        <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                        </svg>
-                        <span>Hubungi Kami</span>
-                    </a>
+            
+            // Advanced settings
+            cookie_domain: 'auto',
+            cookie_expires: 63072000, // 2 years
+            cookie_update: true,
+            anonymize_ip: true,
+            allow_google_signals: true,
+            allow_ad_personalization_signals: true,
+            
+            // User properties
+            user_properties: {
+                company_name: '{{ $companyName }}',
+                template_type: '{{ $templateSlug }}',
+                website_tier: 'saas_generated',
+                @if($enableAbTesting)
+                ab_variant: '{{ $abTestingVariant }}',
                 @endif
-            </div>
-
-            <!-- Hero Statistics -->
-            @if(!empty($heroStats) && is_array($heroStats))
-                <div class="hero-stats {{ $heroAnimation === 'fade-up' ? 'animate-fade-up-delay' : '' }}">
-                    @foreach($heroStats as $stat)
-                        @if(!empty($stat['number']) && !empty($stat['label']))
-                            <div class="hero-stat-item">
-                                <div class="hero-stat-number">{{ $stat['number'] }}</div>
-                                <div class="hero-stat-label">{{ $stat['label'] }}</div>
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
+                signup_date: '{{ $websiteContent->created_at ?? now()->format('Y-m-d') }}',
+                user_segment: 'small_business'
+            },
+            
+            @if($debugMode)
+            debug_mode: true,
             @endif
-
-            <!-- Trust Indicators -->
-            @if(!empty($content['hero_trust_badges']) && is_array($content['hero_trust_badges']))
-                <div class="flex justify-center items-center space-x-8 mt-12 opacity-70">
-                    @foreach($content['hero_trust_badges'] as $badge)
-                        @if(!empty($badge['image']))
-                            <img 
-                                src="{{ asset('storage/' . $badge['image']) }}" 
-                                alt="{{ $badge['alt'] ?? 'Trust badge' }}"
-                                class="h-8 md:h-12 grayscale hover:grayscale-0 transition-all duration-300"
-                                loading="lazy"
-                            >
-                        @endif
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Scroll Indicator -->
-    @if($heroHeight === 'fullscreen')
-        <div class="scroll-indicator">
-            <a 
-                href="#{{ !empty($content['services']) ? 'services' : (!empty($content['about_content']) ? 'about' : 'contact') }}"
-                class="text-white hover:text-{{ $accentColor }} transition-colors"
-                aria-label="Scroll to next section"
-                onclick="trackScrollIndicator()"
-            >
-                <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                </svg>
-                <div class="text-sm font-medium">Scroll</div>
-            </a>
-        </div>
-    @endif
-</section>
-
-<!-- Hero JavaScript -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-in');
-                }
-            });
-        }, observerOptions);
-
-        // Observe animated elements
-        document.querySelectorAll('[class*="animate-"]').forEach(el => {
-            observer.observe(el);
         });
-
-        // Parallax effect for hero background (if enabled)
-        @if($heroParallax && !empty($heroBackground))
-        let ticking = false;
         
-        function updateParallax() {
-            const scrolled = window.pageYOffset;
-            const parallaxElements = document.querySelectorAll('.hero-background');
-            
-            parallaxElements.forEach(element => {
-                const speed = 0.5;
-                element.style.transform = `translateY(${scrolled * speed}px)`;
-            });
-            
-            ticking = false;
-        }
-
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                requestAnimationFrame(updateParallax);
-                ticking = true;
-            }
+        // Send enhanced page view with custom data
+        gtag('event', 'page_view', {
+            page_title: '{{ $pageTitle }}',
+            page_location: '{{ $currentUrl }}',
+            page_referrer: document.referrer,
+            company_name: '{{ $companyName }}',
+            template_name: '{{ $templateSlug }}',
+            website_id: '{{ $websiteId }}',
+            user_id: '{{ $userId }}',
+            content_group1: '{{ $pageCategory }}',
+            content_group2: '{{ $contentGroup }}',
+            content_group3: '{{ $companyName }}',
+            @if($enableAbTesting)
+            ab_variant: '{{ $abTestingVariant }}',
+            @endif
+            page_load_time: 0, // Will be updated by performance script
+            session_start: true,
+            engagement_time_msec: 0,
+            send_to: '{{ $googleAnalytics }}'
+        });
+        
+        @if($enableEcommerce)
+        // Enhanced ecommerce setup
+        gtag('config', '{{ $googleAnalytics }}', {
+            enhanced_conversions: true,
+            conversion_linker: true
         });
         @endif
+        
+        @if($debugMode)
+        console.log('Google Analytics 4 initialized:', '{{ $googleAnalytics }}');
+        @endif
+    </script>
+    <!-- End Google Analytics 4 -->
+@endif
 
-        // Dynamic text animation (typewriter effect)
-        const heroTitle = document.getElementById('hero-title');
-        if (heroTitle && {{ !empty($content['hero_typewriter']) ? 'true' : 'false' }}) {
-            const originalText = heroTitle.textContent;
-            heroTitle.textContent = '';
+{{-- Google Tag Manager Scripts (if GTM is used instead of direct GA4) --}}
+@if(!empty($googleTagManager))
+    <script>
+        // Enhanced dataLayer with comprehensive data
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'gtm.dom',
+            'company_name': '{{ $companyName }}',
+            'template_name': '{{ $templateSlug }}',
+            'website_id': '{{ $websiteId }}',
+            'user_id': '{{ $userId }}',
+            'page_type': 'saas_website',
+            'page_category': '{{ $pageCategory }}',
+            'page_template': '{{ $templateSlug }}',
+            'content_group1': '{{ $pageCategory }}',
+            'content_group2': '{{ $contentGroup }}',
+            'content_group3': '{{ $companyName }}',
+            'business_type': 'small_business',
+            'website_tier': 'saas_generated',
+            'creation_date': '{{ $websiteContent->created_at ?? now()->format('Y-m-d') }}',
+            @if($enableAbTesting)
+            'ab_variant': '{{ $abTestingVariant }}',
+            'ab_test_name': 'template_variant_test',
+            @endif
+            'user_properties': {
+                'company_name': '{{ $companyName }}',
+                'template_type': '{{ $templateSlug }}',
+                'signup_method': 'website_builder'
+            }
+        });
+        
+        @if($debugMode)
+        console.log('Google Tag Manager dataLayer initialized with enhanced data');
+        @endif
+    </script>
+@endif
+
+{{-- Facebook Pixel --}}
+@if(!empty($facebookPixel))
+    <!-- Facebook Pixel Code -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        
+        fbq('consent', '{{ $analyticsConsent }}');
+        fbq('init', '{{ $facebookPixel }}');
+        fbq('track', 'PageView', {
+            content_name: '{{ $pageTitle }}',
+            content_category: '{{ $templateSlug }}',
+            content_type: 'website',
+            company_name: '{{ $companyName }}',
+            template_type: '{{ $templateSlug }}',
+            website_id: '{{ $websiteId }}',
+            @if($enableAbTesting)
+            ab_variant: '{{ $abTestingVariant }}',
+            @endif
+            value: 0,
+            currency: 'IDR'
+        });
+        
+        // Enhanced tracking events
+        fbq('trackCustom', 'WebsiteGenerated', {
+            company_name: '{{ $companyName }}',
+            template_used: '{{ $templateSlug }}',
+            website_tier: 'saas_generated'
+        });
+        
+        @if($debugMode)
+        console.log('Facebook Pixel initialized:', '{{ $facebookPixel }}');
+        @endif
+    </script>
+    <!-- End Facebook Pixel Code -->
+@endif
+
+{{-- Microsoft Clarity --}}
+@if(!empty($microsoftClarity))
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "{{ $microsoftClarity }}");
+        
+        // Enhanced identify with custom data
+        clarity('identify', '{{ $websiteId }}', '{{ $companyName }}', '{{ $templateSlug }}', {
+            customUserId: '{{ $userId }}',
+            websiteType: 'saas_generated',
+            templateName: '{{ $templateSlug }}',
+            companyName: '{{ $companyName }}',
+            creationDate: '{{ $websiteContent->created_at ?? now()->format('Y-m-d') }}',
+            @if($enableAbTesting)
+            abVariant: '{{ $abTestingVariant }}',
+            @endif
+            businessCategory: 'small_business'
+        });
+        
+        // Set custom tags
+        clarity('set', 'template_type', '{{ $templateSlug }}');
+        clarity('set', 'company_name', '{{ $companyName }}');
+        clarity('set', 'website_tier', 'saas');
+        @if($enableAbTesting)
+        clarity('set', 'ab_variant', '{{ $abTestingVariant }}');
+        @endif
+        
+        @if($debugMode)
+        console.log('Microsoft Clarity initialized:', '{{ $microsoftClarity }}');
+        @endif
+    </script>
+    <!-- End Microsoft Clarity -->
+@endif
+
+{{-- LinkedIn Insight Tag --}}
+@if(!empty($linkedInInsight))
+    <!-- LinkedIn Insight Tag -->
+    <script type="text/javascript">
+        _linkedin_partner_id = "{{ $linkedInInsight }}";
+        window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+        window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+    </script>
+    
+    <script type="text/javascript">
+        (function(l) {
+            if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+            window.lintrk.q=[]}
+            var s = document.getElementsByTagName("script")[0];
+            var b = document.createElement("script");
+            b.type = "text/javascript";b.async = true;
+            b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+            s.parentNode.insertBefore(b, s);
+        })(window.lintrk);
+        
+        // Enhanced tracking
+        lintrk('track', { conversion_id: {{ $linkedInInsight }} });
+        
+        @if($debugMode)
+        console.log('LinkedIn Insight Tag initialized:', '{{ $linkedInInsight }}');
+        @endif
+    </script>
+    <!-- End LinkedIn Insight Tag -->
+@endif
+
+{{-- TikTok Pixel --}}
+@if(!empty($tiktokPixel))
+    <!-- TikTok Pixel Code -->
+    <script>
+        !function (w, d, t) {
+            w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+            ttq.load('{{ $tiktokPixel }}');
+            ttq.page();
             
-            let i = 0;
-            function typeWriter() {
-                if (i < originalText.length) {
-                    heroTitle.textContent += originalText.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, 100);
-                }
+            // Enhanced tracking
+            ttq.track('ViewContent', {
+                content_type: 'website',
+                content_name: '{{ $pageTitle }}',
+                content_category: '{{ $templateSlug }}',
+                company_name: '{{ $companyName }}',
+                template_type: '{{ $templateSlug }}'
+            });
+        }(window, document, 'ttq');
+        
+        @if($debugMode)
+        console.log('TikTok Pixel initialized:', '{{ $tiktokPixel }}');
+        @endif
+    </script>
+    <!-- End TikTok Pixel Code -->
+@endif
+
+{{-- Snapchat Pixel --}}
+@if(!empty($snapchatPixel))
+    <!-- Snapchat Pixel -->
+    <script type='text/javascript'>
+        (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+        {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+        a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+        r.src=n;var u=t.getElementsByTagName(s)[0];
+        u.parentNode.insertBefore(r,u);})(window,document,
+        'https://sc-static.net/scevent.min.js');
+
+        snaptr('init', '{{ $snapchatPixel }}', {
+            'user_email': '__INSERT_USER_EMAIL__'
+        });
+
+        snaptr('track', 'PAGE_VIEW');
+        
+        @if($debugMode)
+        console.log('Snapchat Pixel initialized:', '{{ $snapchatPixel }}');
+        @endif
+    </script>
+    <!-- End Snapchat Pixel -->
+@endif
+
+{{-- Pinterest Pixel --}}
+@if(!empty($pinterestPixel))
+    <!-- Pinterest Pixel -->
+    <script type="text/javascript">
+        !function(e){if(!window.pintrk){window.pintrk = function () {
+        window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
+        n=window.pintrk;n.queue=[],n.version="3.0";var
+        t=document.createElement("script");t.async=!0,t.src=e;var
+        r=document.getElementsByTagName("script")[0];
+        r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+        
+        pintrk('load', '{{ $pinterestPixel }}', {
+            em: '__INSERT_USER_EMAIL__'
+        });
+        pintrk('page');
+        
+        @if($debugMode)
+        console.log('Pinterest Pixel initialized:', '{{ $pinterestPixel }}');
+        @endif
+    </script>
+    <!-- End Pinterest Pixel -->
+@endif
+
+{{-- Enhanced Custom Event Tracking System --}}
+<script>
+    // Enhanced Custom Event Tracking System
+    (function() {
+        'use strict';
+        
+        // Configuration
+        const analyticsConfig = {
+            companyName: '{{ $companyName }}',
+            websiteId: '{{ $websiteId }}',
+            userId: '{{ $userId }}',
+            templateSlug: '{{ $templateSlug }}',
+            pageCategory: '{{ $pageCategory }}',
+            contentGroup: '{{ $contentGroup }}',
+            @if($enableAbTesting)
+            abVariant: '{{ $abTestingVariant }}',
+            @endif
+            enableScrollTracking: {{ $enableScrollTracking ? 'true' : 'false' }},
+            enableClickTracking: {{ $enableClickTracking ? 'true' : 'false' }},
+            enableFormTracking: {{ $enableFormTracking ? 'true' : 'false' }},
+            enableDownloadTracking: {{ $enableFileDownloadTracking ? 'true' : 'false' }},
+            enableVideoTracking: {{ $enableVideoTracking ? 'true' : 'false' }},
+            enableSearchTracking: {{ $enableSearchTracking ? 'true' : 'false' }},
+            debugMode: {{ $debugMode ? 'true' : 'false' }}
+        };
+        
+        // Enhanced tracking functions
+        window.trackEvent = function(eventName, eventData = {}) {
+            const timestamp = new Date().toISOString();
+            const baseData = {
+                company_name: analyticsConfig.companyName,
+                website_id: analyticsConfig.websiteId,
+                user_id: analyticsConfig.userId,
+                template_slug: analyticsConfig.templateSlug,
+                page_category: analyticsConfig.pageCategory,
+                content_group: analyticsConfig.contentGroup,
+                @if($enableAbTesting)
+                ab_variant: analyticsConfig.abVariant,
+                @endif
+                timestamp: timestamp,
+                page_url: window.location.href,
+                page_title: document.title,
+                user_agent: navigator.userAgent,
+                viewport_width: window.innerWidth,
+                viewport_height: window.innerHeight,
+                screen_resolution: `${screen.width}x${screen.height}`,
+                color_depth: screen.colorDepth,
+                language: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                connection_type: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+                device_memory: navigator.deviceMemory || 'unknown',
+                hardware_concurrency: navigator.hardwareConcurrency || 'unknown'
+            };
+            
+            const fullEventData = { ...baseData, ...eventData };
+            
+            // Google Analytics 4
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, {
+                    event_category: eventData.category || 'Custom',
+                    event_label: eventData.label || '',
+                    value: eventData.value || 0,
+                    currency: eventData.currency || 'IDR',
+                    ...fullEventData
+                });
             }
             
-            setTimeout(typeWriter, 500);
-        }
+            // Facebook Pixel
+            @if(!empty($facebookPixel))
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'CustomEvent', {
+                    event_name: eventName,
+                    ...fullEventData
+                });
+            }
+            @endif
+            
+            // LinkedIn
+            @if(!empty($linkedInInsight))
+            if (typeof lintrk !== 'undefined') {
+                lintrk('track', { 
+                    conversion_id: '{{ $linkedInInsight }}',
+                    event_name: eventName,
+                    ...fullEventData
+                });
+            }
+            @endif
+            
+            // TikTok
+            @if(!empty($tiktokPixel))
+            if (typeof ttq !== 'undefined') {
+                ttq.track('CustomEvent', {
+                    content_type: eventName,
+                    ...fullEventData
+                });
+            }
+            @endif
+            
+            // Custom analytics endpoint
+            if (window.customAnalyticsEndpoint) {
+                sendToCustomEndpoint(eventName, fullEventData);
+            }
 
-        // Hero video handling (if video background is used)
-        const heroVideo = document.querySelector('.hero-video');
-        if (heroVideo) {
-            heroVideo.addEventListener('loadedmetadata', function() {
-                this.play();
+        };
+        
+        // Enhanced page performance tracking
+        function trackPagePerformance() {
+            if ('performance' in window && 'timing' in window.performance) {
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        const timing = window.performance.timing;
+                        const navigation = window.performance.navigation;
+                        const loadStart = timing.navigationStart;
+                        const loadEnd = timing.loadEventEnd;
+                        const loadTime = loadEnd - loadStart;
+                        
+                        const performanceData = {
+                            category: 'Performance',
+                            // Core metrics
+                            page_load_time: loadTime,
+                            dom_ready_time: timing.domContentLoadedEventEnd - loadStart,
+                            dom_interactive_time: timing.domInteractive - loadStart,
+                            
+                            // Network metrics
+                            dns_lookup_time: timing.domainLookupEnd - timing.domainLookupStart,
+                            tcp_connection_time: timing.connectEnd - timing.connectStart,
+                            server_response_time: timing.responseEnd - timing.requestStart,
+                            dom_loading_time: timing.responseEnd - timing.navigationStart,
+                            
+                            // Navigation type
+                            navigation_type: navigation.type,
+                            redirect_count: navigation.redirectCount,
+                            
+                            // Connection info
+                            connection_type: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+                            connection_downlink: navigator.connection ? navigator.connection.downlink : 'unknown',
+                            connection_rtt: navigator.connection ? navigator.connection.rtt : 'unknown'
+                        };
+                        
+                        // Get paint metrics
+                        if (window.performance.getEntriesByType) {
+                            const paintMetrics = window.performance.getEntriesByType('paint');
+                            paintMetrics.forEach(metric => {
+                                performanceData[metric.name.replace('-', '_')] = Math.round(metric.startTime);
+                            });
+                        }
+                        
+                        trackEvent('page_performance', performanceData);
+                        
+                        // Update GA4 page_view with load time
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'page_view', {
+                                page_load_time: loadTime,
+                                send_to: '{{ $googleAnalytics }}'
+                            });
+                        }
+                    }, 2000);
+                });
+            }
+        }
+        
+        // Enhanced click tracking with heatmap data
+        function trackClicks() {
+            if (!analyticsConfig.enableClickTracking) return;
+            
+            document.addEventListener('click', function(event) {
+                const element = event.target.closest('a, button, [data-track], [onclick]');
+                if (!element) return;
+                
+                const elementType = element.tagName.toLowerCase();
+                const elementText = element.textContent?.trim().substring(0, 100) || '';
+                const elementHref = element.href || '';
+                const elementClasses = element.className || '';
+                const elementId = element.id || '';
+                const trackingData = element.dataset.track || '';
+                
+                // Get click position relative to element
+                const rect = element.getBoundingClientRect();
+                const clickX = event.clientX - rect.left;
+                const clickY = event.clientY - rect.top;
+                const relativeX = (clickX / rect.width) * 100;
+                const relativeY = (clickY / rect.height) * 100;
+                
+                let eventName = 'element_click';
+                let eventData = {
+                    category: 'Interaction',
+                    element_type: elementType,
+                    element_text: elementText,
+                    element_href: elementHref,
+                    element_classes: elementClasses,
+                    element_id: elementId,
+                    click_x: Math.round(event.clientX),
+                    click_y: Math.round(event.clientY),
+                    element_x: Math.round(rect.left),
+                    element_y: Math.round(rect.top),
+                    element_width: Math.round(rect.width),
+                    element_height: Math.round(rect.height),
+                    relative_click_x: Math.round(relativeX),
+                    relative_click_y: Math.round(relativeY)
+                };
+                
+                // Special tracking for different element types
+                if (elementType === 'a') {
+                    if (elementHref.startsWith('tel:')) {
+                        eventName = 'phone_click';
+                        eventData.phone_number = elementHref.replace('tel:', '');
+                    } else if (elementHref.startsWith('mailto:')) {
+                        eventName = 'email_click';
+                        eventData.email_address = elementHref.replace('mailto:', '');
+                    } else if (elementHref.includes('wa.me') || elementHref.includes('whatsapp')) {
+                        eventName = 'whatsapp_click';
+                    } else if (element.hostname !== window.location.hostname) {
+                        eventName = 'external_link_click';
+                        eventData.external_domain = element.hostname;
+                    } else if (elementHref.startsWith('#')) {
+                        eventName = 'anchor_link_click';
+                        eventData.anchor_target = elementHref;
+                    }
+                } else if (elementType === 'button') {
+                    eventName = 'button_click';
+                    eventData.button_type = element.type || 'button';
+                }
+                
+                // Custom data attributes
+                if (trackingData) {
+                    try {
+                        const customData = JSON.parse(trackingData);
+                        eventData = { ...eventData, ...customData };
+                    } catch (e) {
+                        eventData.custom_data = trackingData;
+                    }
+                }
+                
+                trackEvent(eventName, eventData);
             });
         }
-    });
-
-    // Analytics tracking functions
-    function trackHeroCTA(type, text, link) {
-        if (typeof trackCustomEvent !== 'undefined') {
-            trackCustomEvent('hero_cta_click', {
-                cta_type: type,
-                cta_text: text,
-                cta_link: link,
-                company_name: '{{ $companyName }}',
-                hero_style: '{{ $heroStyle }}'
+        
+        // Enhanced form tracking
+        function trackForms() {
+            if (!analyticsConfig.enableFormTracking) return;
+            
+            // Track form submissions
+            document.addEventListener('submit', function(event) {
+                const form = event.target;
+                if (form.tagName.toLowerCase() !== 'form') return;
+                
+                const formData = new FormData(form);
+                const formFields = {};
+                let fieldCount = 0;
+                let hasEmailField = false;
+                let hasPhoneField = false;
+                
+                for (let [key, value] of formData.entries()) {
+                    if (key && !key.toLowerCase().includes('password') && !key.toLowerCase().includes('secret')) {
+                        if (key.toLowerCase().includes('email')) hasEmailField = true;
+                        if (key.toLowerCase().includes('phone') || key.toLowerCase().includes('tel')) hasPhoneField = true;
+                        
+                        formFields[key] = typeof value === 'string' ? 
+                            value.substring(0, 50) + (value.length > 50 ? '...' : '') : 'file';
+                        fieldCount++;
+                    }
+                }
+                
+                trackEvent('form_submit', {
+                    category: 'Form',
+                    form_id: form.id || 'unnamed',
+                    form_action: form.action || window.location.href,
+                    form_method: form.method || 'get',
+                    field_count: fieldCount,
+                    has_email_field: hasEmailField,
+                    has_phone_field: hasPhoneField,
+                    form_completion_time: Date.now() - (form._startTime || Date.now())
+                });
             });
+            
+            // Track form field interactions
+            document.addEventListener('focus', function(event) {
+                const element = event.target;
+                if (['input', 'textarea', 'select'].includes(element.tagName.toLowerCase())) {
+                    const form = element.closest('form');
+                    if (form && !form._startTime) {
+                        form._startTime = Date.now();
+                    }
+                    
+                    trackEvent('form_field_focus', {
+                        category: 'Form',
+                        field_type: element.type || element.tagName.toLowerCase(),
+                        field_name: element.name || element.id || 'unnamed',
+                        form_id: form?.id || 'unnamed',
+                        field_required: element.required
+                    });
+                }
+            }, true);
+            
+            // Track form field completion
+            document.addEventListener('blur', function(event) {
+                const element = event.target;
+                if (['input', 'textarea', 'select'].includes(element.tagName.toLowerCase())) {
+                    if (element.value && element.value.length > 0) {
+                        trackEvent('form_field_completed', {
+                            category: 'Form',
+                            field_type: element.type || element.tagName.toLowerCase(),
+                            field_name: element.name || element.id || 'unnamed',
+                            field_length: element.value.length,
+                            form_id: element.closest('form')?.id || 'unnamed'
+                        });
+                    }
+                }
+            }, true);
         }
-    }
-
-    function trackScrollIndicator() {
-        if (typeof trackCustomEvent !== 'undefined') {
-            trackCustomEvent('scroll_indicator_click', {
-                company_name: '{{ $companyName }}',
-                hero_height: '{{ $heroHeight }}'
-            });
-        }
-    }
-
-    // Enhanced UX: Auto-focus management
-    window.addEventListener('load', function() {
-        // Focus management for accessibility
-        const firstCTA = document.querySelector('.hero-cta-primary');
-        if (firstCTA && window.location.hash === '#home') {
-            setTimeout(() => {
-                firstCTA.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 1000);
-        }
-    });
-
-    // Performance: Image lazy loading with intersection observer
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.remove('lazy');
-                    observer.unobserve(img);
+        
+        // Enhanced file download tracking
+        function trackDownloads() {
+            if (!analyticsConfig.enableDownloadTracking) return;
+            
+            document.addEventListener('click', function(event) {
+                const link = event.target.closest('a');
+                if (!link || !link.href) return;
+                
+                const href = link.href.toLowerCase();
+                const downloadExtensions = [
+                    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 
+                    'zip', 'rar', '7z', 'tar', 'gz',
+                    'mp3', 'mp4', 'avi', 'mov', 'wmv', 'flv',
+                    'jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp',
+                    'txt', 'csv', 'json', 'xml'
+                ];
+                
+                const urlParts = href.split('?')[0].split('.');
+                const extension = urlParts[urlParts.length - 1];
+                
+                if (downloadExtensions.includes(extension)) {
+                    trackEvent('file_download', {
+                        category: 'Download',
+                        file_extension: extension,
+                        file_url: link.href,
+                        file_name: link.href.split('/').pop(),
+                        link_text: link.textContent?.trim() || '',
+                        file_size_estimated: getEstimatedFileSize(extension)
+                    });
                 }
             });
+        }
+        
+        function getEstimatedFileSize(extension) {
+            const sizeMappings = {
+                'pdf': 'medium', 'doc': 'small', 'docx': 'small',
+                'xls': 'small', 'xlsx': 'small', 'ppt': 'medium', 'pptx': 'medium',
+                'zip': 'large', 'rar': 'large', '7z': 'large',
+                'mp3': 'medium', 'mp4': 'large', 'avi': 'large',
+                'jpg': 'small', 'png': 'small', 'gif': 'small'
+            };
+            return sizeMappings[extension] || 'unknown';
+        }
+        
+        // Enhanced video tracking
+        function trackVideoEngagement() {
+            if (!analyticsConfig.enableVideoTracking) return;
+            
+            const videoEvents = ['play', 'pause', 'ended', 'seeking', 'seeked'];
+            
+            videoEvents.forEach(eventType => {
+                document.addEventListener(eventType, function(event) {
+                    if (event.target.tagName.toLowerCase() === 'video') {
+                        const video = event.target;
+                        const videoSrc = video.src || video.currentSrc || 'unknown';
+                        const videoDuration = video.duration || 0;
+                        const currentTime = video.currentTime || 0;
+                        const watchedPercentage = videoDuration ? (currentTime / videoDuration) * 100 : 0;
+                        
+                        trackEvent(`video_${eventType}`, {
+                            category: 'Media',
+                            video_src: videoSrc,
+                            video_title: video.title || videoSrc.split('/').pop(),
+                            video_duration: Math.round(videoDuration),
+                            current_time: Math.round(currentTime),
+                            watched_percentage: Math.round(watchedPercentage),
+                            video_quality: video.videoWidth ? `${video.videoWidth}x${video.videoHeight}` : 'unknown',
+                            is_fullscreen: document.fullscreenElement === video
+                        });
+                    }
+                }, true);
+            });
+        }
+        
+        // Enhanced error tracking
+        function trackErrors() {
+            // JavaScript errors
+            window.addEventListener('error', function(event) {
+                trackEvent('javascript_error', {
+                    category: 'Error',
+                    error_message: event.message || 'Unknown error',
+                    error_filename: event.filename || 'Unknown file',
+                    error_line: event.lineno || 0,
+                    error_column: event.colno || 0,
+                    error_stack: event.error?.stack?.substring(0, 500) || 'No stack trace'
+                });
+            });
+            
+            // Promise rejection errors
+            window.addEventListener('unhandledrejection', function(event) {
+                trackEvent('promise_rejection', {
+                    category: 'Error',
+                    error_message: event.reason?.message || 'Promise rejected',
+                    error_stack: event.reason?.stack?.substring(0, 500) || 'No stack trace',
+                    error_type: typeof event.reason
+                });
+            });
+            
+            // Resource loading errors
+            document.addEventListener('error', function(event) {
+                if (event.target !== window) {
+                    const element = event.target;
+                    trackEvent('resource_error', {
+                        category: 'Error',
+                        resource_type: element.tagName.toLowerCase(),
+                        resource_src: element.src || element.href || 'unknown',
+                        error_type: 'load_failed'
+                    });
+                }
+            }, true);
+        }
+        
+        // Enhanced page visibility tracking
+        function trackVisibility() {
+            let startTime = Date.now();
+            let isVisible = !document.hidden;
+            let totalVisibleTime = 0;
+            let focusCount = 0;
+            
+            document.addEventListener('visibilitychange', function() {
+                const now = Date.now();
+                const timeSpent = now - startTime;
+                
+                if (document.hidden && isVisible) {
+                    // Page became hidden
+                    totalVisibleTime += timeSpent;
+                    trackEvent('page_hidden', {
+                        category: 'Engagement',
+                        time_visible: Math.round(timeSpent / 1000),
+                        total_visible_time: Math.round(totalVisibleTime / 1000),
+                        focus_count: focusCount
+                    });
+                    isVisible = false;
+                } else if (!document.hidden && !isVisible) {
+                    // Page became visible
+                    focusCount++;
+                    trackEvent('page_visible', {
+                        category: 'Engagement',
+                        focus_count: focusCount,
+                        total_hidden_time: Math.round((now - startTime) / 1000)
+                    });
+                    isVisible = true;
+                    startTime = now;
+                }
+            });
+            
+            // Track time on page before unload
+            window.addEventListener('beforeunload', function() {
+                if (isVisible) {
+                    const timeSpent = Date.now() - startTime;
+                    totalVisibleTime += timeSpent;
+                }
+                
+                trackEvent('page_unload', {
+                    category: 'Engagement',
+                    total_time_on_page: Math.round((Date.now() - performance.timing.navigationStart) / 1000),
+                    total_visible_time: Math.round(totalVisibleTime / 1000),
+                    focus_count: focusCount,
+                    engagement_score: calculateEngagementScore(totalVisibleTime, focusCount)
+                });
+            });
+        }
+        
+        function calculateEngagementScore(visibleTime, focusCount) {
+            // Simple engagement score calculation
+            const timeScore = Math.min(visibleTime / 60000, 1); // Max 1 minute = score 1
+            const focusScore = Math.min(focusCount / 3, 1); // Max 3 focuses = score 1
+            return Math.round((timeScore + focusScore) * 50); // Scale to 0-100
+        }
+        
+        // Custom analytics endpoint
+        function sendToCustomEndpoint(eventName, eventData) {
+            if (!window.customAnalyticsEndpoint) return;
+            
+            fetch(window.customAnalyticsEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({
+                    event: eventName,
+                    data: eventData,
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href,
+                    referrer: document.referrer,
+                    user_agent: navigator.userAgent
+                })
+            }).catch(error => {
+                if (analyticsConfig.debugMode) {
+                    console.error('Custom analytics error:', error);
+                }
+            });
+        }
+        
+        // Initialize all tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            trackPagePerformance();
+            trackClicks();
+            trackForms();
+            trackDownloads();
+            trackVideoEngagement();
+            trackErrors();
+            trackVisibility();
+            
+            // Initial enhanced page view
+            trackEvent('enhanced_page_view', {
+                category: 'Page',
+                referrer: document.referrer || 'direct',
+                referrer_domain: document.referrer ? new URL(document.referrer).hostname : 'direct',
+                screen_resolution: `${screen.width}x${screen.height}`,
+                available_screen: `${screen.availWidth}x${screen.availHeight}`,
+                color_depth: screen.colorDepth,
+                pixel_ratio: window.devicePixelRatio || 1,
+                language: navigator.language,
+                languages: navigator.languages?.join(',') || navigator.language,
+                platform: navigator.platform,
+                user_agent: navigator.userAgent,
+                cookie_enabled: navigator.cookieEnabled,
+                java_enabled: navigator.javaEnabled ? navigator.javaEnabled() : false,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timezone_offset: new Date().getTimezoneOffset(),
+                connection_type: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+                connection_downlink: navigator.connection ? navigator.connection.downlink : 'unknown',
+                device_memory: navigator.deviceMemory || 'unknown',
+                hardware_concurrency: navigator.hardwareConcurrency || 'unknown',
+                @if($enableAbTesting)
+                ab_test_variant: analyticsConfig.abVariant,
+                @endif
+                page_load_source: performance.navigation ? 
+                    (performance.navigation.type === 1 ? 'reload' : 'navigation') : 'unknown'
+            });
+            
+            if (analyticsConfig.debugMode) {
+                console.log('🚀 Enhanced Analytics initialized with config:', analyticsConfig);
+            }
         });
-
-        document.querySelectorAll('img[data-src]').forEach(img => {
-            imageObserver.observe(img);
-        });
-    }
+        
+    })();
 </script>
 
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "WebPageElement",
-    "name": "Hero Section",
-    "description": "{{ $heroSubtitle }}",
-    "url": "{{ url()->current() }}#home",
-    "mainEntity": {
-        "@type": "Organization",
-        "name": "{{ $companyName }}",
-        "description": "{{ $heroSubtitle }}"
-        @if(!empty($contactPhone))
-        ,"telephone": "{{ $contactPhone }}"
+{{-- Core Web Vitals and Advanced Performance Monitoring --}}
+<script>
+    // Core Web Vitals monitoring with enhanced data
+    function sendMetricToAnalytics({name, value, id, navigationType, rating}) {
+        const metricData = {
+            category: 'Web Vitals',
+            metric_name: name,
+            metric_value: Math.round(name === 'CLS' ? value * 1000 : value),
+            metric_id: id,
+            metric_rating: rating || 'unknown',
+            navigation_type: navigationType || 'navigate',
+            connection_type: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+            device_memory: navigator.deviceMemory || 'unknown',
+            hardware_concurrency: navigator.hardwareConcurrency || 'unknown'
+        };
+        
+        // Determine performance rating
+        let performanceRating = 'good';
+        switch(name) {
+            case 'LCP':
+                performanceRating = value <= 2500 ? 'good' : value <= 4000 ? 'needs-improvement' : 'poor';
+                break;
+            case 'FID':
+                performanceRating = value <= 100 ? 'good' : value <= 300 ? 'needs-improvement' : 'poor';
+                break;
+            case 'CLS':
+                performanceRating = value <= 0.1 ? 'good' : value <= 0.25 ? 'needs-improvement' : 'poor';
+                break;
+            case 'FCP':
+                performanceRating = value <= 1800 ? 'good' : value <= 3000 ? 'needs-improvement' : 'poor';
+                break;
+            case 'TTFB':
+                performanceRating = value <= 800 ? 'good' : value <= 1800 ? 'needs-improvement' : 'poor';
+                break;
+        }
+        metricData.performance_rating = performanceRating;
+        
+        // Send to Google Analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', name, {
+                event_category: 'Web Vitals',
+                event_label: id,
+                value: Math.round(name === 'CLS' ? value * 1000 : value),
+                custom_parameter_1: '{{ $companyName }}',
+                custom_parameter_2: '{{ $templateSlug }}',
+                custom_parameter_3: performanceRating,
+                non_interaction: true
+            });
+        }
+        
+        // Send to custom tracking
+        if (typeof trackEvent !== 'undefined') {
+            trackEvent('web_vital_' + name.toLowerCase(), metricData);
+        }
+        
+        @if($debugMode)
+        console.log('Web Vital tracked:', name, value, 'Rating:', performanceRating);
         @endif
     }
-}
+    
+    // Load web-vitals library dynamically
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/web-vitals@3/dist/web-vitals.iife.js';
+    script.onload = function() {
+        if (window.webVitals) {
+            webVitals.getCLS(sendMetricToAnalytics);
+            webVitals.getFID(sendMetricToAnalytics);
+            webVitals.getFCP(sendMetricToAnalytics);
+            webVitals.getLCP(sendMetricToAnalytics);
+            webVitals.getTTFB(sendMetricToAnalytics);
+        }
+    };
+    document.head.appendChild(script);
+</script>
+
+{{-- Custom Analytics Endpoint (Optional) --}}
+@if(!empty($content['custom_analytics_endpoint']))
+<script>
+    // Set custom analytics endpoint for server-side tracking
+    window.customAnalyticsEndpoint = '{{ $content['custom_analytics_endpoint'] }}';
+    
+    // Enhanced server-side tracking
+    window.sendToCustomAnalytics = function(eventName, eventData) {
+        if (!window.customAnalyticsEndpoint) return;
+        
+        const enhancedData = {
+            ...eventData,
+            server_timestamp: new Date().toISOString(),
+            client_ip: 'auto_detect', // Server will detect
+            session_id: getOrCreateSessionId(),
+            user_fingerprint: generateUserFingerprint()
+        };
+        
+        fetch(window.customAnalyticsEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-Analytics-Version': '2.0',
+                'X-Client-Timestamp': new Date().toISOString()
+            },
+            body: JSON.stringify({
+                event: eventName,
+                data: enhancedData,
+                metadata: {
+                    url: window.location.href,
+                    referrer: document.referrer,
+                    user_agent: navigator.userAgent,
+                    viewport: `${window.innerWidth}x${window.innerHeight}`,
+                    screen: `${screen.width}x${screen.height}`,
+                    language: navigator.language,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                }
+            })
+        }).catch(error => {
+            @if($debugMode)
+            console.error('Custom analytics error:', error);
+            @endif
+        });
+    };
+    
+    function getOrCreateSessionId() {
+        let sessionId = sessionStorage.getItem('analytics_session_id');
+        if (!sessionId) {
+            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('analytics_session_id', sessionId);
+        }
+        return sessionId;
+    }
+    
+    function generateUserFingerprint() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillText('Analytics fingerprint', 2, 2);
+        
+        return btoa(JSON.stringify({
+            screen: `${screen.width}x${screen.height}`,
+            timezone: new Date().getTimezoneOffset(),
+            language: navigator.language,
+            platform: navigator.platform,
+            plugins: Array.from(navigator.plugins).map(p => p.name),
+            canvas: canvas.toDataURL(),
+            webgl: getWebGLInfo()
+        })).substring(0, 32);
+    }
+    
+    function getWebGLInfo() {
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return {
+                    vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                    renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+                };
+            }
+        } catch (e) {
+            return null;
+        }
+        return null;
+    }
+</script>
+@endif
+
+{{-- A/B Testing Integration --}}
+@if($enableAbTesting)
+<script>
+    // A/B Testing configuration
+    window.abTestConfig = {
+        variant: '{{ $abTestingVariant }}',
+        testName: 'template_variant_test',
+        websiteId: '{{ $websiteId }}',
+        startDate: '{{ $websiteContent->created_at ?? now()->format('Y-m-d') }}'
+    };
+    
+    // Track A/B test exposure
+    if (typeof trackEvent !== 'undefined') {
+        trackEvent('ab_test_exposure', {
+            category: 'A/B Testing',
+            test_name: window.abTestConfig.testName,
+            variant: window.abTestConfig.variant,
+            website_id: window.abTestConfig.websiteId
+        });
+    }
+    
+    // Set A/B test data in all analytics platforms
+    if (typeof gtag !== 'undefined') {
+        gtag('set', {
+            'custom_parameter_6': window.abTestConfig.variant
+        });
+    }
+    
+    @if(!empty($facebookPixel))
+    if (typeof fbq !== 'undefined') {
+        fbq('set', 'ab_variant', window.abTestConfig.variant);
+    }
+    @endif
+    
+    @if($debugMode)
+    console.log('A/B Testing initialized:', window.abTestConfig);
+    @endif
+</script>
+@endif
+
+{{-- Debug Console (Development Only) --}}
+@if($debugMode)
+<script>
+    console.group('🔍 Enhanced Analytics Debug Information');
+    console.log('Company:', '{{ $companyName }}');
+    console.log('Template:', '{{ $templateSlug }}');
+    console.log('Website ID:', '{{ $websiteId }}');
+    console.log('User ID:', '{{ $userId }}');
+    console.log('Page Category:', '{{ $pageCategory }}');
+    console.log('Content Group:', '{{ $contentGroup }}');
+    
+    console.group('📊 Analytics Platforms');
+    console.log('Google Analytics:', '{{ $googleAnalytics ?: "Not configured" }}');
+    console.log('Google Tag Manager:', '{{ $googleTagManager ?: "Not configured" }}');
+    console.log('Facebook Pixel:', '{{ $facebookPixel ?: "Not configured" }}');
+    console.log('Microsoft Clarity:', '{{ $microsoftClarity ?: "Not configured" }}');
+    console.log('LinkedIn Insight:', '{{ $linkedInInsight ?: "Not configured" }}');
+    console.log('TikTok Pixel:', '{{ $tiktokPixel ?: "Not configured" }}');
+    console.groupEnd();
+    
+    console.group('⚙️ Tracking Features');
+    console.log('Scroll Tracking:', {{ $enableScrollTracking ? 'true' : 'false' }});
+    console.log('Click Tracking:', {{ $enableClickTracking ? 'true' : 'false' }});
+    console.log('Form Tracking:', {{ $enableFormTracking ? 'true' : 'false' }});
+    console.log('Download Tracking:', {{ $enableFileDownloadTracking ? 'true' : 'false' }});
+    console.log('Video Tracking:', {{ $enableVideoTracking ? 'true' : 'false' }});
+    console.log('Search Tracking:', {{ $enableSearchTracking ? 'true' : 'false' }});
+    console.log('Custom Dimensions:', {{ $enableCustomDimensions ? 'true' : 'false' }});
+    console.log('Ecommerce Tracking:', {{ $enableEcommerce ? 'true' : 'false' }});
+    @if($enableAbTesting)
+    console.log('A/B Testing:', 'Enabled - Variant {{ $abTestingVariant }}');
+    @endif
+    console.groupEnd();
+    
+    console.group('🌐 Page Information');
+    console.log('Page URL:', '{{ $currentUrl }}');
+    console.log('Page Title:', '{{ $pageTitle }}');
+    console.log('Referrer:', document.referrer || 'Direct');
+    console.log('User Agent:', navigator.userAgent);
+    console.log('Language:', navigator.language);
+    console.log('Timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    console.log('Screen Resolution:', `${screen.width}x${screen.height}`);
+    console.log('Viewport:', `${window.innerWidth}x${window.innerHeight}`);
+    console.log('Connection:', navigator.connection ? navigator.connection.effectiveType : 'Unknown');
+    console.groupEnd();
+    
+    console.groupEnd();
+    
+    // Add debug panel toggle
+    window.toggleAnalyticsDebug = function() {
+        const debugPanel = document.getElementById('analytics-debug');
+        if (debugPanel) {
+            debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+        }
+    };
+    
+    // Keyboard shortcut for debug panel (Ctrl+Shift+A)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+            e.preventDefault();
+            toggleAnalyticsDebug();
+        }
+    });
+    
+    // Debug event logger
+    const originalTrackEvent = window.trackEvent;
+    if (originalTrackEvent) {
+        window.trackEvent = function(eventName, eventData) {
+            console.group('📈 Event: ' + eventName);
+            console.log('Data:', eventData);
+            console.log('Timestamp:', new Date().toISOString());
+            console.groupEnd();
+            return originalTrackEvent.call(this, eventName, eventData);
+        };
+    }
+</script>
+@endif
+
+{{-- Performance mark for scripts end --}}
+<script>
+    // Mark analytics scripts loaded
+    if ('performance' in window && 'mark' in window.performance) {
+        window.performance.mark('analytics-scripts-loaded');
+        window.performance.measure('analytics-load-time', 'navigationStart', 'analytics-scripts-loaded');
+    }
+    
+    // Final initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        // Track successful analytics initialization
+        if (typeof trackEvent !== 'undefined') {
+            trackEvent('analytics_initialized', {
+                category: 'System',
+                platforms_loaded: [
+                    @if(!empty($googleAnalytics) || !empty($googleTagManager))
+                    'google',
+                    @endif
+                    @if(!empty($facebookPixel))
+                    'facebook',
+                    @endif
+                    @if(!empty($microsoftClarity))
+                    'clarity',
+                    @endif
+                    @if(!empty($linkedInInsight))
+                    'linkedin',
+                    @endif
+                    @if(!empty($tiktokPixel))
+                    'tiktok',
+                    @endif
+                ].join(','),
+                initialization_time: performance.now()
+            });
+        }
+    });
+    
+    @if($debugMode)
+    console.log('🚀 All enhanced analytics scripts loaded successfully');
+    console.log('📊 Performance timing:', {
+        'DOM Ready': performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart + 'ms',
+        'Analytics Load': performance.getEntriesByName('analytics-load-time')[0]?.duration + 'ms'
+    });
+    @endif
 </script>

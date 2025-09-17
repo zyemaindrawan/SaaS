@@ -31,7 +31,7 @@
     $footerSections = [
         'company' => [
             'title' => 'Perusahaan',
-            'show' => true,
+            'show' => false,
             'links' => []
         ],
         'services' => [
@@ -313,41 +313,30 @@
             <div class="space-y-6">
                 <!-- Logo and Company Name -->
                 <div class="flex items-center space-x-3">
-                    @if($companyLogo)
-                        <img 
-                            src="{{ asset('storage/' . $companyLogo) }}" 
-                            alt="{{ $companyName }} Logo"
-                            class="h-10 w-auto"
-                            loading="lazy"
-                        >
-                    @endif
-                    <div>
-                        <h3 class="text-2xl font-bold">{{ $companyName }}</h3>
-                        @if($companyTagline)
-                            <p class="text-sm opacity-80 mt-1">{{ $companyTagline }}</p>
-                        @endif
-                    </div>
+                    <img 
+                        src="{{ $companyLogo }}" 
+                        alt="{{ $companyName }}"
+                        class="brand-logo"
+                        loading="eager"
+                        decoding="async"
+                        style="max-width:80%"
+                    >
                 </div>
 
                 <!-- Company Description -->
-                @if($heroSubtitle)
-                    <p class="text-sm opacity-90 leading-relaxed max-w-md">
-                        {{ $heroSubtitle }}
-                    </p>
-                @endif
+                <p class="text-sm opacity-90 leading-relaxed max-w-md">
+                    {{ $heroSubtitle }}
+                </p>
 
                 <!-- Contact Information -->
                 <div class="space-y-3">
-                    @if($contactAddress)
                         <div class="flex items-start space-x-3">
                             <i class="fas fa-map-marker-alt text-{{ $footerStyle === 'light' ? 'blue-600' : 'white' }} mt-1"></i>
                             <address class="text-sm opacity-90 not-italic leading-relaxed">
                                 {{ $contactAddress }}
                             </address>
                         </div>
-                    @endif
 
-                    @if($contactPhone)
                         <div class="flex items-center space-x-3">
                             <i class="fas fa-phone text-{{ $footerStyle === 'light' ? 'blue-600' : 'white' }}"></i>
                             <a 
@@ -358,9 +347,7 @@
                                 {{ $contactPhone }}
                             </a>
                         </div>
-                    @endif
 
-                    @if($contactEmail)
                         <div class="flex items-center space-x-3">
                             <i class="fas fa-envelope text-{{ $footerStyle === 'light' ? 'blue-600' : 'white' }}"></i>
                             <a 
@@ -371,7 +358,6 @@
                                 {{ $contactEmail }}
                             </a>
                         </div>
-                    @endif
                 </div>
 
                 <!-- Social Media Links -->
@@ -721,43 +707,4 @@
             footerObserver.observe(footer);
         }
     });
-</script>
-
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "{{ $companyName }}",
-    @if($companyLogo)
-    "logo": "{{ asset('storage/' . $companyLogo) }}",
-    @endif
-    @if($heroSubtitle)
-    "description": "{{ $heroSubtitle }}",
-    @endif
-    @if($contactEmail || $contactPhone || $contactAddress)
-    "contactPoint": {
-        "@type": "ContactPoint",
-        @if($contactEmail)
-        "email": "{{ $contactEmail }}",
-        @endif
-        @if($contactPhone)
-        "telephone": "{{ $contactPhone }}",
-        @endif
-        @if($contactAddress)
-        "address": "{{ $contactAddress }}",
-        @endif
-        "contactType": "customer support"
-    },
-    @endif
-    @if(!empty($socialLinks))
-    "sameAs": [
-        @foreach($socialLinks as $index => $social)
-            @if(!empty($social['url']))
-                "{{ $social['url'] }}"{{ $index < count($socialLinks) - 1 ? ',' : '' }}
-            @endif
-        @endforeach
-    ],
-    @endif
-    "url": "{{ url('/') }}"
-}
 </script>

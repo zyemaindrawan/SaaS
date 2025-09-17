@@ -318,9 +318,19 @@
             margin-bottom: 2rem;
         }
 
+        .hero-cta-primary,
+        .hero-cta-secondary {
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            justify-content: center;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
         .hero-cta-secondary {
             margin-left: 0;
-            margin-top: 1rem;
+            margin-top: 0.75rem;
         }
 
         .hero-stats {
@@ -335,17 +345,31 @@
         .hero-section {
             background-attachment: scroll;
         }
+
+        /* Better button container spacing */
+        .hero-content .flex.flex-col.sm\:flex-row {
+            gap: 0.75rem;
+            align-items: center;
+        }
     }
 
     @media (max-width: 480px) {
         .hero-cta-primary,
         .hero-cta-secondary {
-            padding: 0.875rem 1.5rem;
+            padding: 1rem 1.5rem;
             font-size: 1rem;
-            display: block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-align: center;
             width: 100%;
-            max-width: 280px;
+            max-width: 100%;
+            margin: 0;
+            border-radius: 0.75rem;
+        }
+
+        .hero-cta-secondary {
+            margin-top: 0.75rem;
         }
 
         .hero-stats {
@@ -356,6 +380,19 @@
 
         .hero-stat-item {
             min-width: 120px;
+        }
+
+        /* Better button container for mobile */
+        .hero-content .flex.flex-col.sm\:flex-row {
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .hero-content {
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
     }
 
@@ -443,7 +480,7 @@
             @endif
 
             <!-- Call to Action Buttons -->
-            <div class="flex flex-col sm:flex-row {{ $heroAlignment === 'center' ? 'justify-center' : ($heroAlignment === 'right' ? 'justify-end' : 'justify-start') }} gap-4 mb-8 {{ $heroAnimation === 'fade-up' ? 'animate-fade-up-delay' : '' }}">
+            <div class="flex flex-col sm:flex-row {{ $heroAlignment === 'center' ? 'justify-center items-center' : ($heroAlignment === 'right' ? 'justify-end items-end' : 'justify-start items-start') }} gap-4 mb-8 {{ $heroAnimation === 'fade-up' ? 'animate-fade-up-delay' : '' }} w-full">
                 <!-- Primary CTA -->
                 <a 
                     href="{{ $heroCtaLink }}"
@@ -661,23 +698,4 @@
             imageObserver.observe(img);
         });
     }
-</script>
-
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "WebPageElement",
-    "name": "Hero Section",
-    "description": "{{ $heroSubtitle }}",
-    "url": "{{ url()->current() }}#home",
-    "mainEntity": {
-        "@type": "Organization",
-        "name": "{{ $companyName }}",
-        "description": "{{ $heroSubtitle }}"
-        @if(!empty($contactPhone))
-        ,"telephone": "{{ $contactPhone }}"
-        @endif
-    }
-}
-</script>
 </script>

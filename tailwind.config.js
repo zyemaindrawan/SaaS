@@ -8,12 +8,19 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.vue',
+        './resources/views/templates/**/*.blade.php',
     ],
 
     theme: {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                // Allow for CSS custom properties
+                primary: 'var(--primary-color, #2563eb)',
+                secondary: 'var(--secondary-color, #64748b)',
+                accent: 'var(--accent-color, #f59e0b)',
             },
         },
     },

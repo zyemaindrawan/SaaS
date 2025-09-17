@@ -1,38 +1,31 @@
 @php
-    use App\Services\SEOService;
-    
-    // Initialize SEO service if websiteContent is available
-    $seoService = app(SEOService::class);
-    $seo = $websiteContent ? $seoService->generateSEOData($websiteContent) : [];
-    
-    // Fallback values from content data
-    $companyName = $content['company_name'] ?? 'Your Company';
-    $heroSubtitle = $content['hero_subtitle'] ?? 'Professional business solutions';
-    $currentUrl = url()->current();
-    
-    // SEO Data with fallbacks
-    $title = $seo['title'] ?? ($content['seo_title'] ?? $companyName);
-    $description = $seo['description'] ?? ($content['seo_description'] ?? $heroSubtitle);
-    $keywords = $seo['keywords'] ?? ($content['seo_keywords'] ?? '');
-    $canonicalUrl = $seo['canonical_url'] ?? ($content['canonical_url'] ?? $currentUrl);
-    $ogImage = $seo['og_image'] ?? ($content['og_image'] ? asset('storage/' . $content['og_image']) : asset('images/default-og-image.jpg'));
-    $favicon = $seo['favicon'] ?? ($content['favicon'] ? asset('storage/' . $content['favicon']) : asset('favicon.ico'));
-    $robots = $seo['robots'] ?? ($content['robots_meta'] ?? 'index,follow');
-    $schemaData = $seo['schema_data'] ?? [];
-    $analytics = $seo['analytics'] ?? [];
-    
-    // Color theme
-    $primaryColor = $content['primary_color'] ?? '#2563eb';
-    $secondaryColor = $content['secondary_color'] ?? '#64748b';
-    $accentColor = $content['accent_color'] ?? '#f59e0b';
-    
-    // Font settings
-    $fontFamily = $content['font_family'] ?? 'inter';
-    $borderRadius = $content['border_radius'] ?? 'medium';
-    
-    // Language and locale
-    $locale = app()->getLocale();
-    $language = $locale === 'id' ? 'id_ID' : 'en_US';
+    $title = $title ?? ($content['seo']['title'] ?? ($content['company']['name'] ?? 'Corporate Website'));
+    $description = $description ?? ($content['seo']['description'] ?? ($content['company']['description'] ?? 'Professional corporate website'));
+    $keywords = $keywords ?? ($content['seo']['keywords'] ?? '');
+    $robots = $robots ?? 'index,follow';
+    $companyName = $companyName ?? ($content['company']['name'] ?? 'Corporate');
+    $siteName = $siteName ?? ($content['company']['name'] ?? 'Corporate Website');
+    $locale = $locale ?? 'en_US';
+    $language = $language ?? 'en_US';
+    $canonicalUrl = $canonicalUrl ?? request()->url();
+    $ogImage = $ogImage ?? ($content['company']['logo'] ?? asset('images/default-og.jpg'));
+    $favicon = $favicon ?? asset('favicon.ico');
+    $primaryColor = $primaryColor ?? ($content['design']['primary_color'] ?? '#2563eb');
+    $secondaryColor = $secondaryColor ?? ($content['design']['secondary_color'] ?? '#64748b');
+    $accentColor = $accentColor ?? ($content['design']['accent_color'] ?? '#f59e0b');
+    $fontFamily = $fontFamily ?? ($content['design']['font_family'] ?? 'inter');
+    $borderRadius = $borderRadius ?? ($content['design']['border_radius'] ?? 'medium');
+    $analytics = $analytics ?? [
+        'google_tag_manager' => config('services.gtm.id', ''),
+        'google_analytics' => config('services.ga.id', '')
+    ];
+    $social = $social ?? ($content['social'] ?? []);
+    $schemaData = $schemaData ?? [
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => $companyName,
+        'url' => $canonicalUrl
+    ];
 @endphp
 
 <meta charset="UTF-8">
@@ -40,13 +33,9 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="format-detection" content="telephone=no">
 <meta name="mobile-web-app-capable" content="yes">
-
 <title>{{ $title }}</title>
 <meta name="title" content="{{ $title }}">
 <meta name="description" content="{{ $description }}">
-@if($keywords)
-    <meta name="keywords" content="{{ $keywords }}">
-@endif
 <meta name="robots" content="{{ $robots }}">
 <meta name="author" content="{{ $companyName }}">
 <meta name="publisher" content="{{ $companyName }}">
@@ -54,11 +43,7 @@
 <meta name="revisit-after" content="7 days">
 <meta name="distribution" content="web">
 <meta name="rating" content="general">
-
 <link rel="canonical" href="{{ $canonicalUrl }}">
-@if($locale === 'id')
-    <link rel="alternate" hreflang="en" href="{{ str_replace('/id/', '/en/', $canonicalUrl) }}">
-@endif
 <link rel="alternate" hreflang="{{ $locale }}" href="{{ $canonicalUrl }}">
 
 <link rel="icon" type="image/x-icon" href="{{ $favicon }}">
@@ -91,17 +76,10 @@
 <meta property="og:locale" content="{{ $language }}">
 <meta property="og:updated_time" content="{{ $websiteContent->updated_at ?? now() }}">
 
-@if($websiteContent ?? false)
-    <meta property="article:published_time" content="{{ $websiteContent->created_at->toW3cString() }}">
-    <meta property="article:modified_time" content="{{ $websiteContent->updated_at->toW3cString() }}">
-    <meta property="article:author" content="{{ $websiteContent->user->name ?? $companyName }}">
-    <meta property="article:section" content="{{ $websiteContent->template_slug }}">
-    @if(!empty($content['seo_keywords']))
-        @foreach(explode(',', $content['seo_keywords']) as $tag)
-            <meta property="article:tag" content="{{ trim($tag) }}">
-        @endforeach
-    @endif
-@endif
+<meta property="article:published_time" content="{{ $websiteContent->created_at->toW3cString() }}">
+<meta property="article:modified_time" content="{{ $websiteContent->updated_at->toW3cString() }}">
+<meta property="article:author" content="{{ $websiteContent->user->name ?? $companyName }}">
+<meta property="article:section" content="{{ $websiteContent->template_slug }}">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@{{ str_replace(' ', '', strtolower($companyName)) }}">
@@ -112,15 +90,6 @@
 <meta name="twitter:image:alt" content="{{ $title }}">
 <meta name="twitter:domain" content="{{ request()->getHost() }}">
 <meta name="twitter:url" content="{{ $canonicalUrl }}">
-
-@if(!empty($content['social_links']))
-    @foreach($content['social_links'] as $social)
-        @if(($social['platform'] ?? '') === 'twitter' && !empty($social['url']))
-            <meta name="twitter:site" content="{{ '@' . basename(parse_url($social['url'], PHP_URL_PATH)) }}">
-            @break
-        @endif
-    @endforeach
-@endif
 
 <meta property="og:see_also" content="{{ $canonicalUrl }}">
 
@@ -139,7 +108,6 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.tailwindcss.com">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
 <link rel="dns-prefetch" href="//www.google-analytics.com">
@@ -151,81 +119,46 @@
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
-@switch($fontFamily)
-    @case('roboto')
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-        @break
-    @case('open-sans')
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-        @break
-    @case('montserrat')
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-        @break
-    @case('poppins')
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        @break
-    @case('playfair')
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-        @break
-    @default
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-@endswitch
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-@if(!empty($analytics['google_tag_manager']))
-    <!-- Google Tag Manager -->
-    <script>
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','{{ $analytics['google_tag_manager'] }}');
-    </script>
-    <!-- End Google Tag Manager -->
-@endif
 
-@if(!empty($analytics['google_analytics']) && empty($analytics['google_tag_manager']))
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $analytics['google_analytics'] }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '{{ $analytics['google_analytics'] }}', {
-            page_title: '{{ $title }}',
-            page_location: '{{ $canonicalUrl }}',
-            custom_map: {
-                'custom_parameter_1': 'company_name',
-                'custom_parameter_2': 'template_name'
-            }
-        });
-        
-        // Enhanced tracking
-        gtag('event', 'page_view', {
-            company_name: '{{ $companyName }}',
-            template_name: '{{ $websiteContent->template_slug ?? "unknown" }}',
-            page_title: '{{ $title }}'
-        });
-    </script>
-    <!-- End Google Analytics 4 -->
-@endif
-
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- Google Tag Manager -->
 <script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '{{ $primaryColor }}',
-                    secondary: '{{ $secondaryColor }}',
-                    accent: '{{ $accentColor }}'
-                },
-                fontFamily: {
-                    body: ['{{ ucfirst($fontFamily) }}', 'system-ui', 'sans-serif']
-                }
-            }
-        }
-    }
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ $analytics['google_tag_manager'] }}');
 </script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ $analytics['google_analytics'] }}"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ $analytics['google_analytics'] }}', {
+        page_title: '{{ $title }}',
+        page_location: '{{ $canonicalUrl }}',
+        custom_map: {
+            'custom_parameter_1': 'company_name',
+            'custom_parameter_2': 'template_name'
+        }
+    });
+    
+    // Enhanced tracking
+    gtag('event', 'page_view', {
+        company_name: '{{ $companyName }}',
+        template_name: '{{ $websiteContent->template_slug ?? "unknown" }}',
+        page_title: '{{ $title }}'
+    });
+</script>
+<!-- End Google Analytics 4 -->
+
+
+{{-- Include only Tailwind CSS without Inertia JS for standalone template --}}
+@vite('resources/css/app.css')
 
 <style>
     :root {
@@ -251,10 +184,7 @@
         @endswitch
     }
     
-    * {
-        font-family: '{{ ucfirst($fontFamily) }}', system-ui, -apple-system, sans-serif;
-    }
-    
+    /* Override Tailwind with custom theme colors */
     .bg-primary { background-color: var(--primary-color) !important; }
     .text-primary { color: var(--primary-color) !important; }
     .border-primary { border-color: var(--primary-color) !important; }
@@ -265,6 +195,11 @@
     
     /* Custom border radius */
     .rounded-custom { border-radius: var(--border-radius) !important; }
+    
+    /* Dynamic font family */
+    * {
+        font-family: '{{ ucfirst($fontFamily) }}', 'Inter', system-ui, -apple-system, sans-serif;
+    }
     
     /* Performance optimizations */
     img {
@@ -331,66 +266,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </noscript>
 
-@if(!empty($schemaData))
-    <script type="application/ld+json">
-        {!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-    </script>
-@endif
-
 <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "{{ $companyName }}",
-    "url": "{{ $canonicalUrl }}",
-    "description": "{{ $description }}",
-    @if(!empty($content['contact_email']))
-    "email": "{{ $content['contact_email'] }}",
-    @endif
-    @if(!empty($content['contact_phone']))
-    "telephone": "{{ $content['contact_phone'] }}",
-    @endif
-    "inLanguage": "{{ $locale }}",
-    "copyrightYear": "{{ date('Y') }}",
-    "dateModified": "{{ $websiteContent->updated_at ?? now() }}",
-    "potentialAction": {
-        "@type": "SearchAction",
-        "target": "{{ $canonicalUrl }}?search={search_term_string}",
-        "query-input": "required name=search_term_string"
-    }
-    @if(!empty($content['social_links']))
-    ,"sameAs": [
-        @foreach($content['social_links'] as $index => $social)
-            @if(!empty($social['url']))
-                "{{ $social['url'] }}"{{ $index < count($content['social_links']) - 1 ? ',' : '' }}
-            @endif
-        @endforeach
-    ]
-    @endif
-}
-</script>
-
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-        {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "{{ url('/') }}"
-        }
-        @if($websiteContent ?? false)
-        ,{
-            "@type": "ListItem", 
-            "position": 2,
-            "name": "{{ $title }}",
-            "item": "{{ $canonicalUrl }}"
-        }
-        @endif
-    ]
-}
+    {!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
 </script>
 
 <style>
@@ -414,7 +291,7 @@
     }
 </style>
 
-@if($preview_mode ?? false)
+
     <style>
         body::before {
             content: "🔍 PREVIEW MODE - This website is not yet published";
@@ -452,7 +329,6 @@
             }
         }
     </style>
-@endif
 
 <script>
     // Core Web Vitals and performance monitoring
@@ -500,4 +376,5 @@
             });
         }
     });
+</script>
 </script>
