@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('custom_domain')->nullable();
             $table->string('subdomain')->nullable();
             $table->enum('status', [
-                'draft', 'previewed', 'paid', 'processing', 'active', 'suspended'
+                'draft', 'previewed', 'paid', 'processing', 'active', 'expired', 'suspended'
             ])->default('draft');
             $table->timestamp('activated_at')->nullable();
             $table->timestamp('expires_at')->nullable();

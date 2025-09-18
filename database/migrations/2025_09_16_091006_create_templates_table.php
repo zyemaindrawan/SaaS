@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('preview_image')->nullable();
             $table->string('config_path');
             $table->decimal('price', 10, 2)->default(0.00);
+            $table->text('demo_url')->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
             $table->timestamps();

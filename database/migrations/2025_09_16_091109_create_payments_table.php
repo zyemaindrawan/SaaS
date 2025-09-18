@@ -10,31 +10,24 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('website_content_id')
-                  ->constrained()->onDelete('cascade');
-            $table->string('midtrans_order_id')->unique();
-            $table->string('midtrans_transaction_id')->nullable();
-            $table->decimal('amount', 10, 2);
-            $table->string('currency', 3)->default('IDR');
-            $table->enum('status', [
-                'pending', 'success', 'failed', 'expired', 'cancelled'
-            ])->default('pending');
+            $table->string('code', 50)->unique();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('website_content_id')->constrained()->cascadeOnDelete();
+            $table->decimal('fee', 10, 2)->default(0.00);
+            $table->decimal('gross_amount', 10, 2);
+            $table->enum('status', ['pending', 'paid', 'failed', 'cancelled', 'expired'])->default('pending');
             $table->string('payment_type', 50)->nullable();
-            $table->string('payment_method', 50)->nullable();
+            $table->json('midtrans_data')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->timestamp('paid_at')->nullable();
-            $table->timestamp('expires_at')->nullable();
-            $table->json('metadata')->nullable();
             $table->timestamps();
-            
-            $table->index('midtrans_order_id');
-            $table->index('midtrans_transaction_id');
+
+            $table->index(['user_id', 'status']);
             $table->index('website_content_id');
             $table->index('status');
+            $table->index('created_at');
             $table->index('paid_at');
-            $table->index('expires_at');
-            $table->index(['website_content_id', 'status']);
-            $table->index(['status', 'created_at']);
-            $table->index(['payment_type', 'status']);
+            $table->index('expired_at');
         });
     }
 

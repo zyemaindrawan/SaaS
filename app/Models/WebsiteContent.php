@@ -28,7 +28,6 @@ class WebsiteContent extends Model
         'expires_at' => 'datetime'
     ];
 
-    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -49,7 +48,6 @@ class WebsiteContent extends Model
         return $this->hasOne(Subscription::class);
     }
 
-    // Scopes
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
@@ -65,7 +63,6 @@ class WebsiteContent extends Model
         return $query->where('user_id', $userId);
     }
 
-    // Methods
     public function getPublicUrl(): string
     {
         if ($this->custom_domain) {

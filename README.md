@@ -1,66 +1,84 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SaaS Pembuatan Website Berbasis Template
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🧩 Gambaran Umum Sistem
+Sistem ini adalah **Software as a Service (SaaS)** yang memungkinkan pengguna untuk membuat website dengan mudah menggunakan template yang tersedia. Platform ini dibangun dengan **Laravel 12** sebagai framework utama dan berfokus pada content management dinamis serta templating yang fleksibel.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Konsep Dasar
+Platform ini memungkinkan user terdaftar untuk:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Memilih template website dari katalog yang tersedia
+- Mengisi konten dinamis (nama perusahaan, slogan, galeri foto, dll)
+- Melihat preview hasil website sebelum publikasi
+- Melakukan pembayaran melalui integrasi Payment Gateway
+- Menunggu proses aktivasi selama 6 jam
+- Menerima notifikasi email ketika website sudah aktif dan bisa diakses
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🏗️ Arsitektur Sistem
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Template Management (Inti Sistem)
+- Setiap template disimpan dalam struktur folder terpisah di  
+  `resources/views/templates/{template_slug}/`
+- Terdapat file `config.json` yang mendefinisikan field konten yang dibutuhkan oleh template tersebut.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 2. Content Management Dinamis
+- Sistem membaca `config.json` dari template yang dipilih dan secara otomatis men-generate form dinamis sesuai kebutuhan template.
+- Data konten disimpan dalam format JSON di database pada tabel `website_contents`.
+- Pendekatan ini memungkinkan fleksibilitas untuk berbagai jenis konten tanpa perlu mengubah struktur database.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Preview Engine & Payment Integration
+- Preview engine memungkinkan user melihat hasil website sebelum publikasi melalui route:  
+  `/preview/{website_content_id}`
+- Setelah user puas dengan preview, mereka dapat melakukan pembayaran melalui integrasi Payment Gateway.
 
-## Laravel Sponsors
+### 4. Activation Queue & Background Jobs
+- Setelah pembayaran berhasil, sistem menggunakan **Laravel Queue** untuk menjalankan `ActivateWebsiteJob` dengan delay 6 jam.
+- Task ini akan:
+  - Mengaktifkan website
+  - Mengirim notifikasi email kepada user
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🔄 Workflow Pengguna
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+1. **Register + Login & Template Selection**  
+   User register & login dan memilih template dari katalog.
 
-## Contributing
+2. **Content Input**  
+   Mengisi form konten dinamis yang di-generate sesuai template.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Preview & Payment**  
+   Melihat preview, jika sudah sesuai melakukan checkout dan pembayaran.
 
-## Code of Conduct
+4. **Processing**  
+   Sistem menerima notifikasi pembayaran dan mengubah status menjadi *paid*.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. **Activation**  
+   Background job dijalankan setelah 6 jam untuk mengaktifkan website.
 
-## Security Vulnerabilities
+6. **Notification**  
+   User menerima email notifikasi dan dapat mengakses website di URL yang diberikan.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 💡 Keunggulan Sistem
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **Scalable**  
+  Mudah menambah template baru hanya dengan membuat folder dan `config.json`.
+
+- **Dinamis**  
+  Content management yang fleksibel sesuai kebutuhan setiap template.
+
+- **Terstruktur**  
+  Proses pembayaran, aktivasi, dan notifikasi yang terkelola dengan baik.
+
+- **Laravel 12**  
+  Menggunakan framework yang solid untuk pengembangan berkelanjutan.
+
+---
+
+## Ringkasan
+Sistem ini dirancang untuk memberikan solusi yang simpel namun powerful bagi user yang ingin memiliki website profesional tanpa perlu memahami coding, dengan model bisnis SaaS yang sustainable.
