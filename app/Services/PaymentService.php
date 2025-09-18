@@ -12,7 +12,6 @@ class PaymentService
 {
     public function __construct()
     {
-        // Set Midtrans configuration
         Config::$serverKey = config('midtrans.server_key');
         Config::$clientKey = config('midtrans.client_key');
         Config::$isProduction = config('midtrans.is_production');
@@ -37,7 +36,7 @@ class PaymentService
             'fee' => $fee,
             'gross_amount' => $grossAmount,
             'status' => 'pending',
-            'expired_at' => now()->addDays(1),
+            'expired_at' => now()->addDays(1), // 1 hari
         ]);
 
         // Log payment creation
@@ -149,7 +148,10 @@ class PaymentService
         ]);
 
         // Update website content status
-        $payment->websiteContent->update(['status' => 'paid']);
+        $payment->websiteContent->update([
+            'status' => 'active',
+            'expired_at' => now()->addDays(30) // 30 hari
+        ]);
 
         $this->logPayment($payment, 'paid', 'Payment completed successfully');
 

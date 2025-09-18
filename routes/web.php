@@ -57,12 +57,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Main preview page (Inertia) - by ID
+    // Main preview page by ID
     Route::get('/preview/{websiteContent}', [PreviewController::class, 'show'])
         ->name('preview.show')
         ->where('websiteContent', '[0-9]+');
     
-    // Render preview (Blade template for iframe) - by ID
+    // Render preview (iframe)
     Route::get('/preview/{websiteContent}/render', [PreviewController::class, 'render'])
         ->name('preview.render')
         ->where('websiteContent', '[0-9]+');
@@ -101,7 +101,7 @@ Route::middleware('auth')->group(function () {
         ->name('payment.error');
 });
 
-// Midtrans notification (no auth required)
+// Midtrans notification
 Route::post('/midtrans/notification', [PaymentController::class, 'notification'])
     ->name('midtrans.notification');
 

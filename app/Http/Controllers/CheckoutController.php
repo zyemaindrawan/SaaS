@@ -39,7 +39,8 @@ class CheckoutController extends Controller
 
         // Calculate pricing
         $subtotal = $template->price;
-        $platformFee = ($subtotal * 0.029) + 2000; // 2.9% + Rp 2,000
+        //$platformFee = ($subtotal * 0.029) + 2000; // 2.9% + Rp 2,000
+        $platformFee = 4000; // Rp 4,000
         $total = $subtotal + $platformFee;
 
         return view('checkout.index', compact('template', 'user', 'subtotal', 'platformFee', 'total'));
