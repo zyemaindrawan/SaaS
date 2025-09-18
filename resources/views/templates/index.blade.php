@@ -9,10 +9,10 @@
         <div class="container mx-auto px-4 py-16">
             <div class="text-center">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                    Choose Your Perfect Template
+                    Pilihan Tema Website
                 </h1>
                 <p class="text-xl opacity-90 max-w-2xl mx-auto">
-                    Professional, modern website templates ready to customize for your business
+                    Pilih tema / template website yang sesuai dengan kebutuhan Anda
                 </p>
             </div>
         </div>
@@ -22,7 +22,7 @@
         <!-- Filters & Search -->
         <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
             <form method="GET" action="{{ route('templates.index') }}" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Search -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
@@ -52,7 +52,7 @@
                     </div>
 
                     <!-- Price Range -->
-                    <div>
+                    <!-- <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
                         <div class="flex gap-2">
                             <input 
@@ -70,7 +70,7 @@
                                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Sort -->
                     <div>
@@ -93,14 +93,14 @@
                         type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition duration-200"
                     >
-                        Apply Filters
+                        Filter
                     </button>
                     
                     <a 
                         href="{{ route('templates.index') }}"
                         class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition duration-200"
                     >
-                        Clear All
+                        Reset
                     </a>
                 </div>
             </form>
@@ -219,7 +219,7 @@
                                     href="{{ route('templates.show', $template->slug) }}"
                                     class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 text-center py-2 px-4 rounded-md transition duration-200 text-sm font-medium"
                                 >
-                                    Details
+                                    Detail
                                 </a>
                                 
                                 @auth
@@ -227,7 +227,7 @@
                                         href="{{ route('templates.checkout', $template->slug) }}"
                                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-md transition duration-200 text-sm font-medium"
                                     >
-                                        Order Now
+                                        Pilih Tema
                                     </a>
                                 @else
                                     <a 

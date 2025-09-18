@@ -15,6 +15,7 @@ class Payment extends Model
         'code',
         'user_id',
         'website_content_id',
+        'amount',
         'fee',
         'gross_amount',
         'status',
@@ -26,6 +27,7 @@ class Payment extends Model
 
     protected $casts = [
         'midtrans_data' => 'array',
+        'amount' => 'decimal:2',
         'fee' => 'decimal:2',
         'gross_amount' => 'decimal:2',
         'expired_at' => 'datetime',

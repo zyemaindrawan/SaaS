@@ -52,17 +52,24 @@ class CheckoutController extends Controller
             abort(404);
         }
 
+        //dd($request->all());
+
         $user = Auth::user();
 
         // Validation
         $validated = $request->validate([
-            'website_name' => 'required|string|max:255',
-            'site_description' => 'nullable|string|max:1000',
-            'business_type' => 'nullable|string|max:100',
-            'contact_name' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255',
+            'company_tagline' => 'nullable|string|max:1000',
+            'seo_title' => 'nullable|string|max:500',
+            'seo_description' => 'nullable|string|max:1000',
+            'seo_keywords' => 'nullable|string|max:500',
             'contact_email' => 'required|email|max:255',
             'contact_phone' => 'nullable|string|max:20',
             'contact_address' => 'nullable|string|max:500',
+            'font_family' => 'nullable|string|max:255',
+            'whatsapp_enabled' => 'nullable|boolean',
+            'whatsapp_number' => 'nullable|string|max:20',
+            'whatsapp_message' => 'nullable|string|max:1000',
             'subdomain' => 'required|string|min:3|max:50|regex:/^[a-z0-9-]+$/|unique:website_contents,subdomain',
             'primary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'secondary_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
@@ -74,32 +81,39 @@ class CheckoutController extends Controller
             'secondary_color.regex' => 'Please select a valid color.',
         ]);
 
+        //dd($validated);
+
         try {
             // Create website content
             $contentData = [
-                'website_name' => $validated['website_name'],
-                'site_description' => $validated['site_description'],
-                'business_type' => $validated['business_type'],
-                'contact_name' => $validated['contact_name'],
+                'company_name' => $validated['company_name'],
+                'company_tagline' => $validated['company_tagline'],
+                'seo_title' => $validated['seo_title'],
+                'seo_description' => $validated['seo_description'],
+                'seo_keywords' => $validated['seo_keywords'],
                 'contact_email' => $validated['contact_email'],
                 'contact_phone' => $validated['contact_phone'],
                 'contact_address' => $validated['contact_address'],
+                'whatsapp_enabled' => $validated['whatsapp_enabled'],
+                'whatsapp_number' => $validated['whatsapp_number'],
+                'whatsapp_message' => $validated['whatsapp_message'],
                 'primary_color' => $validated['primary_color'],
-                'secondary_color' => $validated['secondary_color'] ?? '#1e40af',
-                'logo_url' => null,
-                'gallery_images' => [],
-                'social_media' => [
-                    'facebook' => '',
-                    'instagram' => '',
-                    'twitter' => '',
-                    'linkedin' => '',
-                ],
+                'secondary_color' => $validated['secondary_color'],
+                'font_family' => $validated['font_family'],
+                //'logo_url' => null,
+                //'gallery_images' => [],
+                // 'social_media' => [
+                //     'facebook' => '',
+                //     'instagram' => '',
+                //     'twitter' => '',
+                //     'linkedin' => '',
+                // ],
             ];
 
             $websiteContent = WebsiteContent::create([
                 'user_id' => $user->id,
                 'template_slug' => $template->slug,
-                'website_name' => $validated['website_name'],
+                'website_name' => $validated['company_name'],
                 'content_data' => $contentData,
                 'status' => 'draft',
                 'subdomain' => $validated['subdomain'],

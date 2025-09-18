@@ -24,15 +24,16 @@ class PaymentService
         $template = $websiteContent->template;
         $user = $websiteContent->user;
         
-        // Calculate fee (2.9% + Rp 2,000)
-        $grossAmount = $template->price;
-        $fee = ($grossAmount * 0.029) + 2000;
+        $price = $template->price;
+        $fee = 4000; // fee 4000
+        $grossAmount = $price + $fee;
         
         // Create payment record
         $payment = Payment::create([
             'code' => Payment::generateCode(),
             'user_id' => $user->id,
             'website_content_id' => $websiteContent->id,
+            'amount' => $price,
             'fee' => $fee,
             'gross_amount' => $grossAmount,
             'status' => 'pending',
@@ -110,13 +111,11 @@ class PaymentService
             return;
         }
 
-        // Update midtrans data
         $payment->update([
             'midtrans_data' => $notificationData,
             'payment_type' => $notificationData['payment_type'] ?? null,
         ]);
 
-        // Process based on transaction status
         switch ($transactionStatus) {
             case 'capture':
                 if ($fraudStatus == 'accept') {
