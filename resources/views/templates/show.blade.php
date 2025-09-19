@@ -347,14 +347,6 @@
                                                 Get This Template FREE
                                             @endif
                                         </a>
-                                        
-                                        <p class="text-center text-xs text-gray-500">
-                                            @if($template->price > 0)
-                                                Next: Fill your website details
-                                            @else
-                                                Create your website immediately
-                                            @endif
-                                        </p>
                                     @else
                                         <div class="text-center space-y-4">
                                             <p class="text-gray-600 text-sm">Please login to order this template</p>

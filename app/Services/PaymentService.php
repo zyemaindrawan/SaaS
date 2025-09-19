@@ -26,7 +26,7 @@ class PaymentService
         
         $price = $template->price;
         $fee = 4000; // fee 4000
-        $grossAmount = $price + $fee;
+        $grossAmount = $price+$fee;
         
         // Create payment record
         $payment = Payment::create([
@@ -51,11 +51,15 @@ class PaymentService
         $user = $payment->user;
         $websiteContent = $payment->websiteContent;
         $template = $websiteContent->template;
+        $price = $template->price;
+        $fee = 4000; // fee 4000
+        $grossAmount = $price+$fee;
 
         $params = [
             'transaction_details' => [
                 'order_id' => $payment->code,
-                'gross_amount' => (int) $payment->gross_amount,
+                //'gross_amount' => (int) $payment->gross_amount,
+                'gross_amount' => (int) $grossAmount,
             ],
             'customer_details' => [
                 'first_name' => $user->name,

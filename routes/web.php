@@ -11,25 +11,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return view('pages.home');
 });
 
-// Template routes
 Route::get('/templates', [TemplateController::class, 'index'])
     ->name('templates.index');
 
 Route::get('/templates/{template:slug}', [TemplateController::class, 'show'])
     ->name('templates.show');
 
-// Route::get('/templates/{template:slug}/preview', [TemplateController::class, 'preview'])
-//     ->name('templates.preview');
-
-// Route untuk order (butuh auth)
 Route::middleware(['auth'])->group(function () {
     Route::post('/templates/{template:slug}/order', [OrderController::class, 'create'])
         ->name('templates.order');

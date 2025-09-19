@@ -1,6 +1,6 @@
 # SaaS Pembuatan Website Berbasis Template
 
-## 🧩 Gambaran Umum Sistem
+## Gambaran Umum Sistem
 Sistem ini adalah **Software as a Service (SaaS)** yang memungkinkan pengguna untuk membuat website dengan mudah menggunakan template yang tersedia. Platform ini dibangun dengan **Laravel 12** sebagai framework utama dan berfokus pada content management dinamis serta templating yang fleksibel.
 
 ---
@@ -12,12 +12,12 @@ Platform ini memungkinkan user terdaftar untuk:
 - Mengisi konten dinamis (nama perusahaan, slogan, galeri foto, dll)
 - Melihat preview hasil website sebelum publikasi
 - Melakukan pembayaran melalui integrasi Payment Gateway
-- Menunggu proses aktivasi selama 6 jam
+- Menunggu proses aktivasi dari Admin
 - Menerima notifikasi email ketika website sudah aktif dan bisa diakses
 
 ---
 
-## 🏗️ Arsitektur Sistem
+## Arsitektur Sistem
 
 ### 1. Template Management (Inti Sistem)
 - Setiap template disimpan dalam struktur folder terpisah di  
@@ -42,7 +42,7 @@ Platform ini memungkinkan user terdaftar untuk:
 
 ---
 
-## 🔄 Workflow Pengguna
+## Workflow Pengguna
 
 1. **Register + Login & Template Selection**  
    User register & login dan memilih template dari katalog.
@@ -64,7 +64,7 @@ Platform ini memungkinkan user terdaftar untuk:
 
 ---
 
-## 💡 Keunggulan Sistem
+## Keunggulan Sistem
 
 - **Scalable**  
   Mudah menambah template baru hanya dengan membuat folder dan `config.json`.
