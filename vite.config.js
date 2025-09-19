@@ -37,6 +37,7 @@ export default defineConfig({
                 //'https://f8284b5c3f72.ngrok-free.app',
                 'http://127.0.0.1:8000',
                 'http://localhost:8000',
+                'https://saas.test',
                 /^https:\/\/.*\.ngrok-free\.app$/,
                 /^https:\/\/.*\.ngrok\.io$/
             ],

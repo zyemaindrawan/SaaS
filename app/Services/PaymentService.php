@@ -77,7 +77,7 @@ class PaymentService
                 'error' => route('payment.error', $payment->code),
             ],
             'expiry' => [
-                'duration' => 24,
+                'duration' => 12,
                 'unit' => 'hours'
             ]
         ];
