@@ -34,7 +34,7 @@ export default defineConfig({
         },
         cors: {
             origin: [
-                //'https://f8284b5c3f72.ngrok-free.app',
+                'https://f1cb688ee2e2.ngrok-free.app',
                 'http://127.0.0.1:8000',
                 'http://localhost:8000',
                 'https://saas.test',

@@ -1,54 +1,52 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-/* Template Grid Responsive */
-@media (max-width: 640px) {
-    .template-grid {
-        grid-template-columns: 1fr;
+/* Custom Loading States */
+.loading {
+    cursor: wait;
+}
+
+.loading * {
+    pointer-events: none;
+}
+
+/* Smooth transitions */
+* {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Progress bar animation */
+@keyframes progress {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100vw);
     }
 }
 
-@media (min-width: 641px) and (max-width: 1024px) {
-    .template-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.progress-bar {
+    animation: progress 2s linear infinite;
 }
 
-@media (min-width: 1025px) {
-    .template-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+/* Image loading animation */
+img {
+    transition: opacity 0.3s ease;
 }
 
-@media (min-width: 1280px) {
-    .template-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
+img[loading="lazy"] {
+    opacity: 0;
 }
 
-/* Filter Form Mobile */
-@media (max-width: 768px) {
-    .filter-form {
-        grid-template-columns: 1fr;
-    }
-    
-    .filter-price-inputs {
-        flex-direction: column;
-    }
+img[loading="lazy"].loaded {
+    opacity: 1;
 }
 
-/* Template Card Hover Effects */
-.template-card:hover .template-image {
-    transform: scale(1.05);
-}
-
-.template-overlay {
-    transition: opacity 0.3s ease-in-out;
-}
-
-/* Loading States */
-.template-loading {
+/* Skeleton loading */
+.skeleton {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
     animation: loading 1.5s infinite;
@@ -60,5 +58,13 @@
     }
     100% {
         background-position: -200% 0;
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .sticky {
+        position: relative !important;
+        top: auto !important;
     }
 }

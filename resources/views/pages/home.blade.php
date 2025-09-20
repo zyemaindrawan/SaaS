@@ -1,59 +1,11 @@
-<!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Jasa Website Profesional</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-<script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#5145CD",
-                        "background-light": "#FFFFFF",
-                        "background-dark": "#111827",
-                        "text-light": "#1F2937",
-                        "text-dark": "#F9FAFB",
-                        "subtext-light": "#6B7280",
-                        "subtext-dark": "#9CA3AF",
-                        "border-light": "#E5E7EB",
-                        "border-dark": "#374151"
-                    },
-                    fontFamily: {
-                        display: ["Poppins", "sans-serif"],
-                    },
-                    borderRadius: {
-                        DEFAULT: "0.5rem",
-                    },
-                },
-            },
-        };
-    </script>
-</head>
-<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
-<div class="container mx-auto px-4">
-<header class="flex justify-between items-center py-6">
-<div class="flex items-center space-x-2">
-<span class="font-bold text-lg">{{env('APP_NAME')}}</span>
-</div>
-<nav class="hidden md:flex items-center space-x-8">
-<a class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary" href="{{route('templates.index')}}">Pilih Tema</a>
-<a class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary" href="#">Fitur</a>
-<a class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary" href="#">Portofolio</a>
-</nav>
-<div class="flex items-center space-x-4">
-<a class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary" href="{{route('login')}}">Login</a>
-<a class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary" href="{{route('register')}}">Register</a>
-<a href="{{route('templates.index')}}"><button class="bg-primary text-white px-6 py-2 rounded-lg font-semibold">Pilih Tema</button></a>
-</div>
-</header>
-<main>
+@extends('layouts.app')
+
+@section('title', env('APP_NAME'))
+
+@section('content')
 <section class="text-center py-16 md:py-24">
-<h1 class="text-4xl md:text-6xl font-bold mb-4">Bikin Website</h1>
-<h2 class="text-3xl md:text-5xl font-bold mb-6">Jasa Pembuatan Website Profesional Mudah, Cepat &amp; Terpercaya</h2>
+<h1 class="text-4xl md:text-6xl font-bold mb-4">{{env('APP_NAME')}}</h1>
+<h2 class="text-3xl md:text-5xl font-bold mb-6">Jasa Pembuatan Website Profesional</h2>
 <p class="max-w-3xl mx-auto text-subtext-light dark:text-subtext-dark mb-8">Dapatkan website professional dengan harga terjangkau yang mudah dikelola untuk membantu bisnis Anda berkembang lebih pesat di dunia digital.</p>
 <div class="relative inline-block">
 <input class="border border-border-light dark:border-border-dark rounded-full py-3 pl-6 pr-40 w-full md:w-auto bg-background-light dark:bg-background-dark" placeholder="www.domainanda.com" type="text"/>
@@ -194,36 +146,4 @@
 <p class="mb-6">Jangan ragu! Tim kami siap membantu Anda 24 jam.</p>
 <button class="bg-white text-primary px-8 py-3 rounded-lg font-semibold">Hubungi Kami</button>
 </section>
-</main>
-</div>
-<footer class="bg-gray-800 text-gray-300 py-12">
-<div class="container mx-auto px-4">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-<div>
-<h4 class="font-bold text-white mb-4">Bikin.Website</h4>
-<p class="text-sm">Jasa Pembuatan Website Profesional Murah, Cepat, dan Terpercaya</p>
-</div>
-<div>
-<h5 class="font-semibold text-white mb-4">Layanan</h5>
-<ul class="space-y-2 text-sm">
-<li><a class="hover:text-white" href="#">Jasa Pembuatan Website</a></li>
-<li><a class="hover:text-white" href="#">Jasa Desain Website</a></li>
-<li><a class="hover:text-white" href="#">Jasa SEO Website</a></li>
-</ul>
-</div>
-<div>
-<h5 class="font-semibold text-white mb-4">Alamat</h5>
-<p class="text-sm">Jl. Jenderal Sudirman No.Kav. 52-53, Senayan, Kebayoran Baru, Kota Jakarta Selatan, DKI Jakarta 12190</p>
-</div>
-<div>
-<h5 class="font-semibold text-white mb-4">Pembayaran</h5>
-<p class="text-sm">BCA, Mandiri, BNI, BRI, OVO, Gopay, Dana, &amp; Alfamart</p>
-</div>
-</div>
-<div class="border-t border-gray-700 mt-8 pt-6 text-center text-sm">
-<p>Copyright &copy; 2025. All rights reserved.</p>
-</div>
-</div>
-</footer>
-</body>
-</html>
+@endsection

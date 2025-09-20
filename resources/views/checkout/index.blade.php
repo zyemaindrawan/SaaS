@@ -23,7 +23,7 @@
     </div>
 
     <!-- Alert Messages -->
-    @if(session('success') || session('error') || session('info'))
+    @if(session('success') || session('error') || session('info') || $errors->any())
         <div class="container mx-auto px-4 pt-6">
             @if(session('success'))
                 <div class="max-w-6xl mx-auto mb-6">
@@ -55,6 +55,28 @@
                                 <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            @endif
+            
+            @if($errors->any())
+                <div class="max-w-6xl mx-auto mb-6">
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg shadow-sm">
+                        <div class="flex items-center mb-2">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700 font-medium">Terdapat kesalahan pada form:</p>
+                            </div>
+                        </div>
+                        <ul class="ml-8 text-sm text-red-600 list-disc list-inside">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             @endif
@@ -115,8 +137,11 @@
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-6xl mx-auto">
-            <form method="POST" action="{{ route('templates.checkout.process', $template->slug) }}" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <form method="POST" action="{{ route('templates.checkout.process', $template->slug) }}" class="grid grid-cols-1 lg:grid-cols-3 gap-8" id="checkoutForm">
                 @csrf
+                <input type="hidden" name="_token" value="{{ csrf_token() }}" id="csrf-token">
+                <input type="hidden" name="form_timestamp" value="{{ now()->timestamp }}">
+                <input type="hidden" name="session_id" value="{{ session()->getId() }}">
                 
                 <!-- Left Column - Form -->
                 <div class="lg:col-span-2 space-y-8">
@@ -1561,16 +1586,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ============ Confirmation Modal ============
+    // ============ Form Submission Handling ============
     const submitBtn = document.getElementById('submitBtn');
     const confirmationModal = document.getElementById('confirmationModal');
     const cancelBtn = document.getElementById('cancelBtn');
     const confirmBtn = document.getElementById('confirmBtn');
-    const form = document.querySelector('form');
+    const form = document.getElementById('checkoutForm');
+    
+    if (!submitBtn || !confirmationModal || !cancelBtn || !confirmBtn || !form) {
+        console.error('Required elements not found:', {
+            submitBtn: !!submitBtn,
+            confirmationModal: !!confirmationModal,
+            cancelBtn: !!cancelBtn,
+            confirmBtn: !!confirmBtn,
+            form: !!form
+        });
+        return;
+    }
+
+    // Store original button text
+    const originalSubmitText = submitBtn.innerHTML;
+    const originalConfirmText = confirmBtn.innerHTML;
+    
+    // Track submission state
+    let isSubmitting = false;
 
     // Show modal when submit button is clicked
     submitBtn.addEventListener('click', function(e) {
         e.preventDefault();
+        
+        if (isSubmitting) {
+            console.log('Form is already being submitted');
+            return;
+        }
         
         // Basic form validation
         const requiredFields = form.querySelectorAll('[required]');
@@ -1579,6 +1627,7 @@ document.addEventListener('DOMContentLoaded', function() {
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 field.classList.add('border-red-300');
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 isValid = false;
             } else {
                 field.classList.remove('border-red-300');
@@ -1590,6 +1639,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Log form data for debugging
+        console.log('Form validation passed, showing confirmation modal');
+        
+        // Refresh CSRF token before showing modal
+        try {
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) {
+                const csrfInput = document.getElementById('csrf-token');
+                if (csrfInput) {
+                    csrfInput.value = csrfMeta.getAttribute('content');
+                }
+            }
+        } catch (error) {
+            console.error('CSRF token refresh error:', error);
+        }
+        
         // Show confirmation modal
         confirmationModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -1597,28 +1662,119 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Hide modal when cancel button is clicked
     cancelBtn.addEventListener('click', function() {
+        if (isSubmitting) {
+            return; // Don't allow cancel during submission
+        }
         confirmationModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     });
 
     // Submit form when confirm button is clicked
-    confirmBtn.addEventListener('click', function() {
+    confirmBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Prevent double submission
+        if (isSubmitting || confirmBtn.disabled) {
+            console.log('Submission already in progress');
+            return;
+        }
+        
+        isSubmitting = true;
+        
+        // Hide modal immediately
         confirmationModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
         
         // Add loading state
         confirmBtn.innerHTML = 'Processing...';
         confirmBtn.disabled = true;
+        submitBtn.innerHTML = 'Processing...';
+        submitBtn.disabled = true;
         
-        // Submit the form
-        form.submit();
+        console.log('Starting form submission...');
+        
+        // Add debug logging
+        console.log('Form submission attempt:', {
+            timestamp: new Date().toISOString(),
+            userId: '{{ Auth::id() }}',
+            templateSlug: '{{ $template->slug }}',
+            formAction: form.action,
+            sessionId: '{{ session()->getId() }}',
+            authCheck: '{{ Auth::check() ? "authenticated" : "not_authenticated" }}'
+        });
+        
+        // Ensure form data is properly formatted
+        const formData = new FormData(form);
+        
+        // Log CSRF token for debugging
+        const csrfToken = formData.get('_token');
+        console.log('Form submission debug info:', {
+            csrfTokenPresent: !!csrfToken,
+            csrfTokenLength: csrfToken ? csrfToken.length : 0,
+            formAction: form.action,
+            formMethod: form.method,
+            sessionId: formData.get('session_id'),
+            timestamp: formData.get('form_timestamp'),
+            userAgent: navigator.userAgent
+        });
+        
+        // Validate critical form data
+        const companyName = formData.get('company_name');
+        const subdomain = formData.get('subdomain');
+        const contactEmail = formData.get('contact_email');
+        
+        if (!companyName || !subdomain || !contactEmail) {
+            console.error('Critical form data missing:', {
+                companyName: !!companyName,
+                subdomain: !!subdomain,
+                contactEmail: !!contactEmail
+            });
+            
+            isSubmitting = false;
+            confirmBtn.innerHTML = originalConfirmText;
+            confirmBtn.disabled = false;
+            submitBtn.innerHTML = originalSubmitText;
+            submitBtn.disabled = false;
+            
+            alert('Data form tidak lengkap. Silakan periksa kembali.');
+            return;
+        }
+        
+        // Submit the form with error handling
+        try {
+            console.log('Submitting form directly...');
+            
+            // Simply submit the form - let the browser handle it naturally
+            form.submit();
+            
+        } catch (error) {
+            console.error('Form submission error:', error);
+            
+            // Reset state on error
+            isSubmitting = false;
+            confirmBtn.innerHTML = originalConfirmText;
+            confirmBtn.disabled = false;
+            submitBtn.innerHTML = originalSubmitText;
+            submitBtn.disabled = false;
+            
+            alert('Terjadi kesalahan saat mengirim form. Silakan coba lagi.');
+        }
     });
 
-    // Hide modal when clicking outside
+    // Hide modal when clicking outside (only if not submitting)
     confirmationModal.addEventListener('click', function(e) {
-        if (e.target === confirmationModal) {
+        if (e.target === confirmationModal && !isSubmitting) {
             confirmationModal.classList.add('hidden');
             document.body.style.overflow = 'auto';
+        }
+    });
+    
+    // Handle page unload during submission
+    window.addEventListener('beforeunload', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            e.returnValue = 'Form sedang diproses. Yakin ingin meninggalkan halaman?';
+            return e.returnValue;
         }
     });
 });

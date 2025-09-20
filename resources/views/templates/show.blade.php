@@ -3,10 +3,10 @@
 @section('title', $template->name)
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+<div class="min-h-screen">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div class="container mx-auto px-4 py-12">
+    <div class="bg-primary text-white">
+        <div class="py-12">
             <div class="max-w-4xl mx-auto text-center">
                 <div class="flex items-center justify-center mb-4">
                     <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">Step 1 of 3</span>
@@ -24,15 +24,13 @@
 
     <!-- Alert Messages -->
     @if(session('success') || session('error') || session('info'))
-        <div class="container mx-auto px-4 pt-6">
+        <div class="pt-6">
             @if(session('success'))
                 <div class="max-w-6xl mx-auto mb-6">
                     <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg shadow-sm">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
+                                <span class="material-icons text-green-400">check_circle</span>
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm text-green-700 font-medium">{{ session('success') }}</p>
@@ -47,9 +45,7 @@
                     <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg shadow-sm">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                </svg>
+                                <span class="material-icons text-red-400">error</span>
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
@@ -64,9 +60,7 @@
                     <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg shadow-sm">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                </svg>
+                                <span class="material-icons text-blue-400">info</span>
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm text-blue-700 font-medium">{{ session('info') }}</p>
@@ -79,33 +73,27 @@
     @endif
 
     <!-- Breadcrumb -->
-    <div class="container mx-auto px-4 py-4">
+    <div class="py-4">
         <nav class="flex max-w-6xl mx-auto" aria-label="Breadcrumb">
             <ol class="flex items-center space-x-4">
                 <li>
-                    <a href="{{ route('templates.index') }}" class="text-gray-400 hover:text-gray-500 transition duration-200">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                        </svg>
+                    <a href="{{ route('templates.index') }}" class="text-subtext-light dark:text-subtext-dark hover:text-primary transition duration-200">
+                        <span class="material-icons text-lg">home</span>
                         <span class="sr-only">Templates</span>
                     </a>
                 </li>
                 <li>
-                    <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
+                    <span class="material-icons text-subtext-light dark:text-subtext-dark">chevron_right</span>
                 </li>
                 <li>
-                    <a href="{{ route('templates.index') }}" class="text-gray-400 hover:text-gray-500 transition duration-200">
+                    <a href="{{ route('templates.index') }}" class="text-subtext-light dark:text-subtext-dark hover:text-primary transition duration-200">
                         Templates
                     </a>
                 </li>
                 <li>
-                    <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
+                    <span class="material-icons text-subtext-light dark:text-subtext-dark">chevron_right</span>
                 </li>
-                <li class="text-gray-500 font-medium">
+                <li class="text-text-light dark:text-text-dark font-medium">
                     {{ $template->name }}
                 </li>
             </ol>
@@ -113,7 +101,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
+    <div class="py-8">
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
@@ -121,13 +109,10 @@
                 <div class="lg:col-span-2 space-y-8">
                     
                     <!-- Template Preview -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                    <div class="bg-background-light dark:bg-background-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+                        <div class="bg-primary px-6 py-4">
                             <h3 class="text-lg font-semibold text-white flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
-                                    <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd" />
-                                </svg>
+                                <span class="material-icons mr-2">preview</span>
                                 Template Preview
                             </h3>
                         </div>
@@ -146,11 +131,9 @@
                                     <a 
                                         href="{{ route('templates.preview', $template->slug) }}" 
                                         target="_blank"
-                                        class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg transition duration-200 font-medium"
+                                        class="inline-flex items-center bg-subtext-light hover:bg-subtext-light/90 text-white py-3 px-6 rounded-lg transition duration-200 font-medium"
                                     >
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                        </svg>
+                                        <span class="material-icons mr-2">launch</span>
                                         View Live Preview
                                     </a>
                                 </div>
@@ -159,12 +142,10 @@
                     </div>
 
                     <!-- Template Information -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-                            <h3 class="text-lg font-semibold text-white flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                </svg>
+                    <div class="bg-background-light dark:bg-background-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+                        <div class="bg-green-600 text-white px-6 py-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <span class="material-icons mr-2">info</span>
                                 About This Template
                             </h3>
                         </div>
@@ -172,8 +153,8 @@
                         <div class="p-6 space-y-6">
                             @if($template->description)
                                 <div>
-                                    <h4 class="font-semibold text-gray-900 mb-3">Description</h4>
-                                    <p class="text-gray-600 leading-relaxed">
+                                    <h4 class="font-semibold text-text-light dark:text-text-dark mb-3">Description</h4>
+                                    <p class="text-subtext-light dark:text-subtext-dark leading-relaxed">
                                         {{ $template->description }}
                                     </p>
                                 </div>
@@ -181,18 +162,18 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <h5 class="font-semibold text-gray-900 mb-2">Category</h5>
+                                    <h5 class="font-semibold text-text-light dark:text-text-dark mb-2">Category</h5>
                                     @if($template->category)
-                                        <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                        <span class="inline-block bg-primary/20 text-primary text-sm px-3 py-1 rounded-full">
                                             {{ ucwords(str_replace('-', ' ', $template->category)) }}
                                         </span>
                                     @else
-                                        <span class="text-gray-500">Uncategorized</span>
+                                        <span class="text-subtext-light dark:text-subtext-dark">Uncategorized</span>
                                     @endif
                                 </div>
 
                                 <div>
-                                    <h5 class="font-semibold text-gray-900 mb-2">Price</h5>
+                                    <h5 class="font-semibold text-text-light dark:text-text-dark mb-2">Price</h5>
                                     <div class="text-2xl font-bold text-green-600">
                                         @if($template->price > 0)
                                             Rp {{ number_format($template->price, 0, ',', '.') }}
@@ -283,13 +264,10 @@
                 <div class="lg:col-span-1">
                     <div class="sticky top-8">
                         <!-- Order Summary -->
-                        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                            <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
-                                <h3 class="text-lg font-semibold text-white flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
-                                        <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd" />
-                                    </svg>
+                        <div class="bg-background-light dark:bg-background-dark rounded-xl shadow-lg border border-border-light dark:border-border-dark overflow-hidden">
+                            <div class="bg-subtext-light text-white px-6 py-4">
+                                <h3 class="text-lg font-semibold flex items-center">
+                                    <span class="material-icons mr-2">description</span>
                                     Template Details
                                 </h3>
                             </div>
@@ -304,18 +282,18 @@
                                     >
                                     
                                     <div>
-                                        <h4 class="font-bold text-lg text-gray-900 mb-1">
+                                        <h4 class="font-bold text-lg text-text-light dark:text-text-dark mb-1">
                                             {{ $template->name }}
                                         </h4>
                                         
                                         @if($template->category)
-                                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-3">
+                                            <span class="inline-block bg-primary/20 text-primary text-xs px-2 py-1 rounded-full mb-3">
                                                 {{ ucwords(str_replace('-', ' ', $template->category)) }}
                                             </span>
                                         @endif
                                         
                                         @if($template->description)
-                                            <p class="text-sm text-gray-600">
+                                            <p class="text-sm text-subtext-light dark:text-subtext-dark">
                                                 {{ Str::limit($template->description, 100) }}
                                             </p>
                                         @endif
@@ -331,7 +309,7 @@
                                             FREE
                                         @endif
                                     </div>
-                                    <p class="text-gray-500 text-sm">One-time payment</p>
+                                    <p class="text-subtext-light dark:text-subtext-dark text-sm">One-time payment</p>
                                 </div>
 
                                 <!-- Order Section -->
@@ -339,7 +317,7 @@
                                     @auth
                                         <a 
                                             href="{{ route('templates.checkout', $template->slug) }}"
-                                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-center block"
+                                            class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 px-6 rounded-lg transition duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-center block"
                                         >
                                             @if($template->price > 0)
                                                 Continue to Checkout
@@ -349,19 +327,19 @@
                                         </a>
                                     @else
                                         <div class="text-center space-y-4">
-                                            <p class="text-gray-600 text-sm">Please login to order this template</p>
+                                            <p class="text-subtext-light dark:text-subtext-dark text-sm">Please login to order this template</p>
                                             
                                             <div class="space-y-2">
                                                 <a 
                                                     href="{{ route('login', ['redirect' => request()->url()]) }}"
-                                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition duration-200 font-medium block text-center"
+                                                    class="w-full bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-lg transition duration-200 font-medium block text-center"
                                                 >
                                                     Login to Continue
                                                 </a>
                                                 
-                                                <p class="text-xs text-gray-500">
+                                                <p class="text-xs text-subtext-light dark:text-subtext-dark">
                                                     Don't have an account? 
-                                                    <a href="{{ route('register', ['redirect' => request()->url()]) }}" class="text-blue-600 hover:text-blue-500">
+                                                    <a href="{{ route('register', ['redirect' => request()->url()]) }}" class="text-primary hover:text-primary/80">
                                                         Sign up here
                                                     </a>
                                                 </p>

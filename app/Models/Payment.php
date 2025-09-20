@@ -15,11 +15,15 @@ class Payment extends Model
         'code',
         'user_id',
         'website_content_id',
+        'midtrans_order_id',
+        'snap_token',
         'amount',
         'fee',
         'gross_amount',
         'status',
         'payment_type',
+        'transaction_time',
+        //'settlement_time',
         'midtrans_data',
         'expired_at',
         'paid_at',
@@ -32,6 +36,8 @@ class Payment extends Model
         'gross_amount' => 'decimal:2',
         'expired_at' => 'datetime',
         'paid_at' => 'datetime',
+        'transaction_time' => 'datetime',
+        //'settlement_time' => 'datetime',
     ];
 
     public function user(): BelongsTo
