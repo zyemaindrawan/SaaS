@@ -12,7 +12,7 @@
                     <div class="flex items-center justify-center mb-4">
                         <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">Step 1 of 3</span>
                     </div>
-                    
+
                     <h1 class="text-4xl md:text-5xl font-bold mb-4">
                         {{ template.name }}
                     </h1>
@@ -25,7 +25,7 @@
 
         <!-- Alert Messages -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" v-if="$page.props.flash.message">
-            <Alert 
+            <Alert
                 :type="$page.props.flash.type || 'success'"
                 :message="$page.props.flash.message"
                 @dismiss="$page.props.flash.message = null"
@@ -40,10 +40,10 @@
         <!-- Main Content -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
+
                 <!-- Left Column - Template Details (2 columns) -->
                 <div class="lg:col-span-2 space-y-8">
-                    
+
                     <!-- Template Preview Section -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden slide-in-left">
                         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
@@ -52,22 +52,23 @@
                                 Template Preview
                             </h3>
                         </div>
-                        
+
                         <div class="p-6">
                             <div class="mb-6">
                                 <div class="relative group">
-                                    <img 
-                                        :src="template.preview_image || '/images/template-placeholder.jpg'" 
+                                    <img
+                                        :src="template.preview_image || '/images/template-placeholder.jpg'"
                                         :alt="template.name"
                                         class="w-full h-80 object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-[1.02]"
                                         loading="lazy"
+                                        style="opacity: 1;"
                                     >
-                                    
+
                                     <!-- Overlay with preview button -->
                                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center">
-                                        <Link 
+                                        <Link
                                             v-if="template.demo_url"
-                                            :href="`/preview/${template.slug}`" 
+                                            :href="`/preview/${template.slug}`"
                                             target="_blank"
                                             class="opacity-0 group-hover:opacity-100 transform scale-95 group-hover:scale-100 transition-all duration-300 bg-white text-gray-800 px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl"
                                         >
@@ -77,10 +78,10 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div v-if="template.demo_url" class="text-center">
-                                <Link 
-                                    :href="`/templates/${template.slug}/preview`" 
+                                <Link
+                                    :href="`/templates/${template.slug}/preview`"
                                     target="_blank"
                                     class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg transition duration-200 font-medium"
                                 >
@@ -99,7 +100,7 @@
                                 About This Template
                             </h3>
                         </div>
-                        
+
                         <div class="p-6 space-y-6">
                             <div v-if="template.description">
                                 <h4 class="font-semibold text-gray-900 mb-3">Description</h4>
@@ -145,15 +146,15 @@
                                 Features & Specifications
                             </h3>
                         </div>
-                        
+
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Features -->
                                 <div>
                                     <h4 class="font-semibold text-gray-900 mb-4">What's Included</h4>
                                     <div class="space-y-3">
-                                        <div 
-                                            v-for="(description, feature) in template.features" 
+                                        <div
+                                            v-for="(description, feature) in template.features"
                                             :key="feature"
                                             class="flex items-start"
                                         >
@@ -170,8 +171,8 @@
                                 <div>
                                     <h4 class="font-semibold text-gray-900 mb-4">Technical Specifications</h4>
                                     <div class="space-y-3">
-                                        <div 
-                                            v-for="(value, spec) in template.tech_specs" 
+                                        <div
+                                            v-for="(value, spec) in template.tech_specs"
                                             :key="spec"
                                             class="flex justify-between py-2 border-b border-gray-100 last:border-b-0"
                                         >
@@ -197,21 +198,22 @@
                                     Template Details
                                 </h3>
                             </div>
-                            
+
                             <div class="p-6">
                                 <!-- Template Summary -->
                                 <div class="mb-6">
-                                    <img 
-                                        :src="template.preview_image || '/images/template-placeholder.jpg'" 
+                                    <img
+                                        :src="template.preview_image || '/images/template-placeholder.jpg'"
                                         :alt="template.name"
                                         class="w-full h-32 object-cover rounded-lg mb-4"
+                                        style="opacity: 1;"
                                     >
-                                    
+
                                     <div>
                                         <h4 class="font-bold text-lg text-gray-900 mb-1">
                                             {{ template.name }}
                                         </h4>
-                                        
+
                                         <p v-if="template.description" class="text-sm text-gray-600">
                                             {{ truncateText(template.description, 100) }}
                                         </p>
@@ -228,7 +230,7 @@
 
                                 <!-- Order CTA -->
                                 <div class="space-y-4">
-                                    <Link 
+                                    <Link
                                         v-if="$page.props.auth.user"
                                         :href="`/templates/${template.slug}/checkout`"
                                         class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-center block"
@@ -238,27 +240,27 @@
                                         <ShoppingCartIcon class="w-5 h-5 inline mr-2" />
                                         {{ template.price > 0 ? 'Continue to Checkout' : 'Get This Template FREE' }}
                                     </Link>
-                                    
+
                                     <div v-else class="text-center space-y-4">
                                         <p class="text-gray-600 text-sm">Please login to order this template</p>
-                                        
+
                                         <div class="space-y-2">
-                                            <Link 
+                                            <Link
                                                 :href="`/login?redirect=${$page.url}`"
                                                 class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition duration-200 font-medium block text-center"
                                             >
                                                 Login to Continue
                                             </Link>
-                                            
+
                                             <p class="text-xs text-gray-500">
-                                                Don't have an account? 
+                                                Don't have an account?
                                                 <Link :href="`/register?redirect=${$page.url}`" class="text-blue-600 hover:text-blue-500">
                                                     Sign up here
                                                 </Link>
                                             </p>
                                         </div>
                                     </div>
-                                    
+
                                     <p class="text-center text-xs text-gray-500">
                                         {{ template.price > 0 ? 'Next: Fill your website details' : 'Create your website immediately' }}
                                     </p>
@@ -326,22 +328,23 @@
                             Related Templates
                         </h2>
                     </div>
-                    
+
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div 
-                                v-for="relatedTemplate in relatedTemplates" 
+                            <div
+                                v-for="relatedTemplate in relatedTemplates"
                                 :key="relatedTemplate.id"
                                 class="bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-gray-100 group"
                             >
                                 <div class="relative">
-                                    <img 
-                                        :src="relatedTemplate.preview_image || '/images/template-placeholder.jpg'" 
+                                    <img
+                                        :src="relatedTemplate.preview_image || '/images/template-placeholder.jpg'"
                                         :alt="relatedTemplate.name"
                                         class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                                         loading="lazy"
+                                        style="opacity: 1;"
                                     >
-                                    
+
                                     <div class="absolute top-3 right-3">
                                         <span class="bg-green-600 text-white text-xs px-2 py-1 rounded-full font-bold">
                                             {{ relatedTemplate.price > 0 ? formatPrice(relatedTemplate.price) : 'FREE' }}
@@ -353,13 +356,13 @@
                                     <h3 class="font-bold text-sm text-gray-900 mb-2 line-clamp-1">
                                         {{ relatedTemplate.name }}
                                     </h3>
-                                    
+
                                     <span v-if="relatedTemplate.category" class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-3">
                                         {{ formatCategory(relatedTemplate.category) }}
                                     </span>
-                                    
+
                                     <div class="flex gap-2">
-                                        <Link 
+                                        <Link
                                             :href="`/templates/${relatedTemplate.slug}`"
                                             class="flex-1 bg-white hover:bg-gray-100 text-gray-700 text-center py-2 px-3 rounded-md transition duration-200 text-xs font-medium border"
                                         >
@@ -385,7 +388,7 @@ import Breadcrumb from '@/Components/Breadcrumb.vue'
 import PageLoader from '@/Components/PageLoader.vue'
 
 // Icons
-import { 
+import {
     EyeIcon,
     InformationCircleIcon,
     SparklesIcon,
@@ -427,13 +430,19 @@ const preloadImages = () => {
 
     images.forEach(src => {
         const img = new Image()
+        img.onload = () => {
+            // Image loaded successfully
+        }
+        img.onerror = () => {
+            // Image failed to load, use fallback
+        }
         img.src = src
     })
 }
 
 const formatCategory = (category) => {
     if (!category) return ''
-    return category.split('-').map(word => 
+    return category.split('-').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ')
 }

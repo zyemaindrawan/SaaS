@@ -1,11 +1,11 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\WebsiteContent;
 use App\Models\Payment;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -16,96 +16,78 @@ class PaymentController extends Controller
         $this->paymentService = $paymentService;
     }
 
-    public function checkout(WebsiteContent $websiteContent)
+    /**
+     * Handle successful payment
+     */
+    public function finish($paymentCode)
     {
-        // Verify ownership
-        if ($websiteContent->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $payment = Payment::where('code', $paymentCode)->firstOrFail();
 
-        // Check if already has payment
-        if ($websiteContent->payment) {
-            return redirect()->route('payment.show', $websiteContent->payment->code);
-        }
-
-        // Check if content is in correct status
-        if (!in_array($websiteContent->status, ['draft', 'previewed'])) {
-            return redirect()->back()->with('error', 'Website content cannot be paid at this time.');
-        }
-
-        try {
-            // Create payment
-            $payment = $this->paymentService->createPayment($websiteContent);
-            
-            return redirect()->route('payment.show', $payment->code);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create payment: ' . $e->getMessage());
-        }
+        return redirect()->route('invoice.show', $paymentCode)
+            ->with('success', 'Payment completed successfully!');
     }
 
-    public function show(string $paymentCode)
+    /**
+     * Handle unfinished payment
+     */
+    public function unfinish($paymentCode)
     {
-        $payment = Payment::where('code', $paymentCode)
-            ->with(['user', 'websiteContent.template'])
-            ->firstOrFail();
+        $payment = Payment::where('code', $paymentCode)->firstOrFail();
 
-        // Verify ownership
-        if ($payment->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        // If already paid, redirect to success page
-        if ($payment->status === 'paid') {
-            return view('payment.success', compact('payment'));
-        }
-
-        // If expired, show expired page
-        if ($payment->expired_at < now()) {
-            $payment->update(['status' => 'expired']);
-            return view('payment.expired', compact('payment'));
-        }
-
-        try {
-            $snapToken = $this->paymentService->getSnapToken($payment);
-            return view('payment.checkout', compact('payment', 'snapToken'));
-        } catch (\Exception $e) {
-            return view('payment.error', [
-                'payment' => $payment,
-                'error' => $e->getMessage()
-            ]);
-        }
+        return redirect()->route('invoice.show', $paymentCode)
+            ->with('warning', 'Payment was not completed. Please try again.');
     }
 
+    /**
+     * Handle payment error
+     */
+    public function error($paymentCode)
+    {
+        $payment = Payment::where('code', $paymentCode)->firstOrFail();
+
+        return redirect()->route('invoice.show', $paymentCode)
+            ->with('error', 'Payment failed. Please try again or contact support.');
+    }
+
+    /**
+     * Handle pending payment
+     */
+    public function pending($paymentCode)
+    {
+        $payment = Payment::where('code', $paymentCode)->firstOrFail();
+
+        return redirect()->route('invoice.show', $paymentCode)
+            ->with('info', 'Payment is being processed. Please wait for confirmation.');
+    }
+
+    /**
+     * Handle Midtrans webhook notifications
+     */
     public function notification(Request $request)
     {
         try {
-            $this->paymentService->handleNotification($request->all());
+            $notificationBody = json_decode($request->getContent(), true);
+            $notificationHeader = $request->server('HTTP_X_CALLBACK_TOKEN');
+
+            // Verify notification signature if needed
+            // You can add signature verification here for security
+
+            Log::info('Midtrans notification received', [
+                'order_id' => $notificationBody['order_id'] ?? null,
+                'status' => $notificationBody['transaction_status'] ?? null
+            ]);
+
+            // Handle the notification
+            $this->paymentService->handleNotification($notificationBody);
+
             return response()->json(['status' => 'success']);
+
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            Log::error('Midtrans notification error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json(['status' => 'error'], 500);
         }
-    }
-
-    public function finish(string $paymentCode)
-    {
-        $payment = Payment::where('code', $paymentCode)->firstOrFail();
-        
-        if ($payment->status === 'paid') {
-            return view('payment.success', compact('payment'));
-        }
-        
-        return view('payment.pending', compact('payment'));
-    }
-
-    public function unfinish(string $paymentCode)
-    {
-        $payment = Payment::where('code', $paymentCode)->firstOrFail();
-        return view('payment.unfinish', compact('payment'));
-    }
-
-    public function error(string $paymentCode)
-    {
-        $payment = Payment::where('code', $paymentCode)->firstOrFail();
-        return view('payment.error', compact('payment'));
     }
 }

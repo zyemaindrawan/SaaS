@@ -7,6 +7,9 @@ use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WebsiteBuilderController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,9 +29,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('templates.order');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // Public preview routes (no auth required)
 Route::get('/preview/{slug}', [PreviewController::class, 'showBySlug'])
@@ -52,69 +55,82 @@ Route::middleware('auth')->group(function () {
     Route::get('/preview/{websiteContent}', [PreviewController::class, 'show'])
         ->name('preview.show')
         ->where('websiteContent', '[0-9]+');
-    
+
     // Render preview (iframe)
     Route::get('/preview/{websiteContent}/render', [PreviewController::class, 'render'])
         ->name('preview.render')
         ->where('websiteContent', '[0-9]+');
-    
+
     // Get preview data as JSON
     Route::get('/preview/{websiteContent}/data', [PreviewController::class, 'data'])
         ->name('preview.data')
         ->where('websiteContent', '[0-9]+');
-    
+
     // Update preview content (for real-time editing)
     Route::put('/preview/{websiteContent}/update', [PreviewController::class, 'update'])
         ->name('preview.update')
         ->where('websiteContent', '[0-9]+');
 
+    // Website Builder routes
+    Route::get('/website-builder/create', [WebsiteBuilderController::class, 'create'])
+        ->name('website-builder.create');
+
+    Route::post('/website-builder', [WebsiteBuilderController::class, 'store'])
+        ->name('website-builder.store');
+
+    Route::get('/website-builder/{websiteContent}/edit', [WebsiteBuilderController::class, 'edit'])
+        ->name('website-builder.edit');
+
+    Route::put('/website-builder/{websiteContent}', [WebsiteBuilderController::class, 'update'])
+        ->name('website-builder.update');
+
+    Route::get('/website-builder/{websiteContent}/preview', [WebsiteBuilderController::class, 'preview'])
+        ->name('website-builder.preview');
+
+    // Alias for content.edit (used in CheckoutController)
+    Route::get('/content/{websiteContent}/edit', [WebsiteBuilderController::class, 'edit'])
+        ->name('content.edit');
+
     // Checkout
     Route::get('/templates/{template:slug}/checkout', [CheckoutController::class, 'show'])
         ->name('templates.checkout');
-    
+
     Route::post('/templates/{template:slug}/checkout', [CheckoutController::class, 'process'])
         ->name('templates.checkout.process');
 
     // Invoice routes
     Route::get('/invoice/{code}', [InvoiceController::class, 'show'])
         ->name('invoice.show');
-    
+
     Route::get('/invoice/{code}/pay', [InvoiceController::class, 'pay'])
         ->name('invoice.pay');
-
-    // Payment routes (Old)
-    // Route::post('/website/{websiteContent}/checkout', [PaymentController::class, 'checkout'])
-    //     ->name('payment.checkout');
-    
-    // Route::get('/payment/{paymentCode}', [PaymentController::class, 'show'])
-    //     ->name('payment.show');
-    
-    // Route::get('/payment/{paymentCode}/finish', [PaymentController::class, 'finish'])
-    //     ->name('payment.finish');
-    
-    // Route::get('/payment/{paymentCode}/unfinish', [PaymentController::class, 'unfinish'])
-    //     ->name('payment.unfinish');
-    
-    // Route::get('/payment/{paymentCode}/error', [PaymentController::class, 'error'])
-    //     ->name('payment.error');
 
     // Payment routes (New)
     Route::get('/payment/{code}/finish', [PaymentController::class, 'finish'])
         ->name('payment.finish');
-    
+
+    Route::get('/payment/{code}/unfinish', [PaymentController::class, 'unfinish'])
+        ->name('payment.unfinish');
+
     Route::get('/payment/{code}/error', [PaymentController::class, 'error'])
         ->name('payment.error');
-    
+
     Route::get('/payment/{code}/pending', [PaymentController::class, 'pending'])
         ->name('payment.pending');
 });
 
-// Midtrans notification (Old)
+// Midtrans notification
 Route::post('/midtrans/notification', [PaymentController::class, 'notification'])
     ->name('midtrans.notification');
 
-// Midtrans notification (New)
-// Route::post('/midtrans/notification', [MidtransController::class, 'notification'])
-//     ->name('midtrans.notification');
+// Voucher API routes
+Route::prefix('api')->group(function () {
+    Route::prefix('vouchers')->group(function () {
+        Route::post('/check', [VoucherController::class, 'check']);
+        Route::post('/validate', [VoucherController::class, 'check']);
+        Route::get('/', [VoucherController::class, 'index']);
+        Route::get('/{code}', [VoucherController::class, 'show']);
+    });
+});
 
 require __DIR__.'/auth.php';

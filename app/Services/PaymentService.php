@@ -19,25 +19,23 @@ class PaymentService
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    public function createPayment(WebsiteContent $websiteContent): Payment
+    public function createPayment(WebsiteContent $websiteContent, array $pricingDetails): Payment
     {
-        $template = $websiteContent->template;
         $user = $websiteContent->user;
-        
-        $price = $template->price;
-        $fee = 4000; // fee 4000
-        $grossAmount = $price+$fee;
-        
+
         // Create payment record
         $payment = Payment::create([
             'code' => Payment::generateCode(),
             'user_id' => $user->id,
             'website_content_id' => $websiteContent->id,
-            'amount' => $price,
-            'fee' => $fee,
-            'gross_amount' => $grossAmount,
+            'amount' => $pricingDetails['subtotal'],
+            'fee' => $pricingDetails['platform_fee'],
+            'discount' => $pricingDetails['discount'],
+            'gross_amount' => $pricingDetails['total'],
+            'voucher_code' => $pricingDetails['voucher_code'] ?? null,
+            'final_amount' => $pricingDetails['total'],
             'status' => 'pending',
-            'expired_at' => now()->addDays(1), // 1 hari
+            'expired_at' => now()->addHours(2), // 2 Jam
         ]);
 
         // Log payment creation
@@ -51,15 +49,11 @@ class PaymentService
         $user = $payment->user;
         $websiteContent = $payment->websiteContent;
         $template = $websiteContent->template;
-        $price = $template->price;
-        $fee = 4000; // fee 4000
-        $grossAmount = $price+$fee;
 
         $params = [
             'transaction_details' => [
                 'order_id' => $payment->code,
-                //'gross_amount' => (int) $payment->gross_amount,
-                'gross_amount' => (int) $grossAmount,
+                'gross_amount' => (int) $payment->gross_amount,
             ],
             'customer_details' => [
                 'first_name' => $user->name,
@@ -69,10 +63,17 @@ class PaymentService
             'item_details' => [
                 [
                     'id' => $template->slug,
-                    'price' => (int) $template->price,
+                    'price' => (int) $payment->amount, // Use stored amount
                     'quantity' => 1,
                     'name' => $template->name,
                     'category' => $template->category->name ?? 'Template',
+                ],
+                [
+                    'id' => 'platform_fee',
+                    'price' => (int) $payment->fee, // Use stored fee
+                    'quantity' => 1,
+                    'name' => 'Platform Fee',
+                    'category' => 'Service',
                 ]
             ],
             'callbacks' => [
@@ -88,10 +89,10 @@ class PaymentService
 
         try {
             $snapToken = Snap::getSnapToken($params);
-            
+
             // Log snap token generation
             $this->logPayment($payment, 'snap_token_generated', 'Snap token generated successfully');
-            
+
             return $snapToken;
         } catch (\Exception $e) {
             // Log error
@@ -126,15 +127,15 @@ class PaymentService
                     $this->markAsPaid($payment);
                 }
                 break;
-                
+
             case 'settlement':
                 $this->markAsPaid($payment);
                 break;
-                
+
             case 'pending':
                 $this->logPayment($payment, 'pending', 'Payment is pending');
                 break;
-                
+
             case 'deny':
             case 'expire':
             case 'cancel':

@@ -6,9 +6,12 @@ use App\Models\WebsiteContent;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use App\Models\Voucher;
+use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
@@ -83,9 +86,40 @@ class CheckoutController extends Controller
 
         $user = Auth::user();
         $validationRules = $this->getValidationRules($template);
+        $validationRules['voucher_code'] = 'nullable|string|max:255';
         $validated = $request->validate($validationRules);
 
-        //dd(request()->all());
+        // Calculate pricing
+        $subtotal = $template->price;
+        $platformFee = 4000;
+        $total = $subtotal + $platformFee;
+        $discount = 0;
+        $voucherId = null;
+
+        // Handle voucher logic
+        if (!empty($validated['voucher_code'])) {
+            $voucher = Voucher::where('code', $validated['voucher_code'])->first();
+
+            if (!$voucher || !$voucher->is_active || ($voucher->expires_at && $voucher->expires_at->isPast())) {
+                throw ValidationException::withMessages([
+                    'voucher_code' => 'The provided voucher is invalid or has expired.',
+                ]);
+            }
+
+            // Calculate discount based on type. Assuming 'fixed' and 'percentage' types.
+            if (isset($voucher->type) && isset($voucher->value)) {
+                if ($voucher->type === 'fixed') {
+                    $discount = $voucher->value;
+                } elseif ($voucher->type === 'percentage') {
+                    // Apply discount to subtotal (template price)
+                    $discount = ($subtotal * $voucher->value) / 100;
+                }
+            }
+
+            $total = max(0, $total - $discount);
+            $voucherId = $voucher->id;
+        }
+
 
         DB::beginTransaction();
 
@@ -100,54 +134,53 @@ class CheckoutController extends Controller
                 'subdomain' => $validated['subdomain'],
                 'expires_at' => now()->addYear(),
             ]);
-            
+
             // Load the template relationship to ensure it's available
             $websiteContent->load('template');
-            
+
             // Verify the website content was created properly
             if (!$websiteContent->template) {
                 throw new \Exception('Website content template relationship not loaded properly');
             }
 
-            // Handle free templates
-            if ($template->price == 0) {
+            // Handle free templates or if total is 0 after discount
+            if ($total <= 0) {
                 $websiteContent->update(['status' => 'paid']);
-                
+
                 DB::commit();
-                
-                // For free templates, redirect to success page or dashboard
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Free template activated successfully!',
-                    'redirect' => route('dashboard')
-                ]);
+
+                // For free templates, redirect to content edit page
+                return redirect()->route('content.edit', $websiteContent->id)
+                    ->with('success', 'Template activated successfully!');
             }
 
             // Create payment with Midtrans
-            $payment = $this->paymentService->createPayment($websiteContent);
-            
+            $pricingDetails = [
+                'subtotal' => $subtotal,
+                'platform_fee' => $platformFee,
+                'discount' => $discount,
+                'total' => $total,
+                'voucher_code' => !empty($validated['voucher_code']) ? $validated['voucher_code'] : null,
+            ];
+            $payment = $this->paymentService->createPayment($websiteContent, $pricingDetails);
+
             DB::commit();
-            
-            // Redirect to invoice page instead of payment directly
-            return response()->json([
-                'success' => true,
-                'message' => 'Order created successfully! Redirecting to invoice...',
-                'redirect' => route('invoice.show', $payment->code)
-            ]);
+
+            // Redirect to invoice page for paid templates
+            return redirect()->route('invoice.show', $payment->code)
+                ->with('success', 'Order created successfully! Please complete your payment.');
 
         } catch (\Exception $e) {
             DB::rollback();
-            
-            \Log::error('Checkout process error: ' . $e->getMessage(), [
+
+            Log::error('Checkout process error: ' . $e->getMessage(), [
                 'user_id' => $user->id,
                 'template_id' => $template->id,
                 'error' => $e->getTraceAsString()
             ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong: ' . $e->getMessage()
-            ], 422);
+
+            return back()->withInput()
+                ->with('error', 'Something went wrong: ' . $e->getMessage());
         }
     }
 
@@ -442,13 +475,13 @@ class CheckoutController extends Controller
             $rules['company_stats.*.icon'] = 'nullable|string|max:100';
         }
 
-        if ($template->category === 'portfolio') {
-            $rules['portfolio_items'] = 'nullable|array|max:12';
-            $rules['portfolio_items.*.title'] = 'required|string|max:255';
-            $rules['portfolio_items.*.category'] = 'required|string|max:100';
-            $rules['portfolio_items.*.image_url'] = 'nullable|url|max:500';
-            $rules['portfolio_items.*.description'] = 'nullable|string|max:1000';
-        }
+        // if ($template->category === 'portfolio') {
+        //     $rules['portfolio_items'] = 'nullable|array|max:12';
+        //     $rules['portfolio_items.*.title'] = 'required|string|max:255';
+        //     $rules['portfolio_items.*.category'] = 'required|string|max:100';
+        //     'portfolio_items.*.image_url' => 'nullable|url|max:500';
+        //     'portfolio_items.*.description' => 'nullable|string|max:1000';
+        // }
 
         return $rules;
     }
@@ -460,8 +493,6 @@ class CheckoutController extends Controller
 
         // Remove non-content fields
         unset($contentData['agree_terms']);
-
-        //dd($contentData);
 
         // Process repeater fields
         if (isset($contentData['services'])) {
@@ -480,7 +511,6 @@ class CheckoutController extends Controller
         $contentData['font_family'] = 'inter';
         $contentData['border_radius'] = 'medium';
         $contentData['whatsapp_enabled'] = false;
-        $contentData['created_at'] = now()->toISOString();
 
         return $contentData;
     }

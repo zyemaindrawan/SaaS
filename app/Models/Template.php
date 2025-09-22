@@ -12,7 +12,7 @@ class Template extends Model
 
     protected $fillable = [
         'name',
-        'slug', 
+        'slug',
         'description',
         'category',
         'preview_image',
@@ -54,16 +54,36 @@ class Template extends Model
     public function getConfigData(): array
     {
         $configPath = resource_path("views/templates/{$this->slug}/config.json");
-        
+
         if (file_exists($configPath)) {
             return json_decode(file_get_contents($configPath), true);
         }
-        
+
         return [];
     }
 
     public function getPreviewUrl(): string
     {
-        return asset("storage/templates/{$this->slug}/preview.png");
+        // If preview_image is already a full URL, return it
+        if ($this->preview_image && (str_starts_with($this->preview_image, 'http://') || str_starts_with($this->preview_image, 'https://'))) {
+            return $this->preview_image;
+        }
+
+        // Check if local image exists in the templates directory
+        $imageFormats = ['.webp', '.png', '.jpg', '.jpeg', '.gif'];
+        foreach ($imageFormats as $format) {
+            $imagePath = public_path("storage/templates/{$this->slug}/preview{$format}");
+            if (file_exists($imagePath)) {
+                return asset("storage/templates/{$this->slug}/preview{$format}");
+            }
+        }
+
+        // Check if preview_image field contains a local path
+        if ($this->preview_image && file_exists(public_path($this->preview_image))) {
+            return asset($this->preview_image);
+        }
+
+        // Fallback to default image
+        return asset('default-avatar.png');
     }
 }

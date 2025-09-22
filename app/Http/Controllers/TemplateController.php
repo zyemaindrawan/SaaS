@@ -54,6 +54,12 @@ class TemplateController extends Controller
 
         $templates = $query->paginate(12)->withQueryString();
 
+        // Transform templates to include proper preview URLs
+        $templates->getCollection()->transform(function ($template) {
+            $template->preview_image = $template->getPreviewUrl();
+            return $template;
+        });
+
         // Get unique categories
         $categories = Template::where('is_active', true)
             ->whereNotNull('category')
@@ -71,7 +77,10 @@ class TemplateController extends Controller
             'templates' => $templates,
             'categories' => $categories,
             'priceRange' => $priceRange,
-            'filters' => $request->only(['search', 'category', 'price_min', 'price_max', 'sort'])
+            'filters' => $request->only(['search', 'category', 'price_min', 'price_max', 'sort']),
+            'app' => [
+                'name' => config('app.name'),
+            ],
         ]);
     }
 
@@ -92,6 +101,12 @@ class TemplateController extends Controller
             ->limit(4)
             ->get(['id', 'name', 'slug', 'preview_image', 'price', 'category']);
 
+        // Transform related templates to include proper preview URLs
+        $relatedTemplates->transform(function ($relatedTemplate) {
+            $relatedTemplate->preview_image = $relatedTemplate->getPreviewUrl();
+            return $relatedTemplate;
+        });
+
         // Get template with optimized data
         $templateData = [
             'id' => $template->id,
@@ -99,7 +114,7 @@ class TemplateController extends Controller
             'slug' => $template->slug,
             'description' => $template->description,
             'category' => $template->category,
-            'preview_image' => $template->preview_image,
+            'preview_image' => $template->getPreviewUrl(),
             'price' => $template->price,
             'demo_url' => $template->demo_url,
             'created_at' => $template->created_at,
@@ -113,7 +128,10 @@ class TemplateController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Templates', 'href' => '/templates'],
                 ['name' => $template->name, 'href' => null],
-            ]
+            ],
+            'app' => [
+                'name' => config('app.name'),
+            ],
         ]);
     }
 

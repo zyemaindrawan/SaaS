@@ -9,34 +9,26 @@
         <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div class="text-center">
-                    <div class="flex items-center justify-center mb-4">
-                        <svg class="w-10 h-10 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                            {{ templates.total }} Templates Available
-                        </span>
-                    </div>
-                    
+
                     <h1 class="text-4xl md:text-6xl font-bold mb-6">
                         Choose Your Perfect Template
                     </h1>
                     <p class="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto mb-8">
-                        Professional, modern website templates ready to customize for your business
+                        Professional, modern website templates ready to customize
                     </p>
-                    
+
                     <!-- Quick Search -->
                     <div class="max-w-md mx-auto">
                         <div class="relative">
                             <MagnifyingGlassIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            <input 
+                            <input
                                 v-model="quickSearch"
                                 @keyup.enter="performQuickSearch"
-                                type="text" 
+                                type="text"
                                 placeholder="Search templates..."
                                 class="w-full pl-10 pr-4 py-3 text-gray-900 rounded-lg border-0 shadow-lg focus:ring-4 focus:ring-white focus:ring-opacity-30 focus:outline-none"
                             >
-                            <button 
+                            <button
                                 @click="performQuickSearch"
                                 class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200"
                             >
@@ -50,7 +42,7 @@
 
         <!-- Alert Messages -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" v-if="$page.props.flash.message">
-            <Alert 
+            <Alert
                 :type="$page.props.flash.type || 'success'"
                 :message="$page.props.flash.message"
                 @dismiss="$page.props.flash.message = null"
@@ -66,10 +58,10 @@
                         Filter Templates
                     </h3>
                 </div>
-                
+
                 <form @submit.prevent="applyFilters" class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        
+
                         <!-- Search Input -->
                         <div>
                             <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
@@ -77,10 +69,10 @@
                             </label>
                             <div class="relative">
                                 <MagnifyingGlassIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                <input 
+                                <input
                                     id="search"
                                     v-model="filterForm.search"
-                                    type="text" 
+                                    type="text"
                                     placeholder="Template name or description..."
                                     class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                                 >
@@ -92,15 +84,15 @@
                             <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
                                 Category
                             </label>
-                            <select 
+                            <select
                                 id="category"
                                 v-model="filterForm.category"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                             >
                                 <option value="all">All Categories</option>
-                                <option 
-                                    v-for="category in categories" 
-                                    :key="category" 
+                                <option
+                                    v-for="category in categories"
+                                    :key="category"
                                     :value="category"
                                 >
                                     {{ formatCategory(category) }}
@@ -114,17 +106,17 @@
                                 Price Range
                             </label>
                             <div class="grid grid-cols-2 gap-2">
-                                <input 
+                                <input
                                     v-model.number="filterForm.price_min"
-                                    type="number" 
+                                    type="number"
                                     placeholder="Min"
                                     :min="0"
                                     :max="priceRange.max_price"
                                     class="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-sm"
                                 >
-                                <input 
+                                <input
                                     v-model.number="filterForm.price_max"
-                                    type="number" 
+                                    type="number"
                                     placeholder="Max"
                                     :min="filterForm.price_min || 0"
                                     :max="priceRange.max_price"
@@ -141,7 +133,7 @@
                             <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">
                                 Sort By
                             </label>
-                            <select 
+                            <select
                                 id="sort"
                                 v-model="filterForm.sort"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
@@ -159,7 +151,7 @@
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
                         <div class="flex gap-4">
-                            <button 
+                            <button
                                 type="submit"
                                 :disabled="loading"
                                 class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-8 py-3 rounded-lg transition duration-200 font-medium shadow-sm hover:shadow-md disabled:cursor-not-allowed"
@@ -173,8 +165,8 @@
                                 </span>
                                 <span v-else>Apply Filters</span>
                             </button>
-                            
-                            <button 
+
+                            <button
                                 @click="clearFilters"
                                 type="button"
                                 class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition duration-200 font-medium"
@@ -182,27 +174,27 @@
                                 Clear All
                             </button>
                         </div>
-                        
+
                         <!-- View Toggle -->
                         <div class="flex items-center bg-gray-100 rounded-lg p-1">
-                            <button 
+                            <button
                                 @click="viewMode = 'grid'"
                                 :class="[
                                     'px-3 py-2 rounded-md text-sm font-medium transition duration-200',
-                                    viewMode === 'grid' 
-                                        ? 'bg-white text-gray-900 shadow-sm' 
+                                    viewMode === 'grid'
+                                        ? 'bg-white text-gray-900 shadow-sm'
                                         : 'text-gray-600 hover:text-gray-900'
                                 ]"
                             >
                                 <Squares2X2Icon class="w-4 h-4 mr-1 inline" />
                                 Grid
                             </button>
-                            <button 
+                            <button
                                 @click="viewMode = 'list'"
                                 :class="[
                                     'px-3 py-2 rounded-md text-sm font-medium transition duration-200',
-                                    viewMode === 'list' 
-                                        ? 'bg-white text-gray-900 shadow-sm' 
+                                    viewMode === 'list'
+                                        ? 'bg-white text-gray-900 shadow-sm'
                                         : 'text-gray-600 hover:text-gray-900'
                                 ]"
                             >
@@ -218,8 +210,8 @@
             <div v-if="hasActiveFilters" class="mb-6">
                 <div class="flex flex-wrap gap-2 items-center">
                     <span class="text-sm font-medium text-gray-700 mr-2">Active Filters:</span>
-                    
-                    <span 
+
+                    <span
                         v-if="filters.search"
                         class="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
                     >
@@ -228,8 +220,8 @@
                             <XMarkIcon class="w-3 h-3" />
                         </button>
                     </span>
-                    
-                    <span 
+
+                    <span
                         v-if="filters.category && filters.category !== 'all'"
                         class="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
                     >
@@ -238,17 +230,17 @@
                             <XMarkIcon class="w-3 h-3" />
                         </button>
                     </span>
-                    
-                    <span 
+
+                    <span
                         v-if="filters.price_min || filters.price_max"
                         class="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
                     >
-                        Price: 
+                        Price:
                         <template v-if="filters.price_min">
                             Rp {{ formatPrice(filters.price_min) }}+
                         </template>
                         <template v-if="filters.price_min && filters.price_max">
-                            - 
+                            -
                         </template>
                         <template v-if="filters.price_max">
                             Rp {{ formatPrice(filters.price_max) }}
@@ -270,12 +262,12 @@
                         Filtered results
                     </p>
                 </div>
-                
+
                 <div class="flex items-center gap-3">
                     <!-- Quick Sort -->
                     <div class="flex items-center">
                         <label for="quick-sort" class="text-sm text-gray-600 mr-2">Quick Sort:</label>
-                        <select 
+                        <select
                             id="quick-sort"
                             v-model="filterForm.sort"
                             @change="applyFilters"
@@ -292,15 +284,15 @@
 
             <!-- Templates Display -->
             <div v-if="templates.data.length > 0">
-                
+
                 <!-- Grid View -->
-                <div 
+                <div
                     v-if="viewMode === 'grid'"
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12"
                 >
-                    <TemplateCard 
-                        v-for="template in templates.data" 
-                        :key="template.id" 
+                    <TemplateCard
+                        v-for="template in templates.data"
+                        :key="template.id"
                         :template="template"
                         :view-mode="viewMode"
                         @template-selected="handleTemplateSelected"
@@ -308,13 +300,13 @@
                 </div>
 
                 <!-- List View -->
-                <div 
+                <div
                     v-else
                     class="space-y-6 mb-12"
                 >
-                    <TemplateCard 
-                        v-for="template in templates.data" 
-                        :key="template.id" 
+                    <TemplateCard
+                        v-for="template in templates.data"
+                        :key="template.id"
                         :template="template"
                         :view-mode="viewMode"
                         @template-selected="handleTemplateSelected"
@@ -333,24 +325,24 @@
                     <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5l7-7 7 7M9 20h6"/>
                     </svg>
-                    
+
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">No templates found</h3>
                     <p class="text-gray-500 mb-6">
                         We couldn't find any templates matching your criteria. Try adjusting your search filters.
                     </p>
-                    
+
                     <div class="space-y-4">
-                        <button 
+                        <button
                             @click="clearFilters"
                             class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition duration-200"
                         >
                             View All Templates
                         </button>
-                        
+
                         <div class="text-sm text-gray-500">
                             <p>Or try searching for:</p>
                             <div class="flex flex-wrap justify-center gap-2 mt-2">
-                                <button 
+                                <button
                                     v-for="suggestion in searchSuggestions"
                                     :key="suggestion"
                                     @click="applySuggestion(suggestion)"
@@ -370,7 +362,7 @@
                     <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
                         <h2 class="text-xl font-bold text-white">Browse by Category</h2>
                     </div>
-                    
+
                     <div class="p-6">
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             <button
@@ -404,7 +396,7 @@ import Pagination from '@/Components/Pagination.vue'
 import PageLoader from '@/Components/PageLoader.vue'
 
 // Icons
-import { 
+import {
     MagnifyingGlassIcon,
     FunnelIcon,
     XMarkIcon,
@@ -440,9 +432,9 @@ const filterForm = reactive({
 
 // Computed properties
 const hasActiveFilters = computed(() => {
-    return props.filters.search || 
-           (props.filters.category && props.filters.category !== 'all') || 
-           props.filters.price_min || 
+    return props.filters.search ||
+           (props.filters.category && props.filters.category !== 'all') ||
+           props.filters.price_min ||
            props.filters.price_max
 })
 
@@ -453,7 +445,7 @@ const searchSuggestions = computed(() => {
 // Methods
 const formatCategory = (category) => {
     if (!category) return ''
-    return category.split('-').map(word => 
+    return category.split('-').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ')
 }
@@ -476,9 +468,9 @@ const getCategoryIcon = (category) => {
 
 const applyFilters = () => {
     loading.value = true
-    
+
     const params = {}
-    
+
     if (filterForm.search) params.search = filterForm.search
     if (filterForm.category !== 'all') params.category = filterForm.category
     if (filterForm.price_min) params.price_min = filterForm.price_min
@@ -498,7 +490,7 @@ const clearFilters = () => {
     filterForm.price_min = ''
     filterForm.price_max = ''
     filterForm.sort = 'sort_order'
-    
+
     router.get('/templates', {}, {
         preserveState: true,
         preserveScroll: true
@@ -543,24 +535,24 @@ const handleTemplateSelected = (template) => {
     router.visit(`/templates/${template.slug}`)
 }
 
-// Watchers
-watch(() => filterForm.sort, () => {
-    if (!loading.value) {
-        applyFilters()
-    }
-})
-
 // Lifecycle
 onMounted(() => {
     setTimeout(() => {
         loading.value = false
     }, 1000)
-    
-    // Preload template images
+
+    // Preload template images with error handling
     if (props.templates.data) {
-        props.templates.data.forEach(template => {
+        props.templates.data.forEach((template, index) => {
             if (template.preview_image) {
                 const img = new Image()
+                img.onload = () => {
+                    // Image loaded successfully
+                }
+                img.onerror = () => {
+                    // Image failed to load, use fallback
+                    template.preview_image = '/default-avatar.png'
+                }
                 img.src = template.preview_image
             }
         })

@@ -1,7 +1,7 @@
 <template>
     <div class="min-h-screen bg-gray-50">
         <!-- Progress Bar -->
-        <div 
+        <div
             v-if="$page.props.inertia?.loading"
             class="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 to-purple-600 transform origin-left transition-transform duration-200"
             :class="{ 'scale-x-0': !$page.props.inertia?.loading }"
@@ -15,13 +15,13 @@
                         <!-- Logo -->
                         <Link href="/" class="flex-shrink-0 flex items-center group">
                             <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                <span class="text-white font-bold text-sm">S</span>
+                                <span class="text-white font-bold text-sm">{{ ($page.props.app?.name || 'SaaS').charAt(0) }}</span>
                             </div>
                             <span class="ml-2 text-xl font-bold text-gray-900 group-hover:text-blue-600 transition duration-200">
-                                SaaS Builder
+                                {{ $page.props.app?.name || 'SaaS' }}
                             </span>
                         </Link>
-                        
+
                         <!-- Navigation Links -->
                         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                             <NavLink href="/templates" :active="$page.url.startsWith('/templates')">
@@ -44,14 +44,14 @@
                         </template>
                         <template v-else>
                             <!-- Guest Links -->
-                            <Link 
-                                href="/login" 
+                            <Link
+                                href="/login"
                                 class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-200"
                             >
                                 Login
                             </Link>
-                            <Link 
-                                href="/register" 
+                            <Link
+                                href="/register"
                                 class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200 shadow-sm hover:shadow-md"
                             >
                                 Get Started
@@ -74,9 +74,9 @@
                     <div class="col-span-1">
                         <div class="flex items-center mb-4">
                             <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                <span class="text-white font-bold text-sm">S</span>
+                                <span class="text-white font-bold text-sm">{{ ($page.props.app?.name || 'SaaS').charAt(0) }}</span>
                             </div>
-                            <h3 class="ml-2 text-lg font-semibold">SaaS Builder</h3>
+                            <h3 class="ml-2 text-lg font-semibold">{{ $page.props.app?.name || 'SaaS' }}</h3>
                         </div>
                         <p class="text-gray-300 text-sm">
                             Create professional websites in minutes with our template-based platform.
@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300 text-sm">
-                    <p>&copy; 2025 SaaS Builder. All rights reserved.</p>
+                    <p>&copy; 2025 {{ $page.props.app?.name || 'SaaS' }}. All rights reserved.</p>
                 </div>
             </div>
         </footer>
