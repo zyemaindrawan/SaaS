@@ -48,6 +48,7 @@ class CheckoutController extends Controller
 
         // Get dynamic form fields based on template
         $formFields = $this->getTemplateFormFields($template);
+        //dd($formFields);
 
         return Inertia::render('Checkout/Index', [
             'template' => [
@@ -87,7 +88,21 @@ class CheckoutController extends Controller
         $user = Auth::user();
         $validationRules = $this->getValidationRules($template);
         $validationRules['voucher_code'] = 'nullable|string|max:255';
-        $validated = $request->validate($validationRules);
+        
+        try {
+            $validated = $request->validate($validationRules);
+        } catch (ValidationException $e) {
+            Log::warning('Form validation failed', [
+                'user_id' => $user->id,
+                'template' => $template->slug,
+                'errors' => $e->errors()
+            ]);
+            
+            return back()
+                ->withInput()
+                ->withErrors($e->errors())
+                ->with('error', 'Mohon periksa kembali form anda. Beberapa field wajib belum diisi dengan benar.');
+        }
 
         // Calculate pricing
         $subtotal = $template->price;
@@ -126,23 +141,75 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create website content
-            $websiteContent = WebsiteContent::create([
-                'user_id' => $user->id,
-                'template_slug' => $template->slug,
-                'website_name' => $validated['website_name'], // Use the validated input from form
-                'content_data' => $this->processContentData($validated, $template),
-                'status' => 'draft',
-                'subdomain' => $validated['subdomain'],
-                'expires_at' => now()->addYear(),
-            ]);
+            try {
+                // Log::info('Starting website content creation', [
+                //     'user_id' => $user->id,
+                //     'template_slug' => $template->slug,
+                //     'validated_data' => array_keys($validated)
+                // ]);
 
-            // Load the template relationship to ensure it's available
-            $websiteContent->load('template');
+                // Process content data first
+                $contentData = $this->processContentData($validated, $template);
+                
+                // Validate required fields in content data
+                if (empty($validated['company_name'])) {
+                    throw ValidationException::withMessages(['company_name' => 'Nama perusahaan wajib diisi']);
+                }
+                
+                if (empty($validated['website_name'])) {
+                    throw ValidationException::withMessages(['website_name' => 'Nama website wajib diisi']);
+                }
+                
+                if (empty($validated['subdomain'])) {
+                    throw ValidationException::withMessages(['subdomain' => 'Subdomain wajib diisi']);
+                }
 
-            // Verify the website content was created properly
-            if (!$websiteContent->template) {
-                throw new \Exception('Website content template relationship not loaded properly');
+                // Create website content
+                $websiteContent = WebsiteContent::create([
+                    'user_id' => $user->id,
+                    'template_slug' => $template->slug,
+                    'website_name' => $validated['website_name'],
+                    'content_data' => $contentData,
+                    'status' => 'draft',
+                    'subdomain' => $validated['subdomain'],
+                    'expires_at' => now()->addYear(),
+                ]);
+
+                // Log::info('Website content created successfully', [
+                //     'website_content_id' => $websiteContent->id
+                // ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create website content', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'validated_data' => $validated
+                ]);
+                throw $e;
+            }
+
+            try {
+                // Load the template relationship to ensure it's available
+                $websiteContent->load('template');
+
+                // Verify the website content was created properly
+                if (!$websiteContent->template) {
+                    Log::error('Template relationship not loaded', [
+                        'website_content_id' => $websiteContent->id,
+                        'template_slug' => $template->slug
+                    ]);
+                    throw new \Exception('Website content template relationship not loaded properly');
+                }
+
+                // Log::info('Template relationship loaded successfully', [
+                //     'website_content_id' => $websiteContent->id,
+                //     'template_id' => $websiteContent->template->id
+                // ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to load template relationship', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
             }
 
             // Handle free templates or if total is 0 after discount
@@ -156,15 +223,35 @@ class CheckoutController extends Controller
                     ->with('success', 'Template activated successfully!');
             }
 
-            // Create payment with Midtrans
-            $pricingDetails = [
-                'subtotal' => $subtotal,
-                'platform_fee' => $platformFee,
-                'discount' => $discount,
-                'total' => $total,
-                'voucher_code' => !empty($validated['voucher_code']) ? $validated['voucher_code'] : null,
-            ];
-            $payment = $this->paymentService->createPayment($websiteContent, $pricingDetails);
+            try {
+                // Create payment with Midtrans
+                $pricingDetails = [
+                    'subtotal' => $subtotal,
+                    'platform_fee' => $platformFee,
+                    'discount' => $discount,
+                    'total' => $total,
+                    'voucher_code' => !empty($validated['voucher_code']) ? $validated['voucher_code'] : null,
+                ];
+                
+                // Log::info('Creating payment', [
+                //     'website_content_id' => $websiteContent->id,
+                //     'pricing_details' => $pricingDetails
+                // ]);
+
+                $payment = $this->paymentService->createPayment($websiteContent, $pricingDetails);
+
+                // Log::info('Payment created successfully', [
+                //     'payment_id' => $payment->id,
+                //     'payment_code' => $payment->code
+                // ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create payment', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'pricing_details' => $pricingDetails
+                ]);
+                throw $e;
+            }
 
             DB::commit();
 
@@ -172,17 +259,33 @@ class CheckoutController extends Controller
             return redirect()->route('invoice.show', $payment->code)
                 ->with('success', 'Order created successfully! Please complete your payment.');
 
+        } catch (ValidationException $e) {
+            DB::rollback();
+            
+            Log::warning('Validation failed during checkout', [
+                'user_id' => $user->id,
+                'template_id' => $template->id,
+                'validation_errors' => $e->errors()
+            ]);
+
+            return back()->withInput()->withErrors($e->errors());
+
         } catch (\Exception $e) {
             DB::rollback();
 
-            Log::error('Checkout process error: ' . $e->getMessage(), [
+            Log::error('Checkout process error', [
                 'user_id' => $user->id,
                 'template_id' => $template->id,
-                'error' => $e->getTraceAsString()
+                'error_message' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->except(['company_logo', 'favicon', 'og_image', 'hero_background', 'about_image']) // Exclude large image data from logs
             ]);
 
             return back()->withInput()
-                ->with('error', 'Something went wrong: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat memproses checkout. Silakan coba lagi atau hubungi support.');
         }
     }
 
@@ -447,34 +550,124 @@ class CheckoutController extends Controller
     private function getValidationRules($template)
     {
         $rules = [
+            // Company Info
             'company_name' => 'required|string|max:255',
-            'website_name' => 'required|string|max:255',
             'company_tagline' => 'nullable|string|max:255',
+            'company_logo' => 'nullable|string',
+            
+            // Website Basics
+            'website_name' => 'required|string|max:255',
+            'subdomain' => 'required|string|min:3|max:50|regex:/^[a-z0-9-]+$/|unique:website_contents,subdomain',
+            'font_family' => 'required|string|in:inter,poppins,nunito,roboto',
+            'border_radius' => 'required|string|in:none,small,medium,large',
+            
+            // Colors
+            'primary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'secondary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'accent_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'whatsapp_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            
+            // SEO
             'seo_title' => 'required|string|max:60',
             'seo_description' => 'required|string|max:160',
+            'seo_keywords' => 'required|string|max:500',
+            'robots_meta' => 'required|string',
+            'favicon' => 'nullable|string',
+            'og_image' => 'nullable|string',
+            
+            // Contact
             'contact_email' => 'required|email|max:255',
             'contact_phone' => 'required|string|max:20',
             'contact_address' => 'required|string|max:500',
-            'primary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'secondary_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'subdomain' => 'required|string|min:3|max:50|regex:/^[a-z0-9-]+$/|unique:website_contents,subdomain',
-            'services' => 'nullable|array|max:10',
+            'contact_title' => 'nullable|string|max:255',
+            
+            // Hero Section
+            'hero_title' => 'required|string|max:255',
+            'hero_subtitle' => 'required|string|max:500',
+            'hero_background' => 'nullable|string|max:1000',
+            'hero_cta_text' => 'required|string|max:50',
+            'hero_cta_link' => 'required|string|max:255',
+            
+            // About Section
+            'about_title' => 'nullable|string|max:255',
+            'about_content' => 'nullable|string|max:2000',
+            'about_image' => 'nullable|string|max:1000',
+            
+            // Services Section
+            'services_title' => 'required|string|max:255',
+            'services_subtitle' => 'nullable|string|max:500',
+            'services' => 'required|array|min:1|max:10',
             'services.*.title' => 'required|string|max:255',
             'services.*.description' => 'required|string|max:1000',
-            'services.*.icon' => 'nullable|string|max:100',
+            'services.*.icon' => 'required|string|max:100',
+            'services.*.link' => 'required|string|max:255',
+            
+            // Company Stats
+            'company_stats' => 'required|array|min:1|max:6',
+            'company_stats.*.icon' => 'required|string|max:100',
+            'company_stats.*.label' => 'required|string|max:100',
+            'company_stats.*.number' => 'required|string|max:20',
+            
+            // Social Media
             'social_links' => 'nullable|array|max:10',
             'social_links.*.platform' => 'required|string|in:facebook,instagram,twitter,linkedin,youtube,tiktok',
             'social_links.*.url' => 'required|url|max:500',
-            'social_links.*.label' => 'nullable|string|max:255',
+            'social_links.*.label' => 'required|string|max:255',
+            
+            // Testimonials
+            'testimonials_title' => 'required|string|max:255',
+            'testimonials' => 'required|array|min:1|max:10',
+            'testimonials.*.name' => 'required|string|max:255',
+            'testimonials.*.photo' => 'nullable|string|max:1000',
+            'testimonials.*.rating' => 'required|string|in:1,2,3,4,5',
+            'testimonials.*.content' => 'required|string|max:1000',
+            'testimonials.*.position' => 'required|string|max:255',
+            
+            // Gallery
+            'gallery_title' => 'nullable|string|max:255',
+            'gallery_photos' => 'nullable|array|max:12',
+            'gallery_photos.*' => 'nullable|string|max:1000',
+            
+            // WhatsApp Integration
+            'whatsapp_enabled' => 'required|boolean',
+            'whatsapp_number' => 'nullable|required_if:whatsapp_enabled,true|string|max:20',
+            'whatsapp_message' => 'nullable|required_if:whatsapp_enabled,true|string|max:500',
+            'whatsapp_position' => 'nullable|required_if:whatsapp_enabled,true|string|in:bottom-left,bottom-right',
+            'whatsapp_greeting_text' => 'nullable|string|max:255',
+            
+            // Analytics
+            'google_analytics' => 'nullable|string|max:50',
+            'google_tag_manager' => 'nullable|string|max:50',
+            
+            // Form Control
             'agree_terms' => 'required|accepted',
+            'voucher_code' => 'nullable|string|max:255',
         ];
 
         // Template-specific validation rules
         if ($template->category === 'corporate') {
-            $rules['company_stats'] = 'nullable|array|max:4';
+            // Company Stats
+            $rules['company_stats'] = 'required|array|min:1|max:4';
             $rules['company_stats.*.number'] = 'required|string|max:20';
             $rules['company_stats.*.label'] = 'required|string|max:100';
-            $rules['company_stats.*.icon'] = 'nullable|string|max:100';
+            $rules['company_stats.*.icon'] = 'required|string|max:100';
+            
+            // Hero section is required for corporate
+            $rules['hero_title'] = 'required|string|max:255';
+            $rules['hero_subtitle'] = 'required|string|max:500';
+            $rules['hero_background'] = 'required|string';
+            
+            // About section is required for corporate
+            $rules['about_title'] = 'nullable|string|max:255';
+            $rules['about_content'] = 'nullable|string|max:2000';
+            $rules['about_image'] = 'nullable|string';
+            
+            // Services section is required
+            $rules['services'] = 'required|array|min:3|max:10';
+            $rules['services.*.title'] = 'required|string|max:255';
+            $rules['services.*.description'] = 'required|string|min:50|max:1000';
+            $rules['services.*.icon'] = 'required|string|max:100';
+            $rules['services.*.link'] = 'required|string|max:255';
         }
 
         // if ($template->category === 'portfolio') {
@@ -495,7 +688,9 @@ class CheckoutController extends Controller
 
         // Remove non-content fields
         unset($contentData['agree_terms']);
-
+        unset($contentData['voucher_code']);
+        // Don't unset subdomain here since we need it for validation
+        
         // Process repeater fields
         if (isset($contentData['services'])) {
             $contentData['services'] = array_values(array_filter($contentData['services'], function($service) {
@@ -509,10 +704,69 @@ class CheckoutController extends Controller
             }));
         }
 
-        // Add default values
-        $contentData['font_family'] = 'inter';
-        $contentData['border_radius'] = 'medium';
-        $contentData['whatsapp_enabled'] = false;
+        if (isset($contentData['company_stats'])) {
+            $contentData['company_stats'] = array_values(array_filter($contentData['company_stats'], function($stat) {
+                return !empty($stat['label']) && !empty($stat['number']);
+            }));
+        }
+
+        if (isset($contentData['testimonials'])) {
+            $contentData['testimonials'] = array_values(array_filter($contentData['testimonials'], function($testimonial) {
+                return !empty($testimonial['name']) && !empty($testimonial['content']);
+            }));
+        }
+
+        // Process image fields (convert from base64 if needed)
+        $imageFields = ['company_logo', 'favicon', 'og_image', 'hero_background', 'about_image'];
+        foreach ($imageFields as $field) {
+            if (isset($contentData[$field])) {
+                if (strpos($contentData[$field], 'data:image') === 0) {
+                    // Validate image size
+                    $base64Image = preg_replace('#^data:image/\w+;base64,#i', '', $contentData[$field]);
+                    $decodedImage = base64_decode($base64Image);
+                    
+                    if (!$decodedImage) {
+                        throw ValidationException::withMessages([
+                            $field => 'Format gambar tidak valid'
+                        ]);
+                    }
+                    
+                    // Check file size (max 2MB)
+                    if (strlen($decodedImage) > 2 * 1024 * 1024) {
+                        throw ValidationException::withMessages([
+                            $field => 'Ukuran gambar tidak boleh lebih dari 2MB'
+                        ]);
+                    }
+                    
+                    // For now, we'll just store the filename placeholder
+                    $contentData[$field] = $field . '_' . time() . '.jpg';
+                } else if (!filter_var($contentData[$field], FILTER_VALIDATE_URL)) {
+                    throw ValidationException::withMessages([
+                        $field => 'URL gambar tidak valid'
+                    ]);
+                }
+            }
+        }
+
+        // Process gallery photos
+        if (isset($contentData['gallery_photos']) && is_array($contentData['gallery_photos'])) {
+            $contentData['gallery_photos'] = array_values(array_filter($contentData['gallery_photos']));
+        }
+
+        // Set default values if not provided
+        $defaults = [
+            'font_family' => 'inter',
+            'border_radius' => 'medium',
+            'whatsapp_enabled' => false,
+            'whatsapp_position' => 'bottom-right',
+            'robots_meta' => 'index,follow',
+        ];
+
+        foreach ($defaults as $key => $value) {
+            if (!isset($contentData[$key])) {
+                $contentData[$key] = $value;
+            }
+        }
 
         return $contentData;
     }

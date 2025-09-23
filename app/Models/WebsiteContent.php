@@ -43,11 +43,6 @@ class WebsiteContent extends Model
         return $this->hasMany(Payment::class);
     }
 
-    public function subscription()
-    {
-        return $this->hasOne(Subscription::class);
-    }
-
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');

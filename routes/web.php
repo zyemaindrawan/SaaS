@@ -15,8 +15,12 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return view('pages.home');
-});
+    return Inertia::render('Home/Index');
+})->name('home');
+
+Route::get('/{page}', fn () => inertia('Home/Index'))
+     ->where('page', 'settings|pricing|about|features|help|contact|docs|terms|privacy')
+     ->name('static');
 
 Route::get('/templates', [TemplateController::class, 'index'])
     ->name('templates.index');

@@ -26,7 +26,7 @@ class VoucherController extends Controller
             return response()->json([
                 'valid' => false,
                 'message' => 'Voucher code is invalid or has expired.'
-            ], 404);
+            ]);
         }
 
         // Check minimum purchase requirement

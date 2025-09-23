@@ -225,7 +225,7 @@
                                     <div class="text-3xl font-bold text-green-600 mb-2">
                                         {{ template.price > 0 ? formatPrice(template.price) : 'FREE' }}
                                     </div>
-                                    <p class="text-gray-500 text-sm">One-time payment</p>
+                                    <!-- <p class="text-gray-500 text-sm">One-time payment</p> -->
                                 </div>
 
                                 <!-- Order CTA -->
@@ -238,7 +238,7 @@
                                         @click="orderLoading = true"
                                     >
                                         <ShoppingCartIcon class="w-5 h-5 inline mr-2" />
-                                        {{ template.price > 0 ? 'Continue to Checkout' : 'Get This Template FREE' }}
+                                        {{ template.price > 0 ? 'Order Sekarang' : 'Dapatkan Gratis' }}
                                     </Link>
 
                                     <div v-else class="text-center space-y-4">
@@ -262,7 +262,7 @@
                                     </div>
 
                                     <p class="text-center text-xs text-gray-500">
-                                        {{ template.price > 0 ? 'Next: Fill your website details' : 'Create your website immediately' }}
+                                        {{ template.price > 0 ? '' : 'Create your website immediately' }}
                                     </p>
                                 </div>
 
@@ -301,12 +301,12 @@
                         </div>
 
                         <!-- Security Badge -->
-                        <div class="mt-6 text-center">
+                        <!-- <div class="mt-6 text-center">
                             <div class="inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
                                 <ShieldCheckIcon class="w-5 h-5 text-green-500 mr-2" />
                                 <span class="text-sm text-green-700 font-medium">Secure & Trusted</span>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Money Back Guarantee -->
                         <div v-if="template.price > 0" class="mt-4 text-center">
