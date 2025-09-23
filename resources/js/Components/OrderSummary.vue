@@ -42,19 +42,34 @@
                         <span class="text-gray-500">{{ formatPrice(pricing.platform_fee) }}</span>
                     </div>
 
+                    <!-- Subtotal -->
+                    <div v-if="pricing.subtotal > 0" class="flex justify-between text-sm border-t border-gray-100 pt-2">
+                        <span class="text-gray-600 font-medium">Subtotal</span>
+                        <span class="font-medium">{{ formatPrice(pricing.total) }}</span>
+                    </div>
+
                     <!-- Voucher Discount -->
-                    <div v-if="localVoucherDiscount > 0" class="flex justify-between text-sm">
-                        <span class="text-green-600">Discount</span>
-                        <span class="text-green-600">-{{ formatPrice(localVoucherDiscount) }}</span>
+                    <div v-if="localVoucherDiscount > 0 && voucherApplied" class="flex justify-between text-sm">
+                        <span class="text-green-600">Voucher ({{ appliedVoucher }})</span>
+                        <span class="text-green-600 font-medium">-{{ formatPrice(localVoucherDiscount) }}</span>
                     </div>
 
                     <hr class="border-gray-200">
 
-                    <div class="flex justify-between text-lg font-bold">
-                        <span>Final Amount</span>
-                        <span class="text-green-600">
-                            {{ finalTotal > 0 ? formatPrice(finalTotal) : 'FREE' }}
-                        </span>
+                    <!-- Enhanced Final Amount -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold text-gray-900">Final Amount</span>
+                        <div class="text-right">
+                            <div v-if="localVoucherDiscount > 0" class="text-sm text-gray-500 line-through">
+                                {{ formatPrice(pricing.total) }}
+                            </div>
+                            <div class="text-xl font-bold" :class="finalTotal > 0 ? 'text-green-600' : 'text-blue-600'">
+                                {{ finalTotal > 0 ? formatPrice(finalTotal) : 'FREE' }}
+                            </div>
+                            <div v-if="localVoucherDiscount > 0" class="text-xs text-green-600 font-medium mt-1">
+                                💰 You save {{ formatPrice(localVoucherDiscount) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -74,8 +89,31 @@
 
                 <!-- Voucher Section -->
                 <div v-if="pricing.total > 0" class="mt-6 pt-4 border-t border-gray-200">
-                    <h5 class="font-semibold text-gray-900 mb-3">Voucher Code</h5>
+                    <h5 class="font-semibold text-gray-900 mb-3 flex items-center">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clip-rule="evenodd" />
+                            <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
+                        </svg>
+                        Voucher Code
+                    </h5>
+                    
                     <div class="space-y-3">
+                        <!-- Popular Voucher Codes -->
+                        <div v-if="!voucherApplied" class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <div class="text-xs font-semibold text-blue-800 mb-2">💡 Popular Codes:</div>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    v-for="popularCode in popularVoucherCodes"
+                                    :key="popularCode.code"
+                                    @click="applyPopularVoucher(popularCode.code)"
+                                    class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-full transition duration-200 font-medium"
+                                    :disabled="applyingVoucher"
+                                >
+                                    {{ popularCode.code }}
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="flex space-x-2">
                             <input
                                 type="text"
@@ -106,19 +144,19 @@
                         </div>
 
                         <!-- Voucher Success Message -->
-                        <div v-if="voucherApplied" class="flex items-center text-sm text-green-600">
+                        <div v-if="voucherApplied" class="flex items-center text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg p-2">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
-                            Voucher applied successfully!
+                            <span class="font-medium">Voucher applied successfully!</span>
                         </div>
 
                         <!-- Voucher Error Message -->
-                        <div v-if="voucherError" class="flex items-center text-sm text-red-600">
+                        <div v-if="voucherError" class="flex items-center text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-2">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
-                            {{ voucherError }}
+                            <span class="font-medium">{{ voucherError }}</span>
                         </div>
                     </div>
                 </div>
@@ -187,6 +225,14 @@ const appliedVoucher = ref('')
 const applyingVoucher = ref(false)
 const localVoucherDiscount = ref(props.voucherDiscount || 0)
 
+// Popular voucher codes
+const popularVoucherCodes = ref([
+    { code: 'WELCOME10', description: '10% off for new users' },
+    { code: 'SAVE20', description: '20% discount' },
+    { code: 'PROMO15', description: '15% off' },
+    { code: 'NEWBIE', description: 'Special discount for beginners' }
+])
+
 const hasFormData = computed(() => {
     return props.formData.company_name || props.formData.subdomain
 })
@@ -196,6 +242,12 @@ const finalTotal = computed(() => {
     const baseTotal = props.pricing.total || 0
     return Math.max(0, baseTotal - localVoucherDiscount.value)
 })
+
+// Apply popular voucher function
+const applyPopularVoucher = (code) => {
+    voucherCode.value = code
+    applyVoucher()
+}
 
 // Apply voucher function using database API
 const applyVoucher = async () => {
@@ -224,7 +276,7 @@ const applyVoucher = async () => {
             emit('voucherApplied', {
                 code: code,
                 discount: response.data.discount,
-                finalTotal: response.data.final_amount
+                finalTotal: Math.max(0, props.pricing.total - response.data.discount)
             })
         } else {
             voucherError.value = response.data.message || 'Invalid voucher code'
@@ -237,18 +289,32 @@ const applyVoucher = async () => {
 
         // Fallback to static vouchers if API fails
         const validVouchers = {
-            'PROMO10': {
+            'PROMO15': {
+                discount: 15,
+                type: 'percentage'
+            },
+            'WELCOME10': {
                 discount: 10,
+                type: 'percentage'
+            },
+            'SAVE20': {
+                discount: 20,
+                type: 'percentage'
+            },
+            'NEWBIE': {
+                discount: 5,
                 type: 'percentage'
             }
         };
         
         if (validVouchers[code]) {
             const voucher = validVouchers[code]
-            const baseTotal = props.pricing.total || 0
+            const subtotal = props.pricing.subtotal || 0
 
             if (voucher.type === 'percentage') {
-                localVoucherDiscount.value = Math.round(baseTotal * (voucher.discount / 100))
+                localVoucherDiscount.value = Math.round(subtotal * (voucher.discount / 100))
+            } else if (voucher.type === 'fixed') {
+                localVoucherDiscount.value = voucher.discount
             }
 
             voucherApplied.value = true
@@ -259,7 +325,7 @@ const applyVoucher = async () => {
             emit('voucherApplied', {
                 code: code,
                 discount: localVoucherDiscount.value,
-                finalTotal: finalTotal.value
+                finalTotal: Math.max(0, props.pricing.total - localVoucherDiscount.value)
             })
         } else {
             voucherError.value = error.response?.data?.message || 'Failed to validate voucher. Please try again.'

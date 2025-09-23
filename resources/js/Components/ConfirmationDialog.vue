@@ -76,9 +76,9 @@
 
                                     <!-- Pricing -->
                                     <div class="border-t border-gray-200 pt-4">
-                                        <div class="space-y-2">
+                                        <div class="space-y-3">
                                             <div class="flex justify-between">
-                                                <span class="text-gray-600">Price:</span>
+                                                <span class="text-gray-600">Template Price:</span>
                                                 <span class="font-medium">
                                                     {{ pricing.subtotal > 0 ? formatPrice(pricing.subtotal) : 'FREE' }}
                                                 </span>
@@ -88,18 +88,31 @@
                                                 <span class="text-gray-500">{{ formatPrice(pricing.platform_fee) }}</span>
                                             </div>
                                             
-                                            <!-- Voucher Discount -->
-                                            <div v-if="formData.voucher_code && formData.voucher_discount > 0" class="flex justify-between text-sm">
-                                                <span class="text-green-600">Discount ({{ formData.voucher_code }}):</span>
-                                                <span class="text-green-600">-{{ formatPrice(formData.voucher_discount) }}</span>
+                                            <!-- Subtotal -->
+                                            <div v-if="pricing.subtotal > 0" class="flex justify-between text-sm border-t border-gray-100 pt-2">
+                                                <span class="text-gray-600 font-medium">Subtotal:</span>
+                                                <span class="font-medium">{{ formatPrice(pricing.total) }}</span>
                                             </div>
                                             
-                                            <hr>
-                                            <div class="flex justify-between text-lg font-bold">
-                                                <span>Total Amount:</span>
-                                                <span class="text-green-600">
-                                                    {{ finalTotal > 0 ? formatPrice(finalTotal) : 'FREE' }}
-                                                </span>
+                                            <!-- Voucher Discount -->
+                                            <div v-if="formData.voucher_code && formData.voucher_discount > 0" class="flex justify-between text-sm">
+                                                <span class="text-green-600">Voucher ({{ formData.voucher_code }}):</span>
+                                                <span class="text-green-600 font-medium">-{{ formatPrice(formData.voucher_discount) }}</span>
+                                            </div>
+                                            
+                                            <!-- Total Amount with emphasis -->
+                                            <div class="border-t border-gray-200 pt-3">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-lg font-bold text-gray-900">Total Amount:</span>
+                                                    <div class="text-right">
+                                                        <div v-if="formData.voucher_discount > 0" class="text-sm text-gray-500 line-through">
+                                                            {{ formatPrice(pricing.total) }}
+                                                        </div>
+                                                        <div class="text-xl font-bold" :class="finalTotal > 0 ? 'text-green-600' : 'text-blue-600'">
+                                                            {{ finalTotal > 0 ? formatPrice(finalTotal) : 'FREE' }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

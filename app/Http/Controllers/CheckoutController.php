@@ -92,34 +92,36 @@ class CheckoutController extends Controller
         // Calculate pricing
         $subtotal = $template->price;
         $platformFee = 4000;
-        $total = $subtotal + $platformFee;
         $discount = 0;
         $voucherId = null;
 
         // Handle voucher logic
         if (!empty($validated['voucher_code'])) {
-            $voucher = Voucher::where('code', $validated['voucher_code'])->first();
+            $voucher = Voucher::where('code', strtoupper(trim($validated['voucher_code'])))
+                ->active()
+                ->first();
 
-            if (!$voucher || !$voucher->is_active || ($voucher->expires_at && $voucher->expires_at->isPast())) {
+            if (!$voucher) {
                 throw ValidationException::withMessages([
                     'voucher_code' => 'The provided voucher is invalid or has expired.',
                 ]);
             }
 
-            // Calculate discount based on type. Assuming 'fixed' and 'percentage' types.
-            if (isset($voucher->type) && isset($voucher->value)) {
-                if ($voucher->type === 'fixed') {
-                    $discount = $voucher->value;
-                } elseif ($voucher->type === 'percentage') {
-                    // Apply discount to subtotal (template price)
-                    $discount = ($subtotal * $voucher->value) / 100;
-                }
+            // Check minimum purchase requirement
+            if ($voucher->min_purchase && $subtotal < $voucher->min_purchase) {
+                throw ValidationException::withMessages([
+                    'voucher_code' => 'Minimum purchase amount of Rp ' . number_format($voucher->min_purchase, 0, ',', '.') . ' is required for this voucher.',
+                ]);
             }
 
-            $total = max(0, $total - $discount);
+            // Calculate discount using the model method
+            $discount = $voucher->calculateDiscount($subtotal);
             $voucherId = $voucher->id;
         }
 
+        // Calculate total after discount
+        $total = $subtotal + $platformFee - $discount;
+        $total = max(0, $total); // Ensure total is not negative
 
         DB::beginTransaction();
 

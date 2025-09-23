@@ -25,7 +25,7 @@ class Voucher extends Model
     ];
 
     protected $casts = [
-        'value' => 'decimal:2',
+        'discount_value' => 'decimal:2',
         'min_purchase' => 'decimal:2',
         'max_discount' => 'decimal:2',
         'is_active' => 'boolean',
@@ -59,13 +59,13 @@ class Voucher extends Model
 
         $discount = 0.0;
 
-        if ($this->type === 'percentage') {
-            $discount = ($subtotal * (float)$this->value) / 100;
+        if ($this->discount_type === 'percentage') {
+            $discount = ($subtotal * (float)$this->discount_value) / 100;
             if ($this->max_discount && $discount > $this->max_discount) {
                 $discount = (float)$this->max_discount;
             }
-        } elseif ($this->type === 'fixed') {
-            $discount = (float)$this->value;
+        } elseif ($this->discount_type === 'fixed') {
+            $discount = (float)$this->discount_value;
         }
 
         return min($discount, $subtotal); // Don't exceed subtotal

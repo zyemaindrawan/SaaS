@@ -404,11 +404,14 @@
                         :pricing="pricing"
                         :form-data="formData"
                         :submitting="submitting"
-                        :voucher-discount="voucherDiscount"
+                        :voucher-discount="formData.voucher_discount"
                         @submit="showConfirmation"
                         @voucherApplied="handleVoucherApplied"
                     />
                 </div>
+
+
+
             </div>
         </div>
     </AppLayout>
@@ -446,10 +449,12 @@ const showErrorDialog = ref(false)
 const errorTitle = ref('')
 const errorMessage = ref('')
 const errorDetails = ref(null)
-const voucherDiscount = ref(0)
 
 // Form data
+
+
 const formData = reactive({
+
     company_name: '',
     website_name: '',
     company_tagline: '',
@@ -467,6 +472,7 @@ const formData = reactive({
     subdomain: '',
     agree_terms: false,
     voucher_code: '',
+    voucher_discount: 0,
 })
 
 // Computed
@@ -525,7 +531,7 @@ const removeSocialLink = (index) => {
 
 const handleVoucherApplied = (voucherData) => {
     formData.voucher_code = voucherData.code
-    voucherDiscount.value = voucherData.discount
+    formData.voucher_discount = voucherData.discount
 }
 
 const closeErrorDialog = () => {

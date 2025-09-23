@@ -25,7 +25,7 @@ import { Link } from '@inertiajs/vue3';
 
             <!-- Footer -->
             <div class="mt-8 text-center">
-                <p class="text-sm text-gray-600">
+                <!-- <p class="text-sm text-gray-600">
                     By continuing, you agree to our
                     <Link href="/terms" class="text-blue-600 hover:text-blue-500 font-medium">
                         Terms of Service
@@ -34,7 +34,7 @@ import { Link } from '@inertiajs/vue3';
                     <Link href="/privacy" class="text-blue-600 hover:text-blue-500 font-medium">
                         Privacy Policy
                     </Link>
-                </p>
+                </p> -->
             </div>
         </div>
     </div>

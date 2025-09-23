@@ -30,7 +30,7 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
+    <!-- <GuestLayout> -->
         <Head title="Log in" />
 
         <!-- Main Content -->
@@ -130,7 +130,7 @@ const submit = () => {
                 </div>
             </div>
         </div>
-    </GuestLayout>
+    <!-- </GuestLayout> -->
 </template>
 
 <style scoped>

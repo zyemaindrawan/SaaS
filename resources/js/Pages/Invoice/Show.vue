@@ -32,21 +32,17 @@
                 <nav class="flex max-w-4xl mx-auto" aria-label="Breadcrumb">
                     <ol class="flex items-center space-x-4">
                         <li>
-                            <Link href="/templates" class="text-gray-400 hover:text-gray-500 transition duration-200">
+                            <Link href="/dashboard" class="text-gray-400 hover:text-gray-500 transition duration-200">
                                 <HomeIcon class="w-5 h-5" />
-                                <span class="sr-only">Templates</span>
+                                <span class="sr-only">Dashboard</span>
                             </Link>
                         </li>
                         <li>
                             <ChevronRightIcon class="flex-shrink-0 h-5 w-5 text-gray-300" />
                         </li>
                         <li>
-                            <Link
-                                :href="`/templates/${props.template.slug}`"
-                                class="text-gray-400 hover:text-gray-500 transition duration-200"
-                            >
-                                {{ props.template.name }}
-                            </Link>
+                            <Link href="/templates" class="text-gray-400 hover:text-gray-500 transition duration-200"
+                            >Templates</Link>
                         </li>
                         <li>
                             <ChevronRightIcon class="flex-shrink-0 h-5 w-5 text-gray-300" />
@@ -117,7 +113,7 @@
                                         </svg>
 
                                         <span v-if="!paymentProcessing && !isPaymentExpired && props.snapToken">
-                                            Bayar - {{ formatPrice(payment.gross_amount) }}
+                                            Bayar - {{ formatPrice(payment.final_amount) }}
                                         </span>
                                         <span v-else-if="paymentProcessing">
                                             Processing Payment...
@@ -175,7 +171,7 @@
                                             <div class="flex justify-between">
                                                 <span class="text-gray-600">Template Price</span>
                                                 <span class="font-medium">
-                                                    {{ formatPrice(props.template.price) }}
+                                                    {{ formatPrice(payment.amount) }}
                                                 </span>
                                             </div>
 
@@ -184,11 +180,34 @@
                                                 <span class="text-gray-500">{{ formatPrice(payment.fee) }}</span>
                                             </div>
 
+                                            <!-- Subtotal -->
+                                            <div class="flex justify-between text-sm border-t border-gray-100 pt-2">
+                                                <span class="text-gray-600 font-medium">Subtotal</span>
+                                                <span class="font-medium">{{ formatPrice(payment.gross_amount) }}</span>
+                                            </div>
+
+                                            <!-- Voucher Discount -->
+                                            <div v-if="payment.voucher_code && payment.discount > 0" class="flex justify-between text-sm">
+                                                <span class="text-green-600">Voucher ({{ payment.voucher_code }})</span>
+                                                <span class="text-green-600 font-medium">-{{ formatPrice(payment.discount) }}</span>
+                                            </div>
+
                                             <hr class="border-gray-200">
 
-                                            <div class="flex justify-between text-xl font-bold">
-                                                <span>Total Amount</span>
-                                                <span class="text-green-600">{{ formatPrice(payment.gross_amount) }}</span>
+                                            <!-- Final Amount -->
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-lg font-bold text-gray-900">Final Amount</span>
+                                                <div class="text-right">
+                                                    <div v-if="payment.discount > 0" class="text-sm text-gray-500 line-through">
+                                                        {{ formatPrice(payment.gross_amount) }}
+                                                    </div>
+                                                    <div class="text-xl font-bold text-green-600">
+                                                        {{ formatPrice(payment.final_amount) }}
+                                                    </div>
+                                                    <div v-if="payment.discount > 0" class="text-xs text-green-600 font-medium mt-1">
+                                                        💰 You save {{ formatPrice(payment.discount) }}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

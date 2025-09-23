@@ -35,7 +35,7 @@ Platform ini memungkinkan user terdaftar untuk:
 - Setelah user puas dengan preview, mereka dapat melakukan pembayaran melalui integrasi Payment Gateway.
 
 ### 4. Activation Queue & Background Jobs
-- Setelah pembayaran berhasil, sistem menggunakan **Laravel Queue** untuk menjalankan `ActivateWebsiteJob` dengan delay 6 jam.
+- Setelah pembayaran berhasil, sistem menggunakan **Laravel Queue** untuk menjalankan `ActivateWebsiteJob`.
 - Task ini akan:
   - Mengaktifkan website
   - Mengirim notifikasi email kepada user
@@ -57,7 +57,7 @@ Platform ini memungkinkan user terdaftar untuk:
    Sistem menerima notifikasi pembayaran dan mengubah status menjadi *paid*.
 
 5. **Activation**  
-   Background job dijalankan setelah 6 jam untuk mengaktifkan website.
+   Background job dijalankan untuk mengaktifkan website.
 
 6. **Notification**  
    User menerima email notifikasi dan dapat mengakses website di URL yang diberikan.

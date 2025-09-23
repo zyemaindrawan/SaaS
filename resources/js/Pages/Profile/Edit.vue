@@ -23,14 +23,6 @@ defineProps({
         <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div class="text-center">
-                    <div class="flex items-center justify-center mb-4">
-                        <svg class="w-10 h-10 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                            Account Settings
-                        </span>
-                    </div>
 
                     <h1 class="text-4xl md:text-5xl font-bold mb-6">
                         Profile Settings

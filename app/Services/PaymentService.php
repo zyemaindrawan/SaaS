@@ -23,6 +23,15 @@ class PaymentService
     {
         $user = $websiteContent->user;
 
+        // Calculate gross_amount as (amount + fee) - discount
+        $grossAmount = $pricingDetails['subtotal'] + $pricingDetails['platform_fee'] - $pricingDetails['discount'];
+
+        // Ensure gross_amount is not negative
+        $grossAmount = max(0, $grossAmount);
+
+        // final_amount is the same as gross_amount for Midtrans
+        $finalAmount = $grossAmount;
+
         // Create payment record
         $payment = Payment::create([
             'code' => Payment::generateCode(),
@@ -31,9 +40,9 @@ class PaymentService
             'amount' => $pricingDetails['subtotal'],
             'fee' => $pricingDetails['platform_fee'],
             'discount' => $pricingDetails['discount'],
-            'gross_amount' => $pricingDetails['total'],
+            'gross_amount' => $grossAmount,
             'voucher_code' => $pricingDetails['voucher_code'] ?? null,
-            'final_amount' => $pricingDetails['total'],
+            'final_amount' => $finalAmount,
             'status' => 'pending',
             'expired_at' => now()->addHours(2), // 2 Jam
         ]);
@@ -44,38 +53,53 @@ class PaymentService
         return $payment;
     }
 
+
     public function getSnapToken(Payment $payment): string
     {
         $user = $payment->user;
         $websiteContent = $payment->websiteContent;
         $template = $websiteContent->template;
 
+        // Create item details array
+        $itemDetails = [
+            [
+                'id' => $template->slug,
+                'price' => (int) $payment->amount, // Use stored amount
+                'quantity' => 1,
+                'name' => $template->name,
+                'category' => $template->category->name ?? 'Template',
+            ],
+            [
+                'id' => 'platform_fee',
+                'price' => (int) $payment->fee, // Use stored fee
+                'quantity' => 1,
+                'name' => 'Platform Fee',
+                'category' => 'Service',
+            ]
+        ];
+
+        // Add discount item if applicable
+        if ($payment->discount > 0) {
+            $itemDetails[] = [
+                'id' => 'discount',
+                'price' => -1 * (int) $payment->discount, // Negative value for discount
+                'quantity' => 1,
+                'name' => 'Discount' . ($payment->voucher_code ? ' (' . $payment->voucher_code . ')' : ''),
+                'category' => 'Discount',
+            ];
+        }
+
         $params = [
             'transaction_details' => [
                 'order_id' => $payment->code,
-                'gross_amount' => (int) $payment->gross_amount,
+                'gross_amount' => (int) $payment->final_amount, // Use final_amount that includes discount
             ],
             'customer_details' => [
                 'first_name' => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
             ],
-            'item_details' => [
-                [
-                    'id' => $template->slug,
-                    'price' => (int) $payment->amount, // Use stored amount
-                    'quantity' => 1,
-                    'name' => $template->name,
-                    'category' => $template->category->name ?? 'Template',
-                ],
-                [
-                    'id' => 'platform_fee',
-                    'price' => (int) $payment->fee, // Use stored fee
-                    'quantity' => 1,
-                    'name' => 'Platform Fee',
-                    'category' => 'Service',
-                ]
-            ],
+            'item_details' => $itemDetails,
             'callbacks' => [
                 'finish' => route('payment.finish', $payment->code),
                 'unfinish' => route('payment.unfinish', $payment->code),
@@ -100,6 +124,7 @@ class PaymentService
             throw $e;
         }
     }
+
 
     public function handleNotification(array $notificationData): void
     {
