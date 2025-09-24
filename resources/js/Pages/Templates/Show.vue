@@ -81,7 +81,7 @@
 
                             <div v-if="template.demo_url" class="text-center">
                                 <Link
-                                    :href="`/templates/${template.slug}/preview`"
+                                    :href="`/preview/${template.slug}`"
                                     target="_blank"
                                     class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg transition duration-200 font-medium"
                                 >

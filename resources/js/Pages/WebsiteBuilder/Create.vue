@@ -66,7 +66,7 @@
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
                             <h3 class="text-lg font-semibold text-white flex items-center">
-                                <TemplateIcon class="w-5 h-5 mr-2" />
+                                <DocumentDuplicateIcon class="w-5 h-5 mr-2" />
                                 Template Preview
                             </h3>
                         </div>
@@ -272,7 +272,7 @@ import AlertMessages from '@/Components/AlertMessages.vue'
 import {
     HomeIcon,
     ChevronRightIcon,
-    TemplateIcon,
+    DocumentDuplicateIcon,
     DocumentTextIcon
 } from '@heroicons/vue/24/outline'
 

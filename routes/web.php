@@ -18,7 +18,7 @@ Route::get('/', function () {
     return Inertia::render('Home/Index');
 })->name('home');
 
-Route::get('/{page}', fn () => inertia('Home/Index'))
+Route::get('/{page}', fn () => inertia('404/Index'))
      ->where('page', 'settings|pricing|about|features|help|contact|docs|terms|privacy')
      ->name('static');
 

@@ -1,7 +1,7 @@
 <template>
     <AppLayout>
         <Head>
-            <title>{{ appName }}</title>
+            <title>Homepage</title>
         </Head>
 
         <!-- Loading Component -->
