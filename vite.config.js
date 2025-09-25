@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import fs from 'fs';
+import fullReload from 'vite-plugin-full-reload';
 
 export default defineConfig({
     plugins: [
@@ -12,6 +13,12 @@ export default defineConfig({
             ],
             refresh: true,
         }),
+        fullReload([
+            'resources/views/**/*.blade.php',
+            'resources/views/filament/**/*.blade.php',
+            'app/Filament/**/*.php',
+            'app/Livewire/**/*.php',
+        ]),
         vue({
             template: {
                 transformAssetUrls: {

@@ -37,7 +37,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// Public preview routes (no auth required)
 Route::get('/preview/{slug}', [PreviewController::class, 'showBySlug'])
     ->name('templates.preview')
     ->where('slug', '[a-zA-Z0-9-_]+');
@@ -55,7 +54,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Main preview page by ID
     Route::get('/preview/{websiteContent}', [PreviewController::class, 'show'])
         ->name('preview.show')
         ->where('websiteContent', '[0-9]+');
@@ -70,12 +68,10 @@ Route::middleware('auth')->group(function () {
         ->name('preview.data')
         ->where('websiteContent', '[0-9]+');
 
-    // Update preview content (for real-time editing)
     Route::put('/preview/{websiteContent}/update', [PreviewController::class, 'update'])
         ->name('preview.update')
         ->where('websiteContent', '[0-9]+');
 
-    // Website Builder routes
     Route::get('/website-builder/create', [WebsiteBuilderController::class, 'create'])
         ->name('website-builder.create');
 
@@ -91,25 +87,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/website-builder/{websiteContent}/preview', [WebsiteBuilderController::class, 'preview'])
         ->name('website-builder.preview');
 
-    // Alias for content.edit (used in CheckoutController)
     Route::get('/content/{websiteContent}/edit', [WebsiteBuilderController::class, 'edit'])
         ->name('content.edit');
 
-    // Checkout
     Route::get('/templates/{template:slug}/checkout', [CheckoutController::class, 'show'])
         ->name('templates.checkout');
 
     Route::post('/templates/{template:slug}/checkout', [CheckoutController::class, 'process'])
         ->name('templates.checkout.process');
 
-    // Invoice routes
     Route::get('/invoice/{code}', [InvoiceController::class, 'show'])
         ->name('invoice.show');
 
     Route::get('/invoice/{code}/pay', [InvoiceController::class, 'pay'])
         ->name('invoice.pay');
 
-    // Payment routes (New)
     Route::get('/payment/{code}/finish', [PaymentController::class, 'finish'])
         ->name('payment.finish');
 
