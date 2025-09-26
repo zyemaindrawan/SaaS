@@ -69,21 +69,30 @@ class Template extends Model
             return $this->preview_image;
         }
 
-        // Check if local image exists in the templates directory
-        $imageFormats = ['.webp', '.png', '.jpg', '.jpeg', '.gif'];
-        foreach ($imageFormats as $format) {
-            $imagePath = public_path("storage/templates/{$this->slug}/preview{$format}");
-            if (file_exists($imagePath)) {
-                return asset("storage/templates/{$this->slug}/preview{$format}");
+        // Check if preview_image exists
+        if ($this->preview_image) {
+            $storagePath = public_path('storage/template-previews/' . $this->preview_image);
+            $publicPath = public_path('template-previews/' . $this->preview_image);
+            
+            // Log paths for debugging
+            \Illuminate\Support\Facades\Log::debug('Checking paths:', [
+                'storage' => $storagePath,
+                'public' => $publicPath,
+                'filename' => $this->preview_image
+            ]);
+            
+            // Check in public/storage/template-previews first
+            if (file_exists($storagePath)) {
+                return url('storage/template-previews/' . $this->preview_image);
+            }
+            
+            // Then check in public/template-previews
+            if (file_exists($publicPath)) {
+                return url('template-previews/' . $this->preview_image);
             }
         }
 
-        // Check if preview_image field contains a local path
-        if ($this->preview_image && file_exists(public_path($this->preview_image))) {
-            return asset($this->preview_image);
-        }
-
         // Fallback to default image
-        return asset('default-avatar.png');
+        return url('default-avatar.png');
     }
 }

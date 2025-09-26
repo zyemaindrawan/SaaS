@@ -1,6 +1,6 @@
 <template>
     <AppLayout>
-        <Head title="Website Templates" />
+        <Head title="Templates" />
 
         <!-- Loading Component -->
         <PageLoader :show="loading" />
@@ -548,10 +548,11 @@ onMounted(() => {
                 const img = new Image()
                 img.onload = () => {
                     // Image loaded successfully
+                    //console.log('Image loaded:', template.preview_image)
                 }
                 img.onerror = () => {
-                    // Image failed to load, use fallback
-                    template.preview_image = '/default-avatar.png'
+                    // Image failed to load, let getPreviewUrl handle the fallback
+                    //console.error('Image failed to load:', template.preview_image)
                 }
                 img.src = template.preview_image
             }

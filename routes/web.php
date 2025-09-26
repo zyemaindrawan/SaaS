@@ -63,7 +63,7 @@ Route::middleware('auth')->group(function () {
         ->name('preview.render')
         ->where('websiteContent', '[0-9]+');
 
-    // Get preview data as JSON
+    // Get preview (json data)
     Route::get('/preview/{websiteContent}/data', [PreviewController::class, 'data'])
         ->name('preview.data')
         ->where('websiteContent', '[0-9]+');

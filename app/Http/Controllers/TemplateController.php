@@ -56,7 +56,13 @@ class TemplateController extends Controller
 
         // Transform templates to include proper preview URLs
         $templates->getCollection()->transform(function ($template) {
-            $template->preview_image = $template->getPreviewUrl();
+            $previewUrl = $template->getPreviewUrl();
+            \Illuminate\Support\Facades\Log::debug('Template preview URL:', [
+                'template_id' => $template->id,
+                'preview_image' => $template->preview_image,
+                'preview_url' => $previewUrl
+            ]);
+            $template->preview_image = $previewUrl;
             return $template;
         });
 
