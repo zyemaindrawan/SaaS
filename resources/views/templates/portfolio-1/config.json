@@ -1,0 +1,11 @@
+{
+    "name": "Portfolio 2",
+    "description": "Sistem ini dirancang untuk memberikan solusi yang simpel namun powerful bagi user yang ingin memiliki website profesional tanpa perlu memahami coding, dengan model bisnis SaaS yang sustainable.",
+    "category": "portfolio",
+    "price": "2445000.00",
+    "is_active": true,
+    "sort_order": 1,
+    "version": "1.0.0",
+    "author": "DR-SaaS",
+    "updated_at": "2025-09-29T04:25:17.355307Z"
+}

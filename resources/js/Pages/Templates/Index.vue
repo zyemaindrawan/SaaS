@@ -2,7 +2,6 @@
     <AppLayout>
         <Head title="Templates" />
 
-        <!-- Loading Component -->
         <PageLoader :show="loading" />
 
         <!-- Hero Section -->
@@ -128,7 +127,6 @@
                             </div>
                         </div>
 
-                        <!-- Sort Options -->
                         <div>
                             <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">
                                 Sort By
@@ -252,7 +250,6 @@
                 </div>
             </div>
 
-            <!-- Results Info -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
                     <p class="text-gray-600">
@@ -264,7 +261,6 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <!-- Quick Sort -->
                     <div class="flex items-center">
                         <label for="quick-sort" class="text-sm text-gray-600 mr-2">Quick Sort:</label>
                         <select
@@ -395,7 +391,6 @@ import TemplateCard from '@/Components/TemplateCard.vue'
 import Pagination from '@/Components/Pagination.vue'
 import PageLoader from '@/Components/PageLoader.vue'
 
-// Icons
 import {
     MagnifyingGlassIcon,
     FunnelIcon,
@@ -417,7 +412,6 @@ const props = defineProps({
     filters: Object
 })
 
-// Reactive state
 const loading = ref(true)
 const viewMode = ref('grid')
 const quickSearch = ref('')
@@ -430,7 +424,6 @@ const filterForm = reactive({
     sort: props.filters.sort || 'sort_order'
 })
 
-// Computed properties
 const hasActiveFilters = computed(() => {
     return props.filters.search ||
            (props.filters.category && props.filters.category !== 'all') ||
@@ -442,7 +435,6 @@ const searchSuggestions = computed(() => {
     return ['corporate', 'portfolio', 'ecommerce', 'landing page', 'blog']
 })
 
-// Methods
 const formatCategory = (category) => {
     if (!category) return ''
     return category.split('-').map(word =>
@@ -535,7 +527,6 @@ const handleTemplateSelected = (template) => {
     router.visit(`/templates/${template.slug}`)
 }
 
-// Lifecycle
 onMounted(() => {
     setTimeout(() => {
         loading.value = false
@@ -562,7 +553,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Custom animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -572,13 +562,11 @@ onMounted(() => {
     animation: fadeIn 0.6s ease-out;
 }
 
-/* Grid transition animations */
 .grid > * {
     animation: fadeIn 0.6s ease-out;
     animation-delay: calc(var(--index) * 0.1s);
 }
 
-/* Custom scrollbar for better UX */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -596,7 +584,6 @@ onMounted(() => {
     background: #94a3b8;
 }
 
-/* Responsive utilities */
 @media (max-width: 640px) {
     .hero-title {
         font-size: 2.5rem;

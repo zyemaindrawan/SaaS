@@ -114,13 +114,14 @@ class WebsiteContentResource extends Resource
                     ->searchable()
                     ->icon('heroicon-o-link')
                     ->placeholder('Not set')
-                    ->copyable(),
+                    ->copyable()
+                    ->label('Domain'),
                 
-                Tables\Columns\TextColumn::make('custom_domain')
-                    ->searchable()
-                    ->icon('heroicon-o-globe-europe-africa')
-                    ->placeholder('Not set')
-                    ->copyable(),
+                // Tables\Columns\TextColumn::make('custom_domain')
+                //     ->searchable()
+                //     ->icon('heroicon-o-globe-europe-africa')
+                //     ->placeholder('Not set')
+                //     ->copyable(),
                 
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors([
@@ -159,16 +160,15 @@ class WebsiteContentResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'draft' => 'Draft',
-                        'previewed' => 'Previewed',
-                        'paid' => 'Paid',
                         'active' => 'Active',
                         'suspended' => 'Suspended',
+                        'expired' => 'Expired',
                     ]),
                 Tables\Filters\SelectFilter::make('template')
                     ->relationship('template', 'name'),
-                Tables\Filters\Filter::make('expired')
-                    ->label('Expired')
-                    ->query(fn ($query) => $query->where('expires_at', '<', now())),
+                // Tables\Filters\Filter::make('expired')
+                //     ->label('Expired')
+                //     ->query(fn ($query) => $query->where('expires_at', '<', now())),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

@@ -25,19 +25,32 @@ class TemplateResource extends Resource
             ->schema([
                 Section::make('Template Information')
                     ->icon('heroicon-o-document')
-                    ->columns(3)
+                    ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255)
-                            ->prefixIcon('heroicon-o-identification'),
+                            ->prefixIcon('heroicon-o-identification')
+                            ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+                                if ($operation === 'create') {
+                                    $set('slug', \Str::slug($state));
+                                    $set('config_path', 'resources/views/templates/' . \Str::slug($state) . '/config.json');
+                                }
+                            }),
 
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
                             ->regex('/^[a-z0-9-_]+$/')
-                            ->prefixIcon('heroicon-o-link'),
+                            ->prefixIcon('heroicon-o-link')
+                            ->disabled(),
+
+                        Forms\Components\TextInput::make('config_path')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('resources/views/templates/corporate/config.json')
+                            ->prefixIcon('heroicon-o-folder'),
 
                         Forms\Components\Select::make('category')
                             ->options([
@@ -103,6 +116,12 @@ class TemplateResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-link')
+                    ->copyable(),
+                
+                Tables\Columns\TextColumn::make('config_path')
+                    ->searchable()
+                    ->sortable()
+                    ->icon('heroicon-o-folder')
                     ->copyable(),
                 
                 Tables\Columns\BadgeColumn::make('category')

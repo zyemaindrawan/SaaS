@@ -83,7 +83,7 @@
                     :href="`/login?redirect=/templates/${template.slug}`"
                     class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-md transition duration-200 text-sm font-medium"
                 >
-                    Login to Order
+                    Order Now
                 </Link>
             </div>
         </div>

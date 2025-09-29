@@ -50,7 +50,6 @@ class EditTemplate extends EditRecord
                             }
                             return json_encode($this->getDefaultConfig(), JSON_PRETTY_PRINT);
                         })
-                        ->helperText('Edit the template configuration in JSON format')
                         ->required(),
                 ])
                 ->action(function (array $data) {

@@ -1,0 +1,322 @@
+{
+  "name": "Portfolio 2",
+  "description": "Template personal branding modern untuk profesional kreatif yang ingin memamerkan karya, skill, dan testimoni klien secara elegan.",
+  "category": "portfolio",
+  "price": "2445000.00",
+  "is_active": true,
+  "sort_order": 1,
+  "version": "1.0.0",
+  "author": "DR-SaaS",
+  "updated_at": "2025-09-29T03:36:28.876617Z",
+
+  "fields": [
+    {
+      "key": "seo_title",
+      "label": "SEO Title",
+      "type": "text",
+      "section": "seo",
+      "max_length": 60,
+      "value": "Rizky Pratama – UI/UX Designer & Frontend Developer"
+    },
+    {
+      "key": "seo_description",
+      "type": "textarea",
+      "section": "seo",
+      "max_length": 160,
+      "value": "Portofolio pribadi Rizky Pratama, spesialis UI/UX dan frontend developer dengan pengalaman 5+ tahun. Lihat karya dan testimoni klien saya."
+    },
+    {
+      "key": "company_name",
+      "type": "text",
+      "section": "branding",
+      "value": "Rizky Pratama"
+    },
+    {
+      "key": "company_tagline",
+      "type": "text",
+      "section": "branding",
+      "value": "UI/UX Designer & Frontend Developer"
+    },
+    {
+      "key": "company_logo",
+      "type": "image",
+      "section": "branding",
+      "value": "branding/logo-rizky.png"
+    },
+    {
+      "key": "hero_title",
+      "type": "text",
+      "section": "hero",
+      "value": "Halo, Saya Rizky – Desainer Antarmuka Digital"
+    },
+    {
+      "key": "hero_subtitle",
+      "type": "textarea",
+      "section": "hero",
+      "value": "Saya membantu brand dan startup menciptakan produk digital yang indah, intuitif, dan berdampak."
+    },
+    {
+      "key": "hero_cta_text",
+      "type": "text",
+      "section": "hero",
+      "value": "Lihat Portofolio"
+    },
+    {
+      "key": "hero_cta_link",
+      "type": "text",
+      "section": "hero",
+      "value": "#gallery"
+    },
+    {
+      "key": "services_title",
+      "type": "text",
+      "section": "services",
+      "value": "Layanan yang Saya Tawarkan"
+    },
+    {
+      "key": "services_subtitle",
+      "type": "textarea",
+      "section": "services",
+      "value": "Dari konsep hingga deployment, saya bantu wujudkan visi digital Anda."
+    },
+    {
+      "key": "services",
+      "type": "repeater",
+      "section": "services",
+      "max_items": 6,
+      "value": [
+        {
+          "title": "UI/UX Design",
+          "description": "Desain antarmuka yang user-friendly dengan riset pengguna dan prototipe interaktif.",
+          "icon": "fas fa-paint-brush",
+          "link": "#ui-ux"
+        },
+        {
+          "title": "Frontend Development",
+          "description": "Koding website responsif dengan React, Vue, atau plain HTML/CSS/JS.",
+          "icon": "fas fa-code",
+          "link": "#frontend"
+        },
+        {
+          "title": "Design System",
+          "description": "Komponen desain yang reusable untuk konsistensi brand di seluruh produk.",
+          "icon": "fas fa-layer-group",
+          "link": "#design-system"
+        }
+      ]
+    },
+    {
+      "key": "about_title",
+      "type": "text",
+      "section": "about",
+      "value": "Tentang Saya"
+    },
+    {
+      "key": "about_content",
+      "type": "rich_text",
+      "section": "about",
+      "value": "<p>Saya Rizky, UI/UX designer dan frontend developer berpengalaman 5+ tahun. Telah bekerja dengan 50+ klien dari berbagai industri, mulai dari startup teknologi hingga UMKM lokal.</p><p>Saya percaya bahwa desain yang baik harus indah, fungsional, dan measurable. Setiap proyek adalah kolaborasi untuk menciptakan solusi digital yang berdampak nyata.</p>"
+    },
+    {
+      "key": "about_image",
+      "type": "image",
+      "section": "about",
+      "value": "about/rizky-photo.jpg"
+    },
+    {
+      "key": "company_stats",
+      "type": "repeater",
+      "section": "about",
+      "max_items": 4,
+      "value": [
+        {
+          "number": "50+",
+          "label": "Klien Puas",
+          "icon": "fas fa-users"
+        },
+        {
+          "number": "100+",
+          "label": "Proyek Selesai",
+          "icon": "fas fa-briefcase"
+        },
+        {
+          "number": "5+",
+          "label": "Tahun Pengalaman",
+          "icon": "fas fa-calendar-alt"
+        },
+        {
+          "number": "99%",
+          "label": "Klien Repeat",
+          "icon": "fas fa-heart"
+        }
+      ]
+    },
+    {
+      "key": "gallery_title",
+      "type": "text",
+      "section": "gallery",
+      "value": "Galeri Karya"
+    },
+    {
+      "key": "gallery_photos",
+      "type": "image_multiple",
+      "section": "gallery",
+      "max_files": 12,
+      "value": [
+        "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?q=80&w=800",
+        "https://images.unsplash.com/photo-1559028006-448665bd7c7f?q=80&w=800",
+        "https://images.unsplash.com/photo-1587440871875-191322ee64b0?q=80&w=800",
+        "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?q=80&w=800",
+        "https://images.unsplash.com/photo-1586953208448-b95a79798f07?q=80&w=800",
+        "https://images.unsplash.com/photo-1586953986311-8dd5bb0b98a3?q=80&w=800"
+      ]
+    },
+    {
+      "key": "testimonials_title",
+      "type": "text",
+      "section": "testimonials",
+      "value": "Apa Kata Klien"
+    },
+    {
+      "key": "testimonials",
+      "type": "repeater",
+      "section": "testimonials",
+      "max_items": 6,
+      "value": [
+        {
+          "name": "Budi Santoso",
+          "position": "Founder, Toko Online Sejahtera",
+          "content": "Rizky sangat detail dan responsive. Desain yang dibuat meningkatkan konversi website kami hingga 40%.",
+          "photo": "",
+          "rating": "5"
+        },
+        {
+          "name": "Maya Wulandari",
+          "position": "CEO, Startup EduTech",
+          "content": "Proses kolaborasi sangat nyaman. Rizky tidak hanya desainer, tapi juga strategic partner.",
+          "photo": "",
+          "rating": "5"
+        },
+        {
+          "name": "Ahmad Fauzi",
+          "position": "Owner, Cafe Digital",
+          "content": "Hasilnya melebihi ekspektasi. Website baru kami jauh lebih cepat dan aesthetic.",
+          "photo": "",
+          "rating": "5"
+        }
+      ]
+    },
+    {
+      "key": "contact_title",
+      "type": "text",
+      "section": "contact",
+      "value": "Mari Berkolaborasi"
+    },
+    {
+      "key": "contact_email",
+      "type": "email",
+      "section": "contact",
+      "value": "hello@rizkypratama.dev"
+    },
+    {
+      "key": "contact_phone",
+      "type": "text",
+      "section": "contact",
+      "value": "+62 812-3456-7890"
+    },
+    {
+      "key": "contact_address",
+      "type": "textarea",
+      "section": "contact",
+      "value": "Bandung, Jawa Barat, Indonesia"
+    },
+    {
+      "key": "whatsapp_enabled",
+      "type": "checkbox",
+      "section": "contact",
+      "value": true
+    },
+    {
+      "key": "whatsapp_number",
+      "type": "text",
+      "section": "contact",
+      "value": "6281234567890"
+    },
+    {
+      "key": "whatsapp_message",
+      "type": "textarea",
+      "section": "contact",
+      "value": "Halo Rizky, saya tertarik berkolaborasi untuk proyek desain/development."
+    },
+    {
+      "key": "whatsapp_position",
+      "type": "select",
+      "section": "contact",
+      "value": "bottom-right"
+    },
+    {
+      "key": "whatsapp_greeting_text",
+      "type": "text",
+      "section": "contact",
+      "value": "Tanya-tanya dulu yuk!"
+    },
+    {
+      "key": "social_links",
+      "type": "repeater",
+      "section": "social",
+      "max_items": 8,
+      "value": [
+        {
+          "platform": "instagram",
+          "url": "https://instagram.com/rizkypratama",
+          "label": "@rizkypratama"
+        },
+        {
+          "platform": "linkedin",
+          "url": "https://linkedin.com/in/rizkypratama",
+          "label": "Rizky Pratama"
+        },
+        {
+          "platform": "dribbble",
+          "url": "https://dribbble.com/rizkypratama",
+          "label": "rizkypratama"
+        },
+        {
+          "platform": "github",
+          "url": "https://github.com/rizkypratama",
+          "label": "rizkypratama"
+        }
+      ]
+    },
+    {
+      "key": "primary_color",
+      "type": "color",
+      "section": "theme",
+      "value": "#6366f1"
+    },
+    {
+      "key": "secondary_color",
+      "type": "color",
+      "section": "theme",
+      "value": "#64748b"
+    },
+    {
+      "key": "accent_color",
+      "type": "color",
+      "section": "theme",
+      "value": "#f59e0b"
+    },
+    {
+      "key": "font_family",
+      "type": "select",
+      "section": "theme",
+      "value": "inter"
+    },
+    {
+      "key": "border_radius",
+      "type": "select",
+      "section": "theme",
+      "value": "medium"
+    }
+  ]
+}
