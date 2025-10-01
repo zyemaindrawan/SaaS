@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Storage;
 
 class Template extends Model
 {
@@ -29,11 +28,13 @@ class Template extends Model
         'sort_order' => 'integer'
     ];
 
+    // Relationships
     public function websiteContents()
     {
         return $this->hasMany(WebsiteContent::class, 'template_slug', 'slug');
     }
 
+    // Scopes
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
@@ -49,6 +50,7 @@ class Template extends Model
         return $query->orderBy('sort_order')->orderBy('name');
     }
 
+    // Methods
     public function getConfigData(): array
     {
         $configPath = resource_path("views/templates/{$this->slug}/config.json");
@@ -62,23 +64,26 @@ class Template extends Model
 
     public function getPreviewUrl(): string
     {
+        // If preview_image is already a full URL, return it
         if ($this->preview_image && (str_starts_with($this->preview_image, 'http://') || str_starts_with($this->preview_image, 'https://'))) {
             return $this->preview_image;
         }
 
-        if ($this->preview_image) {
-            $path = $this->preview_image;
-            if (!str_starts_with($this->preview_image, 'template-previews/')) {
-                $path = 'template-previews/' . $this->preview_image;
-            }
-
-            if (Storage::disk('public')->exists($path)) {
-                return Storage::url($path);
+        // Check if local image exists in the templates directory
+        $imageFormats = ['.webp', '.png', '.jpg', '.jpeg', '.gif'];
+        foreach ($imageFormats as $format) {
+            $imagePath = public_path("storage/template-previews/{$this->slug}/preview{$format}");
+            if (file_exists($imagePath)) {
+                return asset("storage/template-previews/{$this->slug}/preview{$format}");
             }
         }
 
+        // Check if preview_image field contains a local path
+        if ($this->preview_image && file_exists(public_path($this->preview_image))) {
+            return asset($this->preview_image);
+        }
+
+        // Fallback to default image
         return asset('default-avatar.png');
     }
-
-
 }

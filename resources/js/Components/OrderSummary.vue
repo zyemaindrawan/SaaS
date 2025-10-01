@@ -12,8 +12,9 @@
                 <!-- Template Preview -->
                 <div class="mb-6">
                     <img
-                        :src="template.preview_image || '/images/template-placeholder.jpg'"
+                        :src="template.preview_image ? `/storage/${template.preview_image}` : '/default-avatar.png'"
                         :alt="template.name"
+                        @error="handleImageError"
                         class="w-full h-32 object-cover rounded-lg mb-4"
                     >
 
@@ -368,5 +369,9 @@ const formatPrice = (price) => {
 const truncateText = (text, length) => {
     if (!text) return ''
     return text.length > length ? text.substring(0, length) + '...' : text
+}
+
+const handleImageError = (event) => {
+    event.target.src = '/default-avatar.png'
 }
 </script>

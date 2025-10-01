@@ -199,4 +199,8 @@ const formatCategory = (category) => {
 const formatPrice = (price) => {
     return 'Rp ' + new Intl.NumberFormat('id-ID').format(price)
 }
+
+const handleImageError = (event) => {
+    event.target.src = '/default-avatar.png'
+}
 </script>

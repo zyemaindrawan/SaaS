@@ -24,7 +24,7 @@ class WebsiteContentResource extends Resource
         return $form
             ->schema([
                 Section::make('Website Information')
-                    ->description('Basic website details and ownership')
+                    //->description('Basic website details and ownership')
                     ->icon('heroicon-o-information-circle')
                     ->columns(2)
                     ->schema([
@@ -44,23 +44,23 @@ class WebsiteContentResource extends Resource
                     ]),
 
                 Section::make('Domain Configuration')
-                    ->description('Website URL and domain settings')
+                    //->description('Website URL and domain settings')
                     ->icon('heroicon-o-globe-alt')
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('subdomain')
                             ->maxLength(255)
-                            ->helperText('yoursite.domain.com')
+                            //->helperText('yoursite.domain.com')
                             ->prefixIcon('heroicon-o-link'),
                         
                         Forms\Components\TextInput::make('custom_domain')
                             ->maxLength(255)
-                            ->helperText('www.yoursite.com')
+                            //->helperText('www.yoursite.com')
                             ->prefixIcon('heroicon-o-globe-europe-africa'),
                     ]),
 
                 Section::make('Status & Timeline')
-                    ->description('Website status and important dates')
+                    //->description('Website status and important dates')
                     ->icon('heroicon-o-clock')
                     ->columns(2)
                     ->schema([
@@ -75,15 +75,15 @@ class WebsiteContentResource extends Resource
                             ->required()
                             ->prefixIcon('heroicon-o-flag'),
                         
-                        Forms\Components\DateTimePicker::make('activated_at')
-                            ->helperText('When the website was activated'),
+                        Forms\Components\DateTimePicker::make('activated_at'),
+                            //->helperText('When the website was activated'),
                         
-                        Forms\Components\DateTimePicker::make('expires_at')
-                            ->helperText('Website expiration date'),
+                        Forms\Components\DateTimePicker::make('expires_at'),
+                            //->helperText('Website expiration date'),
                     ]),
 
                 Section::make('Content Data')
-                    ->description('Website content in JSON format')
+                    //->description('Website content in JSON format')
                     ->icon('heroicon-o-code-bracket')
                     ->schema([
                         Forms\Components\KeyValue::make('content_data')
@@ -171,7 +171,7 @@ class WebsiteContentResource extends Resource
                 //     ->query(fn ($query) => $query->where('expires_at', '<', now())),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                //Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('preview')
                     ->icon('heroicon-o-eye')

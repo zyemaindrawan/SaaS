@@ -28,84 +28,84 @@ class EditWebsiteContent extends EditRecord
                 ->openUrlInNewTab()
                 ->visible(fn (): bool => $this->record->canPreview()),
             
-            Actions\Action::make('reset_content')
-                ->label('Reset to Template Defaults')
-                ->icon('heroicon-o-arrow-uturn-left')
-                ->color('warning')
-                ->action(function () {
-                    $this->resetToTemplateDefaults();
-                })
-                ->requiresConfirmation()
-                ->modalHeading('Reset Content Data')
-                ->modalDescription('This will replace all current content with template default values. This action cannot be undone.')
-                ->modalSubmitActionLabel('Reset Content'),
+            // Actions\Action::make('reset_content')
+            //     ->label('Reset to Template Defaults')
+            //     ->icon('heroicon-o-arrow-uturn-left')
+            //     ->color('warning')
+            //     ->action(function () {
+            //         $this->resetToTemplateDefaults();
+            //     })
+            //     ->requiresConfirmation()
+            //     ->modalHeading('Reset Content Data')
+            //     ->modalDescription('This will replace all current content with template default values. This action cannot be undone.')
+            //     ->modalSubmitActionLabel('Reset Content'),
             
-            Actions\Action::make('change_template')
-                ->label('Change Template')
-                ->icon('heroicon-o-document-duplicate')
-                ->color('info')
-                ->form([
-                    \Filament\Forms\Components\Select::make('new_template_slug')
-                        ->label('New Template')
-                        ->options(Template::active()->pluck('name', 'slug'))
-                        ->required()
-                        ->searchable()
-                        ->helperText('Changing template will reset content data to new template defaults'),
-                ])
-                ->action(function (array $data) {
-                    $this->changeTemplate($data['new_template_slug']);
-                })
-                ->requiresConfirmation()
-                ->modalHeading('Change Website Template')
-                ->modalDescription('This will change the template and reset content data. Current content will be lost.')
-                ->visible(fn (): bool => in_array($this->record->status, ['draft', 'previewed'])),
+            // Actions\Action::make('change_template')
+            //     ->label('Change Template')
+            //     ->icon('heroicon-o-document-duplicate')
+            //     ->color('info')
+            //     ->form([
+            //         \Filament\Forms\Components\Select::make('new_template_slug')
+            //             ->label('New Template')
+            //             ->options(Template::active()->pluck('name', 'slug'))
+            //             ->required()
+            //             ->searchable()
+            //             ->helperText('Changing template will reset content data to new template defaults'),
+            //     ])
+            //     ->action(function (array $data) {
+            //         $this->changeTemplate($data['new_template_slug']);
+            //     })
+            //     ->requiresConfirmation()
+            //     ->modalHeading('Change Website Template')
+            //     ->modalDescription('This will change the template and reset content data. Current content will be lost.')
+            //     ->visible(fn (): bool => in_array($this->record->status, ['draft', 'previewed'])),
             
-            Actions\Action::make('duplicate')
-                ->label('Duplicate Website')
-                ->icon('heroicon-o-document-duplicate')
-                ->color('gray')
-                ->action(function () {
-                    $this->duplicateWebsite();
-                })
-                ->requiresConfirmation()
-                ->modalHeading('Duplicate Website')
-                ->modalDescription('This will create a copy of this website with the same content for the same user.')
-                ->modalSubmitActionLabel('Duplicate'),
+            // Actions\Action::make('duplicate')
+            //     ->label('Duplicate Website')
+            //     ->icon('heroicon-o-document-duplicate')
+            //     ->color('gray')
+            //     ->action(function () {
+            //         $this->duplicateWebsite();
+            //     })
+            //     ->requiresConfirmation()
+            //     ->modalHeading('Duplicate Website')
+            //     ->modalDescription('This will create a copy of this website with the same content for the same user.')
+            //     ->modalSubmitActionLabel('Duplicate'),
             
-            Actions\Action::make('change_status')
-                ->label('Change Status')
-                ->icon('heroicon-o-flag')
-                ->color('warning')
-                ->form([
-                    \Filament\Forms\Components\Select::make('new_status')
-                        ->label('New Status')
-                        ->options([
-                            'draft' => 'Draft',
-                            'previewed' => 'Previewed',
-                            'paid' => 'Paid',
-                            'active' => 'Active',
-                            'suspended' => 'Suspended',
-                        ])
-                        ->required()
-                        ->default($this->record->status),
+            // Actions\Action::make('change_status')
+            //     ->label('Change Status')
+            //     ->icon('heroicon-o-flag')
+            //     ->color('warning')
+            //     ->form([
+            //         \Filament\Forms\Components\Select::make('new_status')
+            //             ->label('New Status')
+            //             ->options([
+            //                 'draft' => 'Draft',
+            //                 'previewed' => 'Previewed',
+            //                 'paid' => 'Paid',
+            //                 'active' => 'Active',
+            //                 'suspended' => 'Suspended',
+            //             ])
+            //             ->required()
+            //             ->default($this->record->status),
                     
-                    \Filament\Forms\Components\DateTimePicker::make('activated_at')
-                        ->label('Activated At')
-                        ->helperText('Set activation date (only for active status)')
-                        ->visible(fn (\Filament\Forms\Get $get) => $get('new_status') === 'active'),
-                ])
-                ->action(function (array $data) {
-                    $updateData = ['status' => $data['new_status']];
+            //         \Filament\Forms\Components\DateTimePicker::make('activated_at')
+            //             ->label('Activated At')
+            //             ->helperText('Set activation date (only for active status)')
+            //             ->visible(fn (\Filament\Forms\Get $get) => $get('new_status') === 'active'),
+            //     ])
+            //     ->action(function (array $data) {
+            //         $updateData = ['status' => $data['new_status']];
                     
-                    if ($data['new_status'] === 'active' && isset($data['activated_at'])) {
-                        $updateData['activated_at'] = $data['activated_at'];
-                    } elseif ($data['new_status'] === 'active' && !$this->record->activated_at) {
-                        $updateData['activated_at'] = now();
-                    }
+            //         if ($data['new_status'] === 'active' && isset($data['activated_at'])) {
+            //             $updateData['activated_at'] = $data['activated_at'];
+            //         } elseif ($data['new_status'] === 'active' && !$this->record->activated_at) {
+            //             $updateData['activated_at'] = now();
+            //         }
                     
-                    $this->record->update($updateData);
-                    $this->notify('success', "Status changed to {$data['new_status']}");
-                }),
+            //         $this->record->update($updateData);
+            //         $this->notify('success', "Status changed to {$data['new_status']}");
+            //     }),
             
             Actions\DeleteAction::make()
                 ->requiresConfirmation()

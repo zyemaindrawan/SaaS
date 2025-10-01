@@ -11,10 +11,12 @@ class TemplateController extends Controller
     {
         $query = Template::where('is_active', true);
 
+        // Filter by category
         if ($request->filled('category') && $request->category !== 'all') {
             $query->where('category', $request->category);
         }
 
+        // Filter by price range
         if ($request->filled('price_min')) {
             $query->where('price', '>=', $request->price_min);
         }
@@ -23,6 +25,7 @@ class TemplateController extends Controller
             $query->where('price', '<=', $request->price_max);
         }
 
+        // Search by name or description
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search . '%')
@@ -30,6 +33,7 @@ class TemplateController extends Controller
             });
         }
 
+        // Sorting
         $sortBy = $request->get('sort', 'sort_order');
         switch ($sortBy) {
             case 'price_low':
@@ -50,12 +54,13 @@ class TemplateController extends Controller
 
         $templates = $query->paginate(12)->withQueryString();
 
+        // Transform templates to include proper preview URLs
         $templates->getCollection()->transform(function ($template) {
-            $previewUrl = $template->getPreviewUrl();
-            $template->preview_image = $previewUrl;
+            $template->preview_image = $template->getPreviewUrl();
             return $template;
         });
 
+        // Get unique categories
         $categories = Template::where('is_active', true)
             ->whereNotNull('category')
             ->distinct()
@@ -63,6 +68,7 @@ class TemplateController extends Controller
             ->sort()
             ->values();
 
+        // Get price range
         $priceRange = Template::where('is_active', true)
             ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
             ->first();
@@ -84,6 +90,10 @@ class TemplateController extends Controller
             abort(404);
         }
 
+        // Simulate loading delay for demo (remove in production)
+        // sleep(1);
+
+        // Get related templates
         $relatedTemplates = Template::where('is_active', true)
             ->where('category', $template->category)
             ->where('id', '!=', $template->id)
@@ -91,11 +101,13 @@ class TemplateController extends Controller
             ->limit(4)
             ->get(['id', 'name', 'slug', 'preview_image', 'price', 'category']);
 
+        // Transform related templates to include proper preview URLs
         $relatedTemplates->transform(function ($relatedTemplate) {
             $relatedTemplate->preview_image = $relatedTemplate->getPreviewUrl();
             return $relatedTemplate;
         });
 
+        // Get template with optimized data
         $templateData = [
             'id' => $template->id,
             'name' => $template->name,

@@ -72,7 +72,7 @@
                                 <!-- Template Preview -->
                                 <div>
                                     <img
-                                        :src="props.template.preview_image || '/default-avatar.png'"
+                                        :src="props.template.preview_image ? `/storage/${props.template.preview_image}` : '/default-avatar.png'"
                                         :alt="props.template.name"
                                         class="w-full h-48 object-cover rounded-lg mb-4"
                                         @error="handleImageError"
