@@ -1,0 +1,345 @@
+{
+  "name": "AutoDealer Pro",
+  "description": "Template website dealer mobil profesional dengan fitur pencarian unit, promo, dan kontak sales. Cocok untuk Toyota, Honda, Suzuki, dll.",
+  "category": "automotive",
+  "price": "3500000.00",
+  "is_active": true,
+  "sort_order": 1,
+  "version": "1.0.0",
+  "author": "DR-SaaS",
+  "updated_at": "2025-09-30T07:00:00Z",
+  "fields": [
+    {
+      "key": "seo_title",
+      "label": "SEO Title",
+      "type": "text",
+      "section": "seo",
+      "max_length": 60,
+      "value": "Dealer Resmi Toyota Bandung | Promo Terbaru 2025"
+    },
+    {
+      "key": "seo_description",
+      "type": "textarea",
+      "section": "seo",
+      "max_length": 160,
+      "value": "Toyota Dago dealer resmi Toyota di Bandung. Penawaran terbaik, promo Oktober 2025, layanan purna jual, suku cadang asli. Hubungi sales kami sekarang."
+    },
+    {
+      "key": "company_name",
+      "type": "text",
+      "section": "branding",
+      "value": "Toyota Dago"
+    },
+    {
+      "key": "company_tagline",
+      "type": "text",
+      "section": "branding",
+      "value": "Dealer Resmi Toyota – Bandung"
+    },
+    {
+      "key": "company_logo",
+      "type": "image",
+      "section": "branding",
+      "value": "branding/logo-toyota-dago.png"
+    },
+    {
+      "key": "hero_title",
+      "type": "text",
+      "section": "hero",
+      "value": "Promo Toyota Terbaru di Bandung – Oktober 2025"
+    },
+    {
+      "key": "hero_subtitle",
+      "type": "textarea",
+      "section": "hero",
+      "value": "Dapatkan diskon s/d Rp 50 juta, bonus aksesoris, dan cicilan 0% untuk semua tipe Toyota. Proses kredit cepat, unit siap stok."
+    },
+    {
+      "key": "hero_cta_text",
+      "type": "text",
+      "section": "hero",
+      "value": "Ajukan Test Drive"
+    },
+    {
+      "key": "hero_cta_link",
+      "type": "text",
+      "section": "hero",
+      "value": "#test-drive"
+    },
+    {
+      "key": "hero_secondary_cta_text",
+      "type": "text",
+      "section": "hero",
+      "value": "Lihat Daftar Mobil"
+    },
+    {
+      "key": "hero_secondary_cta_link",
+      "type": "text",
+      "section": "hero",
+      "value": "#cars"
+    },
+    {
+      "key": "cars_title",
+      "label": "Judul Daftar Mobil",
+      "type": "text",
+      "section": "cars",
+      "value": "Unit Siap Kirim / Stok Terbatas"
+    },
+    {
+      "key": "cars_subtitle",
+      "type": "textarea",
+      "section": "cars",
+      "value": "Pilih unit favorit Anda. Semua mobil sudah melalui inspeksi ketat dan garansi resmi Toyota."
+    },
+    {
+      "key": "cars",
+      "label": "Daftar Mobil",
+      "type": "repeater",
+      "section": "cars",
+      "max_items": 12,
+      "fields": [
+        {
+          "key": "name",
+          "label": "Nama Model",
+          "type": "text",
+          "required": true,
+          "value": "Toyota Avanza G 1.5"
+        },
+        {
+          "key": "type",
+          "label": "Tipe",
+          "type": "select",
+          "options": [
+            { "value": "baru", "label": "Baru" },
+            { "value": "bekas", "label": "Bekas" }
+          ],
+          "value": "baru"
+        },
+        {
+          "key": "price",
+          "label": "Harga",
+          "type": "text",
+          "value": "Rp 285.000.000"
+        },
+        {
+          "key": "image",
+          "label": "Foto Mobil",
+          "type": "image",
+          "value": "cars/toyota-avanza-g.png"
+        },
+        {
+          "key": "year",
+          "label": "Tahun",
+          "type": "text",
+          "value": "2025"
+        },
+        {
+          "key": "transmission",
+          "label": "Transmisi",
+          "type": "select",
+          "options": [
+            { "value": "manual", "label": "Manual" },
+            { "value": "matic", "label": "Matic" }
+          ],
+          "value": "matic"
+        },
+        {
+          "key": "whatsapp_sales",
+          "label": "WhatsApp Sales",
+          "type": "text",
+          "placeholder": "6281234567890",
+          "value": "6281122334455"
+        },
+        {
+          "key": "features",
+          "label": "Fitur Unggulan",
+          "type": "textarea",
+          "value": "AC digital, Airbag dual, Audio touchscreen, Kamera mundur"
+        }
+      ],
+      "value": [
+        {
+          "name": "Toyota Avanza G 1.5",
+          "type": "baru",
+          "price": "Rp 285.000.000",
+          "image": "cars/toyota-avanza-g.png",
+          "year": "2025",
+          "transmission": "matic",
+          "whatsapp_sales": "6281122334455",
+          "features": "AC digital, Airbag dual, Audio touchscreen, Kamera mundur"
+        },
+        {
+          "name": "Toyota Rush GR Sport",
+          "type": "baru",
+          "price": "Rp 314.000.000",
+          "image": "cars/toyota-rush-gr.png",
+          "year": "2025",
+          "transmission": "matic",
+          "whatsapp_sales": "6281122334466",
+          "features": "GR bodykit, LED headlamp, Push start, 7 seater"
+        },
+        {
+          "name": "Toyota Yaris GR",
+          "type": "bekas",
+          "price": "Rp 385.000.000",
+          "image": "cars/toyota-yaris-gr-bekas.png",
+          "year": "2022",
+          "transmission": "manual",
+          "whatsapp_sales": "6281122334477",
+          "features": "Service record resmi, Turbo, Low mileage 18.000 km"
+        }
+      ]
+    },
+    {
+      "key": "promo_title",
+      "label": "Judul Promo",
+      "type": "text",
+      "section": "promo",
+      "value": "Promo Oktober 2025 – Diskon Sampai Rp 50 Juta!"
+    },
+    {
+      "key": "promo_banner",
+      "label": "Banner Promo",
+      "type": "image",
+      "section": "promo",
+      "value": "promo/promo-oktober-2025.jpg"
+    },
+    {
+      "key": "promo_description",
+      "type": "textarea",
+      "section": "promo",
+      "value": "<ul><li>Diskon Rp 50 juta untuk pembelian cash</li><li>Cicilan 0% tenor 1 tahun</li><li>Gratis kaca film & floor mat</li><li>Trade-in bonus Rp 10 juta</li></ul>"
+    },
+    {
+      "key": "testimonials_title",
+      "label": "Judul Testimoni",
+      "type": "text",
+      "section": "testimonials",
+      "value": "Testimoni Pembeli Toyota Dago"
+    },
+    {
+      "key": "testimonials",
+      "type": "repeater",
+      "section": "testimonials",
+      "max_items": 6,
+      "value": [
+        {
+          "name": "Bapak Rudi",
+          "position": "Pemilik Usaha, Bandung",
+          "content": "Pelayanan cepat, harga transparan, bonus banyak. Sales-nya ramah dan profesional. Terima kasih Toyota Dago!",
+          "photo": "",
+          "rating": "5"
+        },
+        {
+          "name": "Ibu Sari",
+          "position": "Ibu Rumah Tangga, Cimahi",
+          "content": "Proses kredit sangat mudah, unit sesuai janji, aftersales oke banget. Puas sekali!",
+          "photo": "",
+          "rating": "5"
+        }
+      ]
+    },
+    {
+      "key": "contact_title",
+      "label": "Judul Kontak",
+      "type": "text",
+      "section": "contact",
+      "value": "Hubungi Sales Kami – Siap Bantu 24 Jam"
+    },
+    {
+      "key": "contact_address",
+      "type": "textarea",
+      "section": "contact",
+      "value": "Jl. Ir. H. Djuanda No. 123, Bandung 40132"
+    },
+    {
+      "key": "contact_phone",
+      "type": "text",
+      "section": "contact",
+      "value": "+628123456890"
+    },
+    {
+      "key": "contact_email",
+      "type": "email",
+      "section": "contact",
+      "value": "sales@example.com"
+    },
+    {
+      "key": "whatsapp_enabled",
+      "type": "checkbox",
+      "section": "contact",
+      "value": true
+    },
+    {
+      "key": "whatsapp_number",
+      "type": "text",
+      "section": "contact",
+      "value": "628123456890"
+    },
+    {
+      "key": "whatsapp_message",
+      "type": "textarea",
+      "section": "contact",
+      "value": "Halo, saya ingin info promo dan ketersediaan unit terbaru."
+    },
+    {
+      "key": "whatsapp_greeting_text",
+      "type": "text",
+      "section": "contact",
+      "value": "Chat sekarang & dapatkan promo spesial"
+    },
+    {
+      "key": "social_links",
+      "type": "repeater",
+      "section": "social",
+      "max_items": 6,
+      "value": [
+        {
+          "platform": "facebook",
+          "url": "https://facebook.com/toyotadago",
+          "label": "Toyota Dago Official"
+        },
+        {
+          "platform": "instagram",
+          "url": "https://instagram.com/toyotadago",
+          "label": "@toyotadago"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://youtube.com/c/ToyotaDago",
+          "label": "Toyota Dago Channel"
+        }
+      ]
+    },
+    {
+      "key": "primary_color",
+      "type": "color",
+      "section": "theme",
+      "value": "#c30010"
+    },
+    {
+      "key": "secondary_color",
+      "type": "color",
+      "section": "theme",
+      "value": "#1f2937"
+    },
+    {
+      "key": "accent_color",
+      "type": "color",
+      "section": "theme",
+      "value": "#f59e0b"
+    },
+    {
+      "key": "font_family",
+      "type": "select",
+      "section": "theme",
+      "value": "inter"
+    },
+    {
+      "key": "border_radius",
+      "type": "select",
+      "section": "theme",
+      "value": "medium"
+    }
+  ]
+}

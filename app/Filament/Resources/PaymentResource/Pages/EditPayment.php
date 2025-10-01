@@ -17,17 +17,17 @@ class EditPayment extends EditRecord
     {
         return [
             
-            Actions\Action::make('recalculate_amounts')
-                ->label('Recalculate Amounts')
-                ->icon('heroicon-o-calculator')
-                ->color('warning')
-                ->action(function () {
-                    $this->recalculateAmounts();
-                })
-                ->requiresConfirmation()
-                ->modalHeading('Recalculate Payment Amounts')
-                ->modalDescription('This will recalculate gross_amount and final_amount based on amount, fee, discount, and voucher_discount.')
-                ->modalSubmitActionLabel('Recalculate'),
+            // Actions\Action::make('recalculate_amounts')
+            //     ->label('Recalculate Amounts')
+            //     ->icon('heroicon-o-calculator')
+            //     ->color('warning')
+            //     ->action(function () {
+            //         $this->recalculateAmounts();
+            //     })
+            //     ->requiresConfirmation()
+            //     ->modalHeading('Recalculate Payment Amounts')
+            //     ->modalDescription('This will recalculate gross_amount and final_amount based on amount, fee, discount, and voucher_discount.')
+            //     ->modalSubmitActionLabel('Recalculate'),
             
             Actions\Action::make('sync_with_gateway')
                 ->label('Sync with Gateway')
@@ -101,7 +101,6 @@ class EditPayment extends EditRecord
                     
                     \Filament\Forms\Components\Toggle::make('update_website_status')
                         ->label('Update Website Status')
-                        ->helperText('Also update the associated website content status')
                         ->default(true)
                         ->visible(fn (\Filament\Forms\Get $get) => $get('new_status') === 'paid'),
                 ])

@@ -25,8 +25,8 @@ class ViewPaymentLog extends ViewRecord
                 ->icon('heroicon-o-credit-card')
                 ->color('info')
                 ->url(fn (): string => route('filament.admin.resources.payments.view', ['record' => $this->record->payment_id]))
-                ->visible(fn (): bool => $this->record->payment !== null)
-                ->openUrlInNewTab(),
+                ->visible(fn (): bool => $this->record->payment !== null),
+                //->openUrlInNewTab(),
             
             Actions\Action::make('view_related_logs')
                 ->label('View Related Logs')
@@ -48,7 +48,6 @@ class ViewPaymentLog extends ViewRecord
         return $infolist
             ->schema([
                 Section::make('Log Information')
-                    ->description('Basic log entry details')
                     ->icon('heroicon-o-information-circle')
                     ->columns(2)
                     ->schema([
@@ -96,7 +95,6 @@ class ViewPaymentLog extends ViewRecord
                     ]),
 
                 Section::make('Payment Details')
-                    ->description('Associated payment information')
                     ->icon('heroicon-o-credit-card')
                     ->columns(2)
                     ->schema([
@@ -132,7 +130,6 @@ class ViewPaymentLog extends ViewRecord
                     ->visible(fn ($record): bool => $record->payment !== null),
 
                 Section::make('Log Data')
-                    ->description('Additional data stored with this log entry')
                     ->icon('heroicon-o-code-bracket')
                     ->collapsed()
                     ->schema([
@@ -145,70 +142,6 @@ class ViewPaymentLog extends ViewRecord
                     ])
                     ->visible(fn ($record): bool => $record->hasData()),
 
-                Section::make('Related Logs Timeline')
-                    ->description('Other logs for the same payment')
-                    ->icon('heroicon-o-queue-list')
-                    ->collapsed()
-                    ->schema([
-                        TextEntry::make('related_logs_summary')
-                            ->label('Related Activity')
-                            ->formatStateUsing(function ($record): string {
-                                if (!$record->payment) {
-                                    return 'No related logs available (payment not found)';
-                                }
-                                
-                                $relatedLogs = PaymentLog::where('payment_id', $record->payment_id)
-                                    ->orderBy('created_at', 'desc')
-                                    ->limit(10)
-                                    ->get();
-                                
-                                if ($relatedLogs->isEmpty()) {
-                                    return 'No related logs found';
-                                }
-                                
-                                $timeline = $relatedLogs->map(function ($log) use ($record) {
-                                    $current = $log->id === $record->id ? ' **[CURRENT]**' : '';
-                                    $timeAgo = $log->created_at->diffForHumans();
-                                    
-                                    return "• **{$log->formatted_action}** - {$timeAgo}{$current}";
-                                })->join("\n");
-                                
-                                return $timeline;
-                            })
-                            ->markdown()
-                            ->columnSpanFull(),
-                    ])
-                    ->visible(fn ($record): bool => $record->payment !== null),
-
-                Section::make('System Information')
-                    ->description('Technical information about this log entry')
-                    ->icon('heroicon-o-server')
-                    ->collapsed()
-                    ->columns(2)
-                    ->schema([
-                        TextEntry::make('id')
-                            ->label('Log ID')
-                            ->icon('heroicon-o-hashtag')
-                            ->copyable(),
-                        
-                        TextEntry::make('payment_id')
-                            ->label('Payment ID')
-                            ->icon('heroicon-o-link')
-                            ->copyable(),
-                        
-                        TextEntry::make('updated_at')
-                            ->label('Last Updated')
-                            ->icon('heroicon-o-clock')
-                            ->dateTime('M j, Y \a\t g:i A')
-                            ->placeholder('Never updated'),
-                        
-                        IconEntry::make('has_data')
-                            ->label('Has Additional Data')
-                            ->boolean()
-                            ->trueIcon('heroicon-o-check-circle')
-                            ->falseIcon('heroicon-o-x-circle')
-                            ->getStateUsing(fn ($record): bool => $record->hasData()),
-                    ]),
             ]);
     }
 

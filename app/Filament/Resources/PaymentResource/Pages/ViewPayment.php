@@ -117,7 +117,6 @@ class ViewPayment extends ViewRecord
         return $infolist
             ->schema([
                 Section::make('Payment Overview')
-                    ->description('Basic payment information and status')
                     ->icon('heroicon-o-information-circle')
                     ->columns(2)
                     ->schema([
@@ -166,7 +165,6 @@ class ViewPayment extends ViewRecord
                     ]),
 
                 Section::make('Amount Breakdown')
-                    ->description('Detailed payment amount calculation')
                     ->icon('heroicon-o-calculator')
                     ->columns(3)
                     ->schema([
@@ -211,7 +209,6 @@ class ViewPayment extends ViewRecord
                     ]),
 
                 Section::make('Timeline & Dates')
-                    ->description('Important dates and timeline information')
                     ->icon('heroicon-o-calendar')
                     ->columns(2)
                     ->schema([
@@ -245,9 +242,8 @@ class ViewPayment extends ViewRecord
                     ]),
 
                 Section::make('Payment Methods & Gateway')
-                    ->description('Payment gateway and method information')
                     ->icon('heroicon-o-credit-card')
-                    ->columns(2)
+                    ->columns(3)
                     ->schema([
                         TextEntry::make('payment_type')
                             ->label('Payment Method')
@@ -259,8 +255,7 @@ class ViewPayment extends ViewRecord
                         TextEntry::make('gross_amount')
                             ->label('Gross Amount')
                             ->icon('heroicon-o-calculator')
-                            ->money('IDR')
-                            ->helperText('Amount sent to payment gateway'),
+                            ->money('IDR'),
                         
                         IconEntry::make('has_midtrans_data')
                             ->label('Gateway Data Available')
@@ -270,34 +265,14 @@ class ViewPayment extends ViewRecord
                             ->falseIcon('heroicon-o-x-circle')
                             ->trueColor('success')
                             ->falseColor('danger'),
-                        
-                        TextEntry::make('payment_method_info')
-                            ->label('Payment Info')
-                            ->getStateUsing(function ($record): string {
-                                if (empty($record->midtrans_data)) return 'No gateway data';
-                                
-                                $data = $record->midtrans_data;
-                                $info = [];
-                                
-                                if (isset($data['va_numbers'][0]['bank'])) {
-                                    $info[] = "Bank: " . strtoupper($data['va_numbers'][0]['bank']);
-                                }
-                                if (isset($data['payment_type'])) {
-                                    $info[] = "Type: " . ucfirst($data['payment_type']);
-                                }
-                                
-                                return implode(' • ', $info) ?: 'Gateway data available';
-                            })
-                            ->columnSpanFull(),
+
                     ]),
 
-                Section::make('Midtrans Gateway Data')
-                    ->description('Raw data from Midtrans payment gateway')
+                Section::make('Payment Gateway Response')
                     ->icon('heroicon-o-server')
                     ->collapsed()
                     ->schema([
                         KeyValueEntry::make('midtrans_data')
-                            ->label('Gateway Response')
                             ->columnSpanFull()
                             ->keyLabel('Field')
                             ->valueLabel('Value')
@@ -305,7 +280,6 @@ class ViewPayment extends ViewRecord
                     ]),
 
                 Section::make('Payment Activity Logs')
-                    ->description('Chronological log of all payment activities')
                     ->icon('heroicon-o-clipboard-document-list')
                     ->collapsed()
                     ->schema([
@@ -331,7 +305,6 @@ class ViewPayment extends ViewRecord
                     ]),
 
                 Section::make('Related Information')
-                    ->description('Associated website and user information')
                     ->icon('heroicon-o-link')
                     ->collapsed()
                     ->columns(2)

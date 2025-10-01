@@ -14,19 +14,18 @@ use Filament\Forms\Components\Section;
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
-    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
-    protected static ?string $navigationGroup = 'E-commerce';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static ?string $navigationGroup = 'System';
     protected static ?string $navigationLabel = 'Payments';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make('Payment Information')
-                    ->description('Basic payment details and references')
                     ->icon('heroicon-o-information-circle')
-                    ->columns(2)
+                    ->columns(3)
                     ->schema([
                         Forms\Components\TextInput::make('code')
                             ->required()
@@ -42,15 +41,15 @@ class PaymentResource extends Resource
                             ->prefixIcon('heroicon-o-user'),
                         
                         Forms\Components\Select::make('website_content_id')
-                            ->relationship('websiteContent', 'id')
+                            ->relationship('websiteContent', 'website_name')
                             ->searchable()
                             ->preload()
                             ->required()
+                            ->label('Website Name')
                             ->prefixIcon('heroicon-o-globe-alt'),
                     ]),
 
                 Section::make('Payment Details')
-                    ->description('Amount breakdown and payment information')
                     ->icon('heroicon-o-calculator')
                     ->columns(3)
                     ->schema([
@@ -90,7 +89,6 @@ class PaymentResource extends Resource
                     ]),
 
                 Section::make('Status & Timeline')
-                    ->description('Payment status and important dates')
                     ->icon('heroicon-o-clock')
                     ->columns(2)
                     ->schema([
@@ -105,18 +103,14 @@ class PaymentResource extends Resource
                             ->required()
                             ->prefixIcon('heroicon-o-flag'),
                         
-                        Forms\Components\DateTimePicker::make('expired_at')
-                            ->helperText('Payment expiration time'),
+                        Forms\Components\DateTimePicker::make('expired_at'),
                         
-                        Forms\Components\DateTimePicker::make('paid_at')
-                            ->helperText('When payment was completed'),
-                        
-                        Forms\Components\DateTimePicker::make('transaction_time')
-                            ->helperText('Transaction timestamp from gateway'),
+                        Forms\Components\DateTimePicker::make('paid_at'),
+
+                        Forms\Components\DateTimePicker::make('transaction_time'),
                     ]),
 
-                Section::make('Gateway Data')
-                    ->description('Midtrans gateway response data')
+                Section::make('PaymentGateway Response')
                     ->icon('heroicon-o-server')
                     ->schema([
                         Forms\Components\KeyValue::make('midtrans_data')

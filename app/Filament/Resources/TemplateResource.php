@@ -118,11 +118,11 @@ class TemplateResource extends Resource
                     ->icon('heroicon-o-link')
                     ->copyable(),
                 
-                Tables\Columns\TextColumn::make('config_path')
-                    ->searchable()
-                    ->sortable()
-                    ->icon('heroicon-o-folder')
-                    ->copyable(),
+                // Tables\Columns\TextColumn::make('config_path')
+                //     ->searchable()
+                //     ->sortable()
+                //     ->icon('heroicon-o-folder')
+                //     ->copyable(),
                 
                 Tables\Columns\BadgeColumn::make('category')
                     ->colors([
@@ -142,7 +142,8 @@ class TemplateResource extends Resource
                 Tables\Columns\TextColumn::make('websites_count')
                     ->label('Used')
                     ->counts('websiteContents')
-                    ->icon('heroicon-o-globe-alt'),
+                    ->icon('heroicon-o-globe-alt')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
