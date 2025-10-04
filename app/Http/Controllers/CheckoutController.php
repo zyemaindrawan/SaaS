@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use App\Models\Voucher;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
@@ -553,7 +554,7 @@ class CheckoutController extends Controller
             // Company Info
             'company_name' => 'required|string|max:255',
             'company_tagline' => 'nullable|string|max:255',
-            'company_logo' => 'nullable|string',
+            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
             
             // Website Basics
             'website_name' => 'required|string|max:255',
@@ -572,8 +573,8 @@ class CheckoutController extends Controller
             'seo_description' => 'required|string|max:160',
             'seo_keywords' => 'required|string|max:500',
             'robots_meta' => 'required|string',
-            'favicon' => 'nullable|string',
-            'og_image' => 'nullable|string',
+            'favicon' => 'nullable|file|mimes:ico,png|max:1024',
+            'og_image' => 'nullable|image|max:4096',
             
             // Contact
             'contact_email' => 'required|email|max:255',
@@ -584,14 +585,14 @@ class CheckoutController extends Controller
             // Hero Section
             'hero_title' => 'required|string|max:255',
             'hero_subtitle' => 'required|string|max:500',
-            'hero_background' => 'nullable|string|max:1000',
+            'hero_background' => 'nullable|image|max:6144',
             'hero_cta_text' => 'required|string|max:50',
             'hero_cta_link' => 'required|string|max:255',
             
             // About Section
             'about_title' => 'nullable|string|max:255',
             'about_content' => 'nullable|string|max:2000',
-            'about_image' => 'nullable|string|max:1000',
+            'about_image' => 'nullable|image|max:4096',
             
             // Services Section
             'services_title' => 'required|string|max:255',
@@ -618,7 +619,7 @@ class CheckoutController extends Controller
             'testimonials_title' => 'required|string|max:255',
             'testimonials' => 'required|array|min:1|max:10',
             'testimonials.*.name' => 'required|string|max:255',
-            'testimonials.*.photo' => 'nullable|string|max:1000',
+            'testimonials.*.photo' => 'nullable|image|max:2048',
             'testimonials.*.rating' => 'required|string|in:1,2,3,4,5',
             'testimonials.*.content' => 'required|string|max:1000',
             'testimonials.*.position' => 'required|string|max:255',
@@ -626,7 +627,7 @@ class CheckoutController extends Controller
             // Gallery
             'gallery_title' => 'nullable|string|max:255',
             'gallery_photos' => 'nullable|array|max:12',
-            'gallery_photos.*' => 'nullable|string|max:1000',
+            'gallery_photos.*' => 'nullable|image|max:4096',
             
             // WhatsApp Integration
             'whatsapp_enabled' => 'required|boolean',
@@ -655,12 +656,12 @@ class CheckoutController extends Controller
             // Hero section is required for corporate
             $rules['hero_title'] = 'required|string|max:255';
             $rules['hero_subtitle'] = 'required|string|max:500';
-            $rules['hero_background'] = 'required|string';
+            $rules['hero_background'] = 'required|image|max:6144';
             
             // About section is required for corporate
             $rules['about_title'] = 'nullable|string|max:255';
             $rules['about_content'] = 'nullable|string|max:2000';
-            $rules['about_image'] = 'nullable|string';
+            $rules['about_image'] = 'nullable|image|max:4096';
             
             // Services section is required
             $rules['services'] = 'required|array|min:3|max:10';
@@ -668,6 +669,22 @@ class CheckoutController extends Controller
             $rules['services.*.description'] = 'required|string|min:50|max:1000';
             $rules['services.*.icon'] = 'required|string|max:100';
             $rules['services.*.link'] = 'required|string|max:255';
+        }
+
+        if ($template->category === 'dealer') {
+            $rules['cars'] = 'nullable|array|max:50';
+            $rules['cars.*.name'] = 'required_with:cars|string|max:255';
+            $rules['cars.*.type'] = 'nullable|string|max:50';
+            $rules['cars.*.year'] = 'nullable|string|max:10';
+            $rules['cars.*.image'] = 'nullable';
+            $rules['cars.*.price'] = 'nullable|string|max:255';
+            $rules['cars.*.features'] = 'nullable|string|max:2000';
+            $rules['cars.*.transmission'] = 'nullable|string|max:50';
+            $rules['cars.*.whatsapp_sales'] = 'nullable|string|max:30';
+
+            $rules['promo_banner'] = 'nullable';
+            $rules['promo_title'] = 'nullable|string|max:255';
+            $rules['promo_description'] = 'nullable|string|max:5000';
         }
 
         // if ($template->category === 'portfolio') {
@@ -693,67 +710,98 @@ class CheckoutController extends Controller
         
         // Process repeater fields
         if (isset($contentData['services'])) {
-            $contentData['services'] = array_values(array_filter($contentData['services'], function($service) {
+            $contentData['services'] = array_values(array_filter($contentData['services'], function ($service) {
                 return !empty($service['title']) && !empty($service['description']);
             }));
         }
 
         if (isset($contentData['social_links'])) {
-            $contentData['social_links'] = array_values(array_filter($contentData['social_links'], function($link) {
+            $contentData['social_links'] = array_values(array_filter($contentData['social_links'], function ($link) {
                 return !empty($link['platform']) && !empty($link['url']);
             }));
         }
 
         if (isset($contentData['company_stats'])) {
-            $contentData['company_stats'] = array_values(array_filter($contentData['company_stats'], function($stat) {
+            $contentData['company_stats'] = array_values(array_filter($contentData['company_stats'], function ($stat) {
                 return !empty($stat['label']) && !empty($stat['number']);
             }));
         }
 
         if (isset($contentData['testimonials'])) {
-            $contentData['testimonials'] = array_values(array_filter($contentData['testimonials'], function($testimonial) {
-                return !empty($testimonial['name']) && !empty($testimonial['content']);
-            }));
+            $processedTestimonials = [];
+
+            foreach ($contentData['testimonials'] as $testimonial) {
+                if (empty($testimonial['name']) || empty($testimonial['content'])) {
+                    continue;
+                }
+
+                if (array_key_exists('photo', $testimonial)) {
+                    $testimonial['photo'] = $this->storeUploadedFile($testimonial['photo'], 'website-assets/testimonials');
+                }
+
+                $processedTestimonials[] = $testimonial;
+            }
+
+            $contentData['testimonials'] = array_values($processedTestimonials);
         }
 
-        // Process image fields (convert from base64 if needed)
-        $imageFields = ['company_logo', 'favicon', 'og_image', 'hero_background', 'about_image'];
-        foreach ($imageFields as $field) {
-            if (isset($contentData[$field])) {
-                if (strpos($contentData[$field], 'data:image') === 0) {
-                    // Validate image size
-                    $base64Image = preg_replace('#^data:image/\w+;base64,#i', '', $contentData[$field]);
-                    $decodedImage = base64_decode($base64Image);
-                    
-                    if (!$decodedImage) {
-                        throw ValidationException::withMessages([
-                            $field => 'Format gambar tidak valid'
-                        ]);
-                    }
-                    
-                    // Check file size (max 2MB)
-                    if (strlen($decodedImage) > 2 * 1024 * 1024) {
-                        throw ValidationException::withMessages([
-                            $field => 'Ukuran gambar tidak boleh lebih dari 2MB'
-                        ]);
-                    }
-                    
-                    // For now, we'll just store the filename placeholder
-                    $contentData[$field] = $field . '_' . time() . '.jpg';
-                } else if (!filter_var($contentData[$field], FILTER_VALIDATE_URL)) {
-                    throw ValidationException::withMessages([
-                        $field => 'URL gambar tidak valid'
-                    ]);
+        if (isset($contentData['cars'])) {
+            $processedCars = [];
+
+            foreach ($contentData['cars'] as $car) {
+                if (empty($car['name'])) {
+                    continue;
                 }
+
+                if (array_key_exists('image_preview', $car)) {
+                    unset($car['image_preview']);
+                }
+
+                if (array_key_exists('image', $car)) {
+                    $car['image'] = $this->storeUploadedFile($car['image'], 'website-assets/cars');
+                }
+
+                $processedCars[] = $car;
             }
+
+            $contentData['cars'] = array_values($processedCars);
+        }
+
+        // Store single image/file fields
+        $fileFields = [
+            'company_logo' => 'website-assets/company-logos',
+            'favicon' => 'website-assets/favicons',
+            'og_image' => 'website-assets/og-images',
+            'hero_background' => 'website-assets/hero-backgrounds',
+            'about_image' => 'website-assets/about-images',
+        ];
+
+        foreach ($fileFields as $field => $directory) {
+            if (array_key_exists($field, $contentData)) {
+                $contentData[$field] = $this->storeUploadedFile($contentData[$field], $directory);
+            }
+        }
+
+        if (array_key_exists('promo_banner', $contentData)) {
+            $contentData['promo_banner'] = $this->storeUploadedFile($contentData['promo_banner'], 'website-assets/promo-banners');
         }
 
         // Process gallery photos
         if (isset($contentData['gallery_photos']) && is_array($contentData['gallery_photos'])) {
-            $contentData['gallery_photos'] = array_values(array_filter($contentData['gallery_photos']));
+            $galleryPaths = [];
+
+            foreach ($contentData['gallery_photos'] as $photo) {
+                $stored = $this->storeUploadedFile($photo, 'website-assets/gallery');
+
+                if ($stored) {
+                    $galleryPaths[] = $stored;
+                }
+            }
+
+            $contentData['gallery_photos'] = $galleryPaths;
         }
 
-        // Set default values if not provided
+        // Set default values jika tidak disediakan
         $defaults = [
             'font_family' => 'inter',
             'border_radius' => 'medium',
@@ -769,5 +817,32 @@ class CheckoutController extends Controller
         }
 
         return $contentData;
+    }
+
+    private function storeUploadedFile($value, string $directory): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        if ($value instanceof UploadedFile) {
+            return $value->store($directory, 'public');
+        }
+
+        if (is_string($value)) {
+            if (Str::startsWith($value, ['http://', 'https://'])) {
+                return $value;
+            }
+
+            $path = ltrim($value, '/');
+
+            if (Str::startsWith($path, 'storage/')) {
+                $path = substr($path, strlen('storage/'));
+            }
+
+            return $path;
+        }
+
+        return null;
     }
 }

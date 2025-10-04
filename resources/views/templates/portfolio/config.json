@@ -1,0 +1,11 @@
+{
+    "name": "Portfolio",
+    "description": "Template untuk personal \/ agency portfolio",
+    "category": "portfolio",
+    "price": "1700000.00",
+    "is_active": true,
+    "sort_order": 3,
+    "version": "1.0.0",
+    "author": "DR-SaaS",
+    "updated_at": "2025-10-04T03:07:42.410341Z"
+}

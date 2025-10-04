@@ -16,11 +16,18 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        $redirect = $this->resolveRedirect($request->query('redirect'));
+
+        if ($redirect) {
+            $request->session()->put('url.intended', url($redirect));
+        }
+
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
+            'redirect' => $redirect,
             'app' => [
                 'name' => config('app.name'),
             ],
@@ -32,6 +39,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        if ($redirect = $this->resolveRedirect($request->input('redirect'))) {
+            $request->session()->put('url.intended', url($redirect));
+        }
+
         $request->authenticate();
 
         $request->session()->regenerate();
@@ -51,5 +62,26 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    protected function resolveRedirect(?string $redirect): ?string
+    {
+        if (! $redirect) {
+            return null;
+        }
+
+        $redirect = trim($redirect);
+
+        if ($redirect === '') {
+            return null;
+        }
+
+        $redirect = '/' . ltrim($redirect, '/');
+
+        if (str_contains($redirect, '://') || str_contains($redirect, '\\')) {
+            return null;
+        }
+
+        return $redirect;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 
 class WebsiteContent extends Model
 {
@@ -79,5 +80,28 @@ class WebsiteContent extends Model
     public function canPreview(): bool
     {
         return in_array($this->status, ['draft', 'previewed', 'paid', 'active']);
+    }
+
+    public function resolveMediaUrl(?string $path): ?string
+    {
+        if (empty($path)) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        $cleanPath = ltrim($path, '/');
+
+        if (str_starts_with($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, strlen('storage/'));
+        }
+
+        if (Storage::disk('public')->exists($cleanPath)) {
+            return Storage::url($cleanPath);
+        }
+
+        return asset($cleanPath);
     }
 }

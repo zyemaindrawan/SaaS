@@ -111,7 +111,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable()
                     ->icon('heroicon-o-phone')
-                    ->placeholder('Not provided'),
+                    ->placeholder('-'),
                 
                 Tables\Columns\IconColumn::make('is_admin')
                     ->boolean()

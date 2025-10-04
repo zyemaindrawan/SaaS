@@ -23,9 +23,6 @@
                             {{ template.name }}
                         </h4>
 
-                        <p v-if="template.description" class="text-sm text-gray-600">
-                            {{ truncateText(template.description, 100) }}
-                        </p>
                     </div>
                 </div>
 
@@ -77,10 +74,6 @@
                 <!-- Form Preview -->
                 <div v-if="hasFormData" class="mt-6 pt-4 border-t border-gray-200">
                     <div class="space-y-2 text-sm">
-                        <div v-if="formData.company_name" class="flex justify-between">
-                            <span class="text-gray-500">Company:</span>
-                            <span class="font-medium">{{ formData.company_name }}</span>
-                        </div>
                         <div v-if="formData.subdomain" class="flex justify-between">
                             <span class="text-gray-500">Website:</span>
                             <span class="font-medium text-blue-600">{{ formData.subdomain }}.oursite.com</span>

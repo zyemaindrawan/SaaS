@@ -4,10 +4,10 @@
     "category": "corporate",
     "price": "1950000.00",
     "is_active": true,
-    "sort_order": 1,
+    "sort_order": 2,
     "version": "1.0.0",
     "author": "DR-SaaS",
-    "updated_at": "2025-09-25T07:42:52.227001Z",
+    "updated_at": "2025-10-04T03:09:39.109355Z",
     "fields": [
         {
             "key": "seo_title",

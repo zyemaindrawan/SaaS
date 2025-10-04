@@ -18,9 +18,16 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        $redirect = $this->resolveRedirect($request->query('redirect'));
+
+        if ($redirect) {
+            $request->session()->put('url.intended', url($redirect));
+        }
+
         return Inertia::render('Auth/Register', [
+            'redirect' => $redirect,
             'app' => [
                 'name' => config('app.name'),
             ],
@@ -34,6 +41,10 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($redirect = $this->resolveRedirect($request->input('redirect'))) {
+            $request->session()->put('url.intended', url($redirect));
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
@@ -50,6 +61,27 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->intended(route('dashboard', absolute: false));
+    }
+
+    protected function resolveRedirect(?string $redirect): ?string
+    {
+        if (! $redirect) {
+            return null;
+        }
+
+        $redirect = trim($redirect);
+
+        if ($redirect === '') {
+            return null;
+        }
+
+        $redirect = '/' . ltrim($redirect, '/');
+
+        if (str_contains($redirect, '://') || str_contains($redirect, '\\')) {
+            return null;
+        }
+
+        return $redirect;
     }
 }

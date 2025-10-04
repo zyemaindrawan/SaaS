@@ -39,21 +39,18 @@
                             <!-- Content -->
                             <div class="px-6 py-4">
                                 <div class="mb-6">
-                                    <p class="text-sm text-gray-600 mb-4">
-                                        Please review your order details:
-                                    </p>
 
                                     <!-- Order Summary -->
                                     <div class="bg-gray-50 rounded-lg p-4 mb-4">
                                         <div class="flex items-center mb-3">
-                                            <img 
-                                                :src="template.preview_image || '/images/template-placeholder.jpg'" 
+                                            <img
+                                                :src="template.preview_image ? `/storage/${template.preview_image}` : '/default-avatar.png'"
                                                 :alt="template.name"
-                                                class="w-12 h-12 object-cover rounded-md mr-3"
+                                                @error="handleImageError"
+                                                class="w-30 h-20 object-cover rounded-md mr-3"
                                             >
                                             <div>
                                                 <h4 class="font-semibold text-gray-900">{{ template.name }}</h4>
-                                                <p class="text-sm text-gray-600">{{ formatCategory(template.category) }}</p>
                                             </div>
                                         </div>
                                         
@@ -182,6 +179,8 @@ const props = defineProps({
 
 defineEmits(['confirm', 'cancel'])
 
+const placeholderImage = '/images/template-placeholder.jpg'
+
 // Calculate final total after voucher discount
 const finalTotal = computed(() => {
     const baseTotal = props.pricing.total || 0
@@ -201,6 +200,6 @@ const formatPrice = (price) => {
 }
 
 const handleImageError = (event) => {
-    event.target.src = '/default-avatar.png'
+    event.target.src = placeholderImage
 }
 </script>

@@ -36,14 +36,12 @@ class VoucherResource extends Resource
                             ->afterStateUpdated(fn ($state, Forms\Set $set) => 
                                 $set('code', strtoupper($state))
                             )
-                            ->prefixIcon('heroicon-o-hashtag')
-                            ->helperText('Voucher code (auto-uppercase)'),
+                            ->prefixIcon('heroicon-o-hashtag'),
                         
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255)
-                            ->prefixIcon('heroicon-o-tag')
-                            ->helperText('Display name for the voucher'),
+                            ->prefixIcon('heroicon-o-tag'),
                         
                         Forms\Components\Textarea::make('description')
                             ->maxLength(500)
@@ -72,24 +70,22 @@ class VoucherResource extends Resource
                             ->suffix(fn (Forms\Get $get) => 
                                 $get('discount_type') === 'percentage' ? '%' : 'Rp'
                             )
-                            ->helperText(fn (Forms\Get $get) => 
-                                $get('discount_type') === 'percentage' ? 'Enter percentage (0-100)' : 'Enter fixed amount in Rupiah'
-                            )
+                            // ->helperText(fn (Forms\Get $get) => 
+                            //     $get('discount_type') === 'percentage' ? 'Enter percentage (0-100)' : 'Enter fixed amount in Rupiah'
+                            // )
                             ->prefixIcon('heroicon-o-currency-dollar'),
                         
                         Forms\Components\TextInput::make('min_purchase')
                             ->numeric()
                             ->minValue(0)
                             ->prefix('Rp')
-                            ->prefixIcon('heroicon-o-banknotes')
-                            ->helperText('Minimum purchase amount (optional)'),
+                            ->prefixIcon('heroicon-o-banknotes'),
                         
                         Forms\Components\TextInput::make('max_discount')
                             ->numeric()
                             ->minValue(0)
                             ->prefix('Rp')
                             ->prefixIcon('heroicon-o-stop-circle')
-                            ->helperText('Maximum discount amount (for percentage type)')
                             ->visible(fn (Forms\Get $get) => $get('discount_type') === 'percentage'),
                     ]),
 
@@ -100,24 +96,20 @@ class VoucherResource extends Resource
                         Forms\Components\TextInput::make('usage_limit')
                             ->numeric()
                             ->minValue(1)
-                            ->prefixIcon('heroicon-o-users')
-                            ->helperText('Maximum number of uses (leave empty for unlimited)'),
+                            ->prefixIcon('heroicon-o-users'),
                         
                         Forms\Components\TextInput::make('used_count')
                             ->numeric()
                             ->default(0)
                             ->disabled()
-                            ->prefixIcon('heroicon-o-check-circle')
-                            ->helperText('Current usage count (read-only)'),
+                            ->prefixIcon('heroicon-o-check-circle'),
                         
                         Forms\Components\DateTimePicker::make('starts_at')
-                            ->prefixIcon('heroicon-o-play-circle')
-                            ->helperText('When voucher becomes active (optional)'),
+                            ->prefixIcon('heroicon-o-play-circle'),
                         
                         Forms\Components\DateTimePicker::make('expires_at')
                             ->after('starts_at')
-                            ->prefixIcon('heroicon-o-stop-circle')
-                            ->helperText('When voucher expires (optional)'),
+                            ->prefixIcon('heroicon-o-stop-circle'),
                     ]),
 
                 Section::make('Status')

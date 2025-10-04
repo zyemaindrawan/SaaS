@@ -110,11 +110,12 @@ class PaymentResource extends Resource
                         Forms\Components\DateTimePicker::make('transaction_time'),
                     ]),
 
-                Section::make('PaymentGateway Response')
+                Section::make('Payment Gateway Response')
                     ->icon('heroicon-o-server')
                     ->schema([
                         Forms\Components\KeyValue::make('midtrans_data')
                             ->columnSpanFull()
+                            ->label('Midtrans Data')
                             ->reorderable(false),
                     ]),
             ]);

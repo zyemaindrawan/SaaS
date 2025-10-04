@@ -7,12 +7,16 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     canResetPassword: {
         type: Boolean,
     },
     status: {
         type: String,
+    },
+    redirect: {
+        type: String,
+        default: null,
     },
 });
 
@@ -20,6 +24,7 @@ const form = useForm({
     email: '',
     password: '',
     remember: false,
+    redirect: props.redirect,
 });
 
 const submit = () => {
@@ -121,7 +126,7 @@ const submit = () => {
                     <p class="text-gray-600">
                         Don't have an account?
                         <Link
-                            :href="route('register')"
+                            :href="props.redirect ? route('register', { redirect: props.redirect }) : route('register')"
                             class="text-blue-600 hover:text-blue-500 font-medium ml-1"
                         >
                             Sign up

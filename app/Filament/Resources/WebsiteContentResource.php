@@ -57,7 +57,7 @@ class WebsiteContentResource extends Resource
 
                 Section::make('Status & Timeline')
                     ->icon('heroicon-o-clock')
-                    ->columns(2)
+                    ->columns(3)
                     ->schema([
                         Forms\Components\Select::make('status')
                             ->options([
@@ -79,8 +79,8 @@ class WebsiteContentResource extends Resource
                     ->icon('heroicon-o-code-bracket')
                     ->schema([
                         Forms\Components\Textarea::make('content_data')
-                            ->label('Content Data (JSON)')
                             ->columnSpanFull()
+                            ->hiddenLabel()
                             ->rows(18)
                             ->afterStateHydrated(fn (Forms\Components\Textarea $component, $state) => $component->state(json_encode($state ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)))
                             ->dehydrateStateUsing(fn (?string $state) => json_decode($state ?: '[]', true) ?? [])

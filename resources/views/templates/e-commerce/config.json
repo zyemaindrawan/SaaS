@@ -1,0 +1,11 @@
+{
+    "name": "E-Commerce",
+    "description": "Template terbaik untuk E-Commerce \/ katalog",
+    "category": "ecommerce",
+    "price": "5250000.00",
+    "is_active": true,
+    "sort_order": 5,
+    "version": "1.0.0",
+    "author": "DR-SaaS",
+    "updated_at": "2025-10-04T03:08:19.929750Z"
+}

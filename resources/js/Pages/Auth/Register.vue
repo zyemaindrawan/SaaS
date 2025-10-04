@@ -6,11 +6,19 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
+const props = defineProps({
+    redirect: {
+        type: String,
+        default: null,
+    },
+});
+
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
+    redirect: props.redirect,
 });
 
 const submit = () => {
@@ -111,7 +119,7 @@ const submit = () => {
                     <p class="text-gray-600">
                         Already have an account?
                         <Link
-                            :href="route('login')"
+                            :href="props.redirect ? route('login', { redirect: props.redirect }) : route('login')"
                             class="text-blue-600 hover:text-blue-500 font-medium ml-1"
                         >
                             Sign in

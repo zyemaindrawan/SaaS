@@ -22,7 +22,7 @@
             :title="errorTitle"
             :message="errorMessage"
             :error="errorDetails"
-            :show-retry="true"
+            :show-retry="showRetryButton"
             @close="closeErrorDialog"
             @retry="retrySubmission"
         />
@@ -108,8 +108,8 @@
                                         class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                     />
                                     <InputError :message="errors.company_logo" class="mt-2" />
-                                    <div v-if="formData.company_logo" class="mt-2">
-                                        <img :src="formData.company_logo" alt="Company Logo Preview" class="h-16 w-auto object-contain" />
+                                    <div v-if="imagePreviews.company_logo" class="mt-2">
+                                        <img :src="imagePreviews.company_logo" alt="Company Logo Preview" class="h-16 w-auto object-contain" />
                                     </div>
                                 </div>
 
@@ -448,15 +448,225 @@
                                         </svg>
                                         Tambah Layanan Baru
                                     </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dealer Inventory -->
+                <div v-if="isDealer" class="bg-white shadow-sm rounded-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Daftar Mobil</h3>
+                        <button
+                            type="button"
+                            @click="addCar"
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Tambah Mobil
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div
+                            v-for="(car, index) in formData.cars"
+                            :key="`car-${index}`"
+                            class="relative border border-gray-200 rounded-lg p-5"
+                        >
+                            <div class="absolute right-4 top-4">
+                                <button
+                                    type="button"
+                                    @click="removeCar(index)"
+                                    v-if="formData.cars.length > 0"
+                                    class="inline-flex items-center text-red-600 hover:text-red-800 focus:outline-none"
+                                    title="Hapus mobil"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    <span class="sr-only">Remove</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <InputLabel :for="`car_name_${index}`" value="Nama Mobil" />
+                                    <TextInput
+                                        :id="`car_name_${index}`"
+                                        v-model="car.name"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        placeholder="Contoh: Honda CR-V 1.5 Prestige"
+                                        required
+                                    />
+                                    <InputError :message="errors[`cars.${index}.name`]" class="mt-1" />
+                                </div>
+
+                                <div>
+                                    <InputLabel :for="`car_type_${index}`" value="Jenis" />
+                                    <TextInput
+                                        :id="`car_type_${index}`"
+                                        v-model="car.type"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        placeholder="baru / bekas"
+                                    />
+                                    <InputError :message="errors[`cars.${index}.type`]" class="mt-1" />
+                                </div>
+
+                                <div>
+                                    <InputLabel :for="`car_year_${index}`" value="Tahun" />
+                                    <TextInput
+                                        :id="`car_year_${index}`"
+                                        v-model="car.year"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        placeholder="2025"
+                                    />
+                                    <InputError :message="errors[`cars.${index}.year`]" class="mt-1" />
+                                </div>
+
+                                <div>
+                                    <InputLabel :for="`car_price_${index}`" value="Harga" />
+                                    <TextInput
+                                        :id="`car_price_${index}`"
+                                        v-model="car.price"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        placeholder="Rp 399.000.000"
+                                    />
+                                    <InputError :message="errors[`cars.${index}.price`]" class="mt-1" />
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <InputLabel :for="`car_image_${index}`" value="Foto Mobil" />
+                                    <input
+                                        :id="`car_image_${index}`"
+                                        type="file"
+                                        accept="image/*"
+                                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        @change="(event) => handleCarImageUpload(event, index)"
+                                    />
+                                    <InputError :message="errors[`cars.${index}.image`]" class="mt-1" />
+                                    <div v-if="getCarImageUrl(car)" class="mt-2">
+                                        <img :src="getCarImageUrl(car)" alt="Preview mobil" class="w-full max-w-sm rounded-md border border-gray-200" />
+                                    </div>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <InputLabel :for="`car_features_${index}`" value="Fitur Unggulan" />
+                                    <textarea
+                                        :id="`car_features_${index}`"
+                                        v-model="car.features"
+                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        rows="3"
+                                        placeholder="Turbo engine, Honda Sensing, Panoramic roof..."
+                                    ></textarea>
+                                    <InputError :message="errors[`cars.${index}.features`]" class="mt-1" />
+                                </div>
+
+                                <div>
+                                    <InputLabel :for="`car_transmission_${index}`" value="Transmisi" />
+                                    <TextInput
+                                        :id="`car_transmission_${index}`"
+                                        v-model="car.transmission"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        placeholder="matic / manual"
+                                    />
+                                    <InputError :message="errors[`cars.${index}.transmission`]" class="mt-1" />
+                                </div>
+
+                                <div>
+                                    <InputLabel :for="`car_whatsapp_${index}`" value="Nomor Sales (WhatsApp)" />
+                                    <TextInput
+                                        :id="`car_whatsapp_${index}`"
+                                        v-model="car.whatsapp_sales"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        placeholder="628123456789"
+                                    />
+                                    <InputError :message="errors[`cars.${index}.whatsapp_sales`]" class="mt-1" />
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Social Media Links -->
-                        <div class="bg-white shadow-sm rounded-lg p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Social Media Links</h3>
+                        <div v-if="formData.cars.length === 0" class="text-sm text-gray-500 italic">
+                            Belum ada mobil yang ditambahkan. Klik “Tambah Mobil” untuk mulai mengisi data.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dealer Promo -->
+                <div v-if="isDealer" class="bg-white shadow-sm rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Promo Dealer</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <InputLabel for="promo_banner" value="Banner Promo" />
+                            <input
+                                id="promo_banner"
+                                type="file"
+                                accept="image/*"
+                                @change="handlePromoBannerUpload"
+                                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            <InputError :message="errors.promo_banner" class="mt-1" />
+                            <div v-if="imagePreviews.promo_banner || resolveMediaPath(formData.promo_banner)" class="mt-2">
+                                <img :src="imagePreviews.promo_banner || resolveMediaPath(formData.promo_banner)" alt="Promo banner" class="w-full max-w-xl rounded-md border border-gray-200" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <InputLabel for="promo_title" value="Judul Promo" />
+                            <TextInput
+                                id="promo_title"
+                                v-model="formData.promo_title"
+                                type="text"
+                                class="mt-1 block w-full"
+                                placeholder="Promo Oktober 2025 – Diskon Sampai Rp 50 Juta!"
+                            />
+                            <InputError :message="errors.promo_title" class="mt-1" />
+                        </div>
+
+                        <div>
+                            <InputLabel for="promo_description" value="Deskripsi Promo (boleh HTML)" />
+                            <textarea
+                                id="promo_description"
+                                v-model="formData.promo_description"
+                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                rows="4"
+                                placeholder="<ul><li>Diskon Rp 50 juta...</li></ul>"
+                            ></textarea>
+                            <p class="mt-1 text-sm text-gray-500">Anda dapat menggunakan HTML sederhana seperti &lt;ul&gt; dan &lt;li&gt;.</p>
+                            <InputError :message="errors.promo_description" class="mt-1" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Links -->
+                <div class="bg-white shadow-sm rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Social Media Links</h3>
                             <div class="space-y-4">
-                                <div v-for="(link, index) in formData.social_links" :key="index" class="border border-gray-200 rounded-lg p-4">
+                                <div
+                                    v-for="(link, index) in formData.social_links"
+                                    :key="index"
+                                    class="relative border border-gray-200 rounded-lg p-4"
+                                >
+                                    <div class="absolute right-4 top-4">
+                                        <button
+                                            type="button"
+                                            @click="removeSocialLink(index)"
+                                            v-if="formData.social_links.length > 0"
+                                            class="inline-flex items-center text-red-600 hover:text-red-800 focus:outline-none"
+                                            title="Hapus tautan"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            <span class="sr-only">Remove</span>
+                                        </button>
+                                    </div>
                                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <div>
                                             <InputLabel :for="'social_platform_' + index" value="Platform" />
@@ -495,16 +705,6 @@
                                                 class="mt-1 block w-full"
                                                 placeholder="Follow us on Facebook"
                                             />
-                                        </div>
-                                        <div class="flex items-end">
-                                            <SecondaryButton
-                                                type="button"
-                                                @click="removeSocialLink(index)"
-                                                v-if="formData.social_links.length > 0"
-                                                class="w-full"
-                                            >
-                                                Remove
-                                            </SecondaryButton>
                                         </div>
                                     </div>
                                 </div>
@@ -715,7 +915,25 @@
                         <div class="bg-white shadow-sm rounded-lg p-6">
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Company Statistics</h3>
                             <div class="space-y-4">
-                                <div v-for="(stat, index) in formData.company_stats" :key="index" class="border border-gray-200 rounded-lg p-4">
+                                <div
+                                    v-for="(stat, index) in formData.company_stats"
+                                    :key="index"
+                                    class="relative border border-gray-200 rounded-lg p-4"
+                                >
+                                    <div class="absolute right-4 top-4">
+                                        <button
+                                            type="button"
+                                            @click="removeCompanyStat(index)"
+                                            v-if="formData.company_stats.length > 1"
+                                            class="inline-flex items-center text-red-600 hover:text-red-800 focus:outline-none"
+                                            title="Hapus statistik"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            <span class="sr-only">Remove</span>
+                                        </button>
+                                    </div>
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <InputLabel :for="'stat_icon_' + index" value="Icon Class" />
@@ -750,15 +968,6 @@
                                                 required
                                             />
                                         </div>
-                                    </div>
-                                    <div class="mt-4 flex justify-end">
-                                        <SecondaryButton
-                                            type="button"
-                                            @click="removeCompanyStat(index)"
-                                            v-if="formData.company_stats.length > 1"
-                                        >
-                                            Remove Stat
-                                        </SecondaryButton>
                                     </div>
                                 </div>
                                 <PrimaryButton
@@ -807,7 +1016,7 @@
                                 <div class="flex items-center space-x-4 mb-6">
                                     <div class="relative">
                                         <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-200 overflow-hidden">
-                                            <img v-if="testimonial.photo" :src="testimonial.photo" alt="Client Photo" class="w-full h-full object-cover" />
+                                            <img v-if="testimonialPreviews[index]" :src="testimonialPreviews[index]" alt="Client Photo" class="w-full h-full object-cover" />
                                             <svg v-else class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
@@ -956,10 +1165,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { Head, useForm, usePage } from '@inertiajs/vue3'
-import { router } from '@inertiajs/vue3'
-import axios from 'axios'
+import { ref, reactive, computed, toRaw, onBeforeUnmount } from 'vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import PageLoader from '@/Components/PageLoader.vue'
 import ConfirmationDialog from '@/Components/ConfirmationDialog.vue'
@@ -967,7 +1174,6 @@ import ErrorDialog from '@/Components/ErrorDialog.vue'
 import InputLabel from '@/Components/InputLabel.vue'
 import TextInput from '@/Components/TextInput.vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
-import SecondaryButton from '@/Components/SecondaryButton.vue'
 import InputError from '@/Components/InputError.vue'
 import OrderSummary from '@/Components/OrderSummary.vue'
 
@@ -984,9 +1190,23 @@ const loading = ref(false)
 const submitting = ref(false)
 const showConfirmDialog = ref(false)
 const showErrorDialog = ref(false)
+const showRetryButton = ref(false)
 const errorTitle = ref('')
 const errorMessage = ref('')
 const errorDetails = ref(null)
+
+const imagePreviews = reactive({
+    company_logo: null,
+    favicon: null,
+    og_image: null,
+    hero_background: null,
+    about_image: null,
+    promo_banner: null,
+})
+
+const testimonialPreviews = ref([])
+const previewRegistry = new Set()
+const isDealer = computed(() => props.template?.category === 'dealer')
 
 // Form data
 
@@ -995,7 +1215,7 @@ const formData = reactive({
     // Company Info
     company_name: '',
     company_tagline: '',
-    company_logo: '',
+    company_logo: null,
     
     // Website Basics
     website_name: '',
@@ -1014,8 +1234,8 @@ const formData = reactive({
     seo_description: '',
     seo_keywords: '',
     robots_meta: 'index,follow',
-    favicon: '',
-    og_image: '',
+    favicon: null,
+    og_image: null,
     
     // Contact
     contact_email: '',
@@ -1026,14 +1246,14 @@ const formData = reactive({
     // Hero Section
     hero_title: '',
     hero_subtitle: '',
-    hero_background: '',
+    hero_background: null,
     hero_cta_text: '',
     hero_cta_link: '',
     
     // About Section
     about_title: '',
     about_content: '',
-    about_image: '',
+    about_image: null,
     
     // Services Section
     services_title: 'Layanan Unggulan Kami',
@@ -1064,7 +1284,7 @@ const formData = reactive({
     testimonials: [
         {
             name: '',
-            photo: '',
+            photo: null,
             rating: '5',
             content: '',
             position: ''
@@ -1074,6 +1294,12 @@ const formData = reactive({
     // Gallery
     gallery_title: 'Portfolio & Galeri',
     gallery_photos: [],
+
+    // Dealer Specials
+    cars: [],
+    promo_banner: null,
+    promo_title: '',
+    promo_description: '',
     
     // WhatsApp Integration
     whatsapp_enabled: true,
@@ -1092,6 +1318,144 @@ const formData = reactive({
     voucher_discount: 0,
 })
 
+testimonialPreviews.value = formData.testimonials.map(() => null)
+
+const createEmptyCar = () => ({
+    name: '',
+    type: '',
+    year: '',
+    image: null,
+    image_preview: null,
+    price: '',
+    features: '',
+    transmission: '',
+    whatsapp_sales: '',
+})
+
+if (isDealer.value) {
+    formData.cars = formData.cars.map((car) => ({
+        ...car,
+        image_preview: car.image_preview ?? null,
+    }))
+}
+
+const FILE_SIZE_LIMITS = {
+    company_logo: 2,
+    favicon: 1,
+    og_image: 4,
+    hero_background: 6,
+    about_image: 4,
+    testimonial_photo: 2,
+    gallery_photo: 4,
+    car_image: 4,
+    promo_banner: 4,
+}
+
+const createPreviewUrl = (file) => {
+    const url = URL.createObjectURL(file)
+    previewRegistry.add(url)
+    return url
+}
+
+const releasePreviewUrl = (url) => {
+    if (!url) {
+        return
+    }
+
+    URL.revokeObjectURL(url)
+    previewRegistry.delete(url)
+}
+
+const resolveMediaPath = (path) => {
+    if (!path || typeof path !== 'string') {
+        return null
+    }
+
+    if (path.startsWith('blob:') || path.startsWith('http://') || path.startsWith('https://')) {
+        return path
+    }
+
+    if (path.startsWith('/')) {
+        return path
+    }
+
+    const normalized = path.replace(/^storage\//, '')
+    return `/storage/${normalized}`
+}
+
+const getCarImageUrl = (car) => {
+    if (!car) {
+        return null
+    }
+
+    if (car.image_preview) {
+        return car.image_preview
+    }
+
+    return resolveMediaPath(car.image)
+}
+
+const updateImageField = (field, file, sizeLimitMb = 2) => {
+    if (!file) {
+        formData[field] = null
+        if (imagePreviews[field]) {
+            releasePreviewUrl(imagePreviews[field])
+            imagePreviews[field] = null
+        }
+        return
+    }
+
+    if (sizeLimitMb && file.size > sizeLimitMb * 1024 * 1024) {
+        alert(`File terlalu besar. Maksimal ${sizeLimitMb}MB.`)
+        return
+    }
+
+    formData[field] = file
+
+    if (imagePreviews[field]) {
+        releasePreviewUrl(imagePreviews[field])
+    }
+
+    imagePreviews[field] = createPreviewUrl(file)
+}
+
+const serializeValue = (value) => {
+    if (value === null || value === undefined) {
+        return value
+    }
+
+    if (value instanceof File || value instanceof Blob) {
+        return value
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((item) => serializeValue(item))
+    }
+
+    if (typeof value === 'object') {
+        const rawObject = toRaw(value)
+        return Object.keys(rawObject).reduce((acc, key) => {
+            if (key === 'image_preview') {
+                return acc
+            }
+
+            acc[key] = serializeValue(rawObject[key])
+            return acc
+        }, {})
+    }
+
+    return value
+}
+
+const buildPayload = () => {
+    const rawFormData = toRaw(formData)
+
+    return Object.keys(rawFormData).reduce((acc, key) => {
+        acc[key] = serializeValue(rawFormData[key])
+        return acc
+    }, {})
+}
+
 // Computed
 const errors = computed(() => usePage().props.errors || {})
 
@@ -1104,13 +1468,44 @@ const submitForm = () => {
     submitting.value = true
     showConfirmDialog.value = false
 
-    const form = useForm(formData)
+    const payload = buildPayload()
 
-    form.post(route('templates.checkout.process', props.template.slug), {
+    router.post(route('templates.checkout.process', props.template.slug), payload, {
+        forceFormData: true,
         onSuccess: () => {
-            submitting.value = false
+            showRetryButton.value = false
         },
-        onError: (errors) => {
+        onError: (formErrors) => {
+            const errorKeys = Object.keys(formErrors || {})
+            const hasValidationErrors = errorKeys.length > 0
+
+            if (hasValidationErrors) {
+                const messageSet = new Set()
+
+                Object.values(formErrors).forEach((value) => {
+                    if (Array.isArray(value)) {
+                        value.filter(Boolean).forEach((msg) => messageSet.add(msg))
+                    } else if (value) {
+                        messageSet.add(value)
+                    }
+                })
+
+                const messages = Array.from(messageSet)
+
+                errorTitle.value = 'Validasi Data Gagal'
+                errorMessage.value = 'Beberapa data belum valid. Silakan periksa kembali formulir Anda.'
+                errorDetails.value = { field: errorKeys[0] }
+                showRetryButton.value = false
+            } else {
+                errorTitle.value = 'Terjadi Kesalahan'
+                errorMessage.value = 'Terjadi kesalahan saat memproses permintaan. Silakan coba lagi.'
+                errorDetails.value = null
+                showRetryButton.value = true
+            }
+
+            showErrorDialog.value = true
+        },
+        onFinish: () => {
             submitting.value = false
         }
     })
@@ -1157,48 +1552,12 @@ const closeErrorDialog = () => {
     errorTitle.value = ''
     errorMessage.value = ''
     errorDetails.value = null
+    showRetryButton.value = false
 }
 
 const retrySubmission = () => {
     closeErrorDialog()
     showConfirmation()
-}
-
-const addTestimonial = () => {
-    if (formData.testimonials.length < 10) {
-        formData.testimonials.push({
-            name: '',
-            photo: '',
-            rating: '5',
-            content: '',
-            position: '',
-            uploaded_photo: null // untuk menyimpan file yang diupload
-        })
-    }
-}
-
-const handleTestimonialPhotoUpload = async (event, index) => {
-    const file = event.target.files[0]
-    if (file) {
-        if (file.size > 2 * 1024 * 1024) { // 2MB limit
-            alert('Ukuran foto terlalu besar. Maksimal 2MB.')
-            return
-        }
-
-        // Save original file for later upload
-        formData.testimonials[index].uploaded_photo = file
-
-        // Create preview
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            formData.testimonials[index].photo = e.target.result
-        }
-        reader.readAsDataURL(file)
-    }
-}
-
-const removeTestimonial = (index) => {
-    formData.testimonials.splice(index, 1)
 }
 
 const addCompanyStat = () => {
@@ -1216,79 +1575,144 @@ const removeCompanyStat = (index) => {
         formData.company_stats.splice(index, 1)
     }
 }
-
-const compressImage = async (file, maxWidth = 800) => {
-    return new Promise((resolve) => {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            const img = new Image()
-            img.onload = () => {
-                const canvas = document.createElement('canvas')
-                let width = img.width
-                let height = img.height
-
-                // Calculate new dimensions while maintaining aspect ratio
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width)
-                    width = maxWidth
-                }
-
-                canvas.width = width
-                canvas.height = height
-                const ctx = canvas.getContext('2d')
-                ctx.drawImage(img, 0, 0, width, height)
-
-                // Compress with lower quality for larger images
-                const quality = width > 400 ? 0.7 : 0.9
-                const compressed = canvas.toDataURL('image/jpeg', quality)
-                resolve(compressed)
-            }
-            img.src = e.target.result
-        }
-        reader.readAsDataURL(file)
-    })
+const addTestimonial = () => {
+    if (formData.testimonials.length < 10) {
+        formData.testimonials.push({
+            name: '',
+            photo: null,
+            rating: '5',
+            content: '',
+            position: ''
+        })
+        testimonialPreviews.value.push(null)
+    }
 }
 
-const handleFileUpload = async (event, field) => {
-    const file = event.target.files[0]
-    if (file) {
-        // Initial file size check (2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            alert('File terlalu besar. Maksimal 2MB.')
-            event.target.value = '' // Reset input
-            return
-        }
-
-        try {
-            // Compress and resize image
-            const reader = new FileReader()
-            reader.onload = async (e) => {
-                const compressed = await compressImage(file)
-                formData[field] = compressed
-            }
-            reader.readAsDataURL(file)
-        } catch (error) {
-            console.error('Error processing image:', error)
-            alert('Terjadi kesalahan saat memproses gambar. Silakan coba lagi.')
-            event.target.value = '' // Reset input
-        }
+const addCar = () => {
+    if (formData.cars.length < 50) {
+        formData.cars.push(createEmptyCar())
     }
+}
+
+const removeCar = (index) => {
+    if (!formData.cars[index]) {
+        return
+    }
+
+    if (formData.cars[index].image_preview) {
+        releasePreviewUrl(formData.cars[index].image_preview)
+    }
+
+    formData.cars.splice(index, 1)
+}
+
+const handleTestimonialPhotoUpload = (event, index) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+
+    if (!file) {
+        return
+    }
+
+    const limit = FILE_SIZE_LIMITS.testimonial_photo || 2
+    if (file.size > limit * 1024 * 1024) {
+        alert(`Ukuran foto terlalu besar. Maksimal ${limit}MB.`)
+        return
+    }
+
+    formData.testimonials[index].photo = file
+
+    const currentPreview = testimonialPreviews.value[index]
+    if (currentPreview) {
+        releasePreviewUrl(currentPreview)
+    }
+
+    testimonialPreviews.value[index] = createPreviewUrl(file)
+}
+
+const removeTestimonial = (index) => {
+    const preview = testimonialPreviews.value[index]
+    if (preview) {
+        releasePreviewUrl(preview)
+    }
+
+    testimonialPreviews.value.splice(index, 1)
+    formData.testimonials.splice(index, 1)
+}
+
+const handleFileUpload = (event, field) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+
+    if (!file) {
+        return
+    }
+
+    const limit = FILE_SIZE_LIMITS[field] ?? 2
+    updateImageField(field, file, limit)
 }
 
 const handleFaviconUpload = (event) => handleFileUpload(event, 'favicon')
 const handleOgImageUpload = (event) => handleFileUpload(event, 'og_image')
 const handleHeroBackgroundUpload = (event) => handleFileUpload(event, 'hero_background')
 const handleCompanyLogoUpload = (event) => handleFileUpload(event, 'company_logo')
+const handleAboutImageUpload = (event) => handleFileUpload(event, 'about_image')
+const handlePromoBannerUpload = (event) => handleFileUpload(event, 'promo_banner')
 
 const handleGalleryUpload = (event) => {
-    const files = Array.from(event.target.files)
-    // TODO: Implement actual file upload to server
-    files.forEach(file => {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            formData.gallery_photos.push(e.target.result)
+    const files = Array.from(event.target.files || [])
+    event.target.value = ''
+
+    if (!files.length) {
+        return
+    }
+
+    const remainingSlots = 12 - formData.gallery_photos.length
+    if (remainingSlots <= 0) {
+        alert('Maksimal 12 foto galeri yang dapat diunggah.')
+        return
+    }
+
+    files.slice(0, remainingSlots).forEach((file) => {
+        const limit = FILE_SIZE_LIMITS.gallery_photo || 4
+        if (file.size > limit * 1024 * 1024) {
+            alert(`Ukuran file ${file.name} terlalu besar. Maksimal ${limit}MB.`)
+            return
         }
-        reader.readAsDataURL(file)
+
+        formData.gallery_photos.push(file)
     })
 }
+
+const handleCarImageUpload = (event, index) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+
+    if (!formData.cars[index]) {
+        return
+    }
+
+    if (!file) {
+        return
+    }
+
+    const limit = FILE_SIZE_LIMITS.car_image || 4
+    if (file.size > limit * 1024 * 1024) {
+        alert(`Ukuran file terlalu besar. Maksimal ${limit}MB.`)
+        return
+    }
+
+    formData.cars[index].image = file
+
+    if (formData.cars[index].image_preview) {
+        releasePreviewUrl(formData.cars[index].image_preview)
+    }
+
+    formData.cars[index].image_preview = createPreviewUrl(file)
+}
+
+onBeforeUnmount(() => {
+    previewRegistry.forEach((url) => URL.revokeObjectURL(url))
+    previewRegistry.clear()
+})
 </script>
