@@ -11,7 +11,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'phone', 'password', 'is_active', 'last_login_at'
+        'name', 'email', 'phone', 'password', 'is_admin', 'is_active', 'last_login_at'
     ];
 
     protected $hidden = [
@@ -24,11 +24,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
 
-    // Relationships
     public function websiteContents()
     {
         return $this->hasMany(WebsiteContent::class);

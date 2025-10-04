@@ -180,14 +180,14 @@ class EditWebsiteContent extends EditRecord
     protected function afterSave(): void
     {
         // Log the update
-        activity()
-            ->causedBy(auth()->user())
-            ->performedOn($this->record)
-            ->withProperties([
-                'old_status' => $this->record->getOriginal('status'),
-                'new_status' => $this->record->status,
-            ])
-            ->log('Website content updated');
+        // activity()
+        //     ->causedBy(auth()->user())
+        //     ->performedOn($this->record)
+        //     ->withProperties([
+        //         'old_status' => $this->record->getOriginal('status'),
+        //         'new_status' => $this->record->status,
+        //     ])
+        //     ->log('Website content updated');
     }
 
     private function resetToTemplateDefaults(): void

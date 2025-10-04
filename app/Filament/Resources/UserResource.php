@@ -26,7 +26,7 @@ class UserResource extends Resource
             ->schema([
                 Section::make('User Information')
                     ->icon('heroicon-o-user-circle')
-                    ->columns(2)
+                    ->columns(3)
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -45,9 +45,13 @@ class UserResource extends Resource
                             ->maxLength(255)
                             ->prefixIcon('heroicon-o-phone'),
                         
+                        Forms\Components\Toggle::make('is_admin')
+                            ->default(true)
+                            ->label('Admin Account'),
+
                         Forms\Components\Toggle::make('is_active')
                             ->default(true)
-                            ->helperText('Activate or deactivate user account'),
+                            ->label('Active Account'),
                     ]),
 
                 Section::make('Password Configuration')
@@ -63,15 +67,13 @@ class UserResource extends Resource
                             ->dehydrated(fn (?string $state): bool => filled($state))
                             ->required(fn (string $operation): bool => $operation === 'create')
                             ->minLength(8)
-                            ->prefixIcon('heroicon-o-key')
-                            ->helperText('Minimum 8 characters required'),
+                            ->prefixIcon('heroicon-o-key'),
                         
                         Forms\Components\TextInput::make('password_confirmation')
                             ->password()
                             ->same('password')
                             ->required(fn (Forms\Get $get): bool => filled($get('password')))
                             ->prefixIcon('heroicon-o-shield-check')
-                            ->helperText('Confirm the password above')
                             ->dehydrated(false),
                     ])
                     ->hiddenOn('view'),
@@ -82,13 +84,11 @@ class UserResource extends Resource
                     ->schema([
                         Forms\Components\DateTimePicker::make('email_verified_at')
                             ->label('Email Verified At')
-                            ->helperText('Set verification date or leave empty')
                             ->prefixIcon('heroicon-o-shield-check'),
                         
                         Forms\Components\DateTimePicker::make('last_login_at')
                             ->label('Last Login')
                             ->disabled()
-                            ->helperText('Automatically updated by system')
                             ->prefixIcon('heroicon-o-clock'),
                     ]),
             ]);
@@ -112,6 +112,12 @@ class UserResource extends Resource
                     ->searchable()
                     ->icon('heroicon-o-phone')
                     ->placeholder('Not provided'),
+                
+                Tables\Columns\IconColumn::make('is_admin')
+                    ->boolean()
+                    ->label('Admin')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle'),
                 
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()

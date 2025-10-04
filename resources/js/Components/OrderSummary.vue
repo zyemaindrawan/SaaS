@@ -57,7 +57,7 @@
 
                     <hr class="border-gray-200">
 
-                    <!-- Enhanced Final Amount -->
+                    <!-- Final Amount -->
                     <div class="flex justify-between items-center">
                         <span class="text-lg font-bold text-gray-900">Final Amount</span>
                         <div class="text-right">
