@@ -194,6 +194,9 @@
                                         class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                     />
                                     <InputError :message="errors.favicon" class="mt-2" />
+                                    <div v-if="imagePreviews.favicon || resolveMediaPath(formData.favicon)" class="mt-2">
+                                        <img :src="imagePreviews.favicon || resolveMediaPath(formData.favicon)" alt="Favicon Preview" class="h-12 w-12 object-contain border border-gray-200 rounded" />
+                                    </div>
                                 </div>
                                 <div>
                                     <InputLabel for="og_image" value="Social Media Share Image" />
@@ -206,6 +209,9 @@
                                     />
                                     <p class="mt-1 text-sm text-gray-500">Recommended size: 1200x630 pixels</p>
                                     <InputError :message="errors.og_image" class="mt-2" />
+                                    <div v-if="imagePreviews.og_image || resolveMediaPath(formData.og_image)" class="mt-2">
+                                        <img :src="imagePreviews.og_image || resolveMediaPath(formData.og_image)" alt="Social Share Image Preview" class="w-full max-w-md rounded-md border border-gray-200 object-cover" />
+                                    </div>
                                 </div>
                                 <div>
                                     <InputLabel for="google_analytics" value="Google Analytics ID" />
@@ -266,6 +272,9 @@
                                         class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                     />
                                     <p class="mt-1 text-sm text-gray-500">Recommended size: 1920x1080 pixels</p>
+                                    <div v-if="imagePreviews.hero_background || resolveMediaPath(formData.hero_background)" class="mt-2">
+                                        <img :src="imagePreviews.hero_background || resolveMediaPath(formData.hero_background)" alt="Hero Background Preview" class="w-full max-w-3xl rounded-md border border-gray-200 object-cover" />
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
@@ -454,19 +463,7 @@
 
                 <!-- Dealer Inventory -->
                 <div v-if="isDealer" class="bg-white shadow-sm rounded-lg p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Daftar Mobil</h3>
-                        <button
-                            type="button"
-                            @click="addCar"
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        >
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Tambah Mobil
-                        </button>
-                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Daftar Mobil</h3>
 
                     <div class="space-y-4">
                         <div
@@ -596,6 +593,18 @@
                             Belum ada mobil yang ditambahkan. Klik “Tambah Mobil” untuk mulai mengisi data.
                         </div>
                     </div>
+
+                    <button
+                        type="button"
+                        @click="addCar"
+                        v-if="formData.cars.length < 50"
+                        class="w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+                    >
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Mobil
+                    </button>
                 </div>
 
                 <!-- Dealer Promo -->
@@ -708,14 +717,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                <PrimaryButton
+                                <button
                                     type="button"
                                     @click="addSocialLink"
-                                    class="w-full"
                                     v-if="formData.social_links.length < 10"
+                                    class="w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
                                 >
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
                                     Add Social Link
-                                </PrimaryButton>
+                                </button>
                             </div>
                         </div>
 
@@ -970,14 +982,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                <PrimaryButton
+                                <button
                                     type="button"
                                     @click="addCompanyStat"
-                                    class="w-full"
                                     v-if="formData.company_stats.length < 6"
+                                    class="w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
                                 >
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
                                     Add Statistic
-                                </PrimaryButton>
+                                </button>
                             </div>
                         </div>
 
@@ -1098,17 +1113,21 @@
                                     </div>
                                 </div>
                             </div>
-                                    <PrimaryButton
-                                        type="button"
-                                        @click="addTestimonial"
-                                        class="w-full"
-                                        v-if="formData.testimonials.length < 10"
-                                    >
-                                        Add Testimonial
-                                    </PrimaryButton>
-                                </div>
-                            </div>
+
+                            <button
+                                type="button"
+                                @click="addTestimonial"
+                                v-if="formData.testimonials.length < 10"
+                                class="w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+                            >
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                                Add Testimonial
+                            </button>
                         </div>
+                    </div>
+                </div>
 
                         <!-- Terms Agreement -->
                         <div class="bg-white shadow-sm rounded-lg p-6">
@@ -1173,7 +1192,6 @@ import ConfirmationDialog from '@/Components/ConfirmationDialog.vue'
 import ErrorDialog from '@/Components/ErrorDialog.vue'
 import InputLabel from '@/Components/InputLabel.vue'
 import TextInput from '@/Components/TextInput.vue'
-import PrimaryButton from '@/Components/PrimaryButton.vue'
 import InputError from '@/Components/InputError.vue'
 import OrderSummary from '@/Components/OrderSummary.vue'
 

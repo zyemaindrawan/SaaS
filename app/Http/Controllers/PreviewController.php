@@ -19,6 +19,14 @@ class PreviewController extends Controller
      */
     public function showBySlug(string $slug)
     {
+        // Allow numeric IDs to fall back to standard preview routes
+        if (is_numeric($slug)) {
+            $websiteContent = WebsiteContent::find($slug);
+            if ($websiteContent) {
+                return $this->show($websiteContent);
+            }
+        }
+
         // First try to find website content by slug
         $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
         
@@ -60,6 +68,14 @@ class PreviewController extends Controller
      */
     public function renderBySlug(string $slug)
     {
+        // Allow numeric IDs to fall back to authenticated render routes
+        if (is_numeric($slug)) {
+            $websiteContent = WebsiteContent::find($slug);
+            if ($websiteContent) {
+                return $this->render($websiteContent);
+            }
+        }
+
         // First try to find website content by slug
         $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
         
@@ -101,6 +117,14 @@ class PreviewController extends Controller
      */
     public function dataBySlug(string $slug)
     {
+        // Allow numeric IDs to fall back to authenticated data routes
+        if (is_numeric($slug)) {
+            $websiteContent = WebsiteContent::find($slug);
+            if ($websiteContent) {
+                return $this->data($websiteContent);
+            }
+        }
+
         // First try to find website content by slug
         $websiteContent = WebsiteContent::where('template_slug', $slug)->first();
         

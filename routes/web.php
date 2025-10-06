@@ -40,15 +40,15 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // Public preview routes (no auth required)
 Route::get('/preview/{slug}', [PreviewController::class, 'showBySlug'])
     ->name('templates.preview')
-    ->where('slug', '[a-zA-Z0-9-_]+');
+    ->where('slug', '^(?![0-9]+$)[A-Za-z0-9_-]+$');
 
 Route::get('/preview/{slug}/render', [PreviewController::class, 'renderBySlug'])
     ->name('preview.render.slug')
-    ->where('slug', '[a-zA-Z0-9-_]+');
+    ->where('slug', '^(?![0-9]+$)[A-Za-z0-9_-]+$');
 
 Route::get('/preview/{slug}/data', [PreviewController::class, 'dataBySlug'])
     ->name('preview.data.slug')
-    ->where('slug', '[a-zA-Z0-9-_]+');
+    ->where('slug', '^(?![0-9]+$)[A-Za-z0-9_-]+$');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

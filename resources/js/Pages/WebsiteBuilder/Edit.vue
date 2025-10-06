@@ -128,19 +128,34 @@
                             </div>
 
                             <div class="p-6">
-                                <!-- Website Name -->
-                                <div class="mb-6">
-                                    <label for="website_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Website Name *
-                                    </label>
-                                    <input
-                                        id="website_name"
-                                        v-model="form.website_name"
-                                        type="text"
-                                        required
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                        :placeholder="websiteContent.website_name"
-                                    >
+                                <!-- Website Basics -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="website_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Website Name *
+                                        </label>
+                                        <input
+                                            id="website_name"
+                                            v-model="form.website_name"
+                                            type="text"
+                                            required
+                                            placeholder="Enter website name"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label for="company_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Company Name *
+                                        </label>
+                                        <input
+                                            id="company_name"
+                                            v-model="form.content_data.company_name"
+                                            type="text"
+                                            required
+                                            placeholder="Enter company name"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                        >
+                                    </div>
                                 </div>
 
                                 <!-- Subdomain -->
@@ -153,91 +168,59 @@
                                             id="subdomain"
                                             v-model="form.subdomain"
                                             type="text"
+                                            placeholder="Enter subdomain"
                                             class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                            :placeholder="websiteContent.subdomain || 'mywebsite'"
                                         >
                                         <span class="inline-flex items-center px-3 py-3 text-sm text-gray-500 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg">
                                             .oursite.com
                                         </span>
                                     </div>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        Use lowercase letters, numbers, and hyphens only.
+                                    </p>
                                 </div>
 
-                                <!-- Dynamic Content Fields -->
-                                <div v-if="config && config.fields" class="space-y-6">
-                                    <div
-                                        v-for="field in config.fields"
-                                        :key="field.name"
-                                        class="border border-gray-200 rounded-lg p-4"
-                                    >
-                                        <label :for="field.name" class="block text-sm font-medium text-gray-700 mb-2">
-                                            {{ field.label }} <span v-if="field.required" class="text-red-500">*</span>
+                                <!-- Branding -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="company_logo" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Company Logo
                                         </label>
-
-                                        <!-- Text Input -->
                                         <input
-                                            v-if="field.type === 'text'"
-                                            :id="field.name"
-                                            v-model="form.content_data[field.name]"
-                                            :type="field.type"
-                                            :required="field.required"
-                                            :placeholder="field.placeholder || `Enter ${field.label.toLowerCase()}`"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                        >
-
-                                        <!-- Textarea -->
-                                        <textarea
-                                            v-else-if="field.type === 'textarea'"
-                                            :id="field.name"
-                                            v-model="form.content_data[field.name]"
-                                            :required="field.required"
-                                            :placeholder="field.placeholder || `Enter ${field.label.toLowerCase()}`"
-                                            rows="4"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                        ></textarea>
-
-                                        <!-- Select -->
-                                        <select
-                                            v-else-if="field.type === 'select'"
-                                            :id="field.name"
-                                            v-model="form.content_data[field.name]"
-                                            :required="field.required"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                        >
-                                            <option value="">Select {{ field.label.toLowerCase() }}</option>
-                                            <option
-                                                v-for="option in field.options"
-                                                :key="option.value"
-                                                :value="option.value"
-                                            >
-                                                {{ option.label }}
-                                            </option>
-                                        </select>
-
-                                        <!-- File Upload -->
-                                        <input
-                                            v-else-if="field.type === 'file'"
-                                            :id="field.name"
-                                            :required="field.required"
+                                            id="company_logo"
                                             type="file"
-                                            @change="handleFileUpload(field.name, $event)"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                                             accept="image/*"
-                                        >
-
-                                        <!-- Default Text Input -->
-                                        <input
-                                            v-else
-                                            :id="field.name"
-                                            v-model="form.content_data[field.name]"
-                                            type="text"
-                                            :required="field.required"
-                                            :placeholder="field.placeholder || `Enter ${field.label.toLowerCase()}`"
+                                            @change="handleCompanyLogoUpload"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                                         >
-
-                                        <p v-if="field.description" class="text-xs text-gray-500 mt-1">
-                                            {{ field.description }}
-                                        </p>
+                                        <p class="text-xs text-gray-500 mt-2">Recommended size: 256x256px (PNG with transparent background).</p>
+                                        <div v-if="imagePreviews.company_logo" class="mt-3 flex items-center justify-center">
+                                            <img
+                                                :src="imagePreviews.company_logo"
+                                                alt="Company logo preview"
+                                                class="h-20 w-auto object-contain border border-dashed border-gray-300 rounded-md bg-white p-3"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="favicon" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Favicon (32x32)
+                                        </label>
+                                        <input
+                                            id="favicon"
+                                            type="file"
+                                            accept="image/*"
+                                            @change="handleFaviconUpload"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                        >
+                                        <p class="text-xs text-gray-500 mt-2">Upload a square image (ICO, PNG, or SVG).</p>
+                                        <div v-if="imagePreviews.favicon" class="mt-3 flex items-center justify-center">
+                                            <img
+                                                :src="imagePreviews.favicon"
+                                                alt="Favicon preview"
+                                                class="w-12 h-12 object-contain border border-dashed border-gray-300 rounded-md bg-white p-2"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -277,7 +260,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import PageLoader from '@/Components/PageLoader.vue'
@@ -382,6 +365,49 @@ const form = reactive({
     }
 })
 
+const imagePreviews = reactive({
+    company_logo: null,
+    favicon: null,
+})
+
+const resolveMediaPath = (value) => {
+    if (!value) {
+        return null
+    }
+
+    if (typeof value === 'string') {
+        if (
+            value.startsWith('data:') ||
+            value.startsWith('http://') ||
+            value.startsWith('https://') ||
+            value.startsWith('blob:')
+        ) {
+            return value
+        }
+
+        const normalized = value.replace(/^storage\//, '')
+        return `/storage/${normalized}`
+    }
+
+    return null
+}
+
+watch(
+    () => form.content_data.company_logo,
+    (value) => {
+        imagePreviews.company_logo = resolveMediaPath(value)
+    },
+    { immediate: true }
+)
+
+watch(
+    () => form.content_data.favicon,
+    (value) => {
+        imagePreviews.favicon = resolveMediaPath(value)
+    },
+    { immediate: true }
+)
+
 // Methods
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString('id-ID', {
@@ -400,24 +426,30 @@ const copyToClipboard = async (text) => {
     }
 }
 
-const handleFileUpload = async (fieldName, event) => {
-    const file = event.target.files[0]
-    if (file) {
-        if (file.size > 2 * 1024 * 1024) { // 2MB limit
-            alert('File size should not exceed 2MB')
-            return
-        }
+const handleImageUpload = async (fieldName, event, sizeLimitMb = 2) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
 
-        try {
-            // Convert to base64
-            const base64 = await fileToBase64(file)
-            form.content_data[fieldName] = base64
-        } catch (error) {
-            console.error('Error processing file:', error)
-            alert('Error processing file. Please try again.')
-        }
+    if (!file) {
+        return
+    }
+
+    if (file.size > sizeLimitMb * 1024 * 1024) {
+        alert(`File size should not exceed ${sizeLimitMb}MB`)
+        return
+    }
+
+    try {
+        const base64 = await fileToBase64(file)
+        form.content_data[fieldName] = base64
+    } catch (error) {
+        console.error('Error processing file:', error)
+        alert('Error processing file. Please try again.')
     }
 }
+
+const handleCompanyLogoUpload = (event) => handleImageUpload('company_logo', event, 2)
+const handleFaviconUpload = (event) => handleImageUpload('favicon', event, 1)
 
 const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -428,92 +460,15 @@ const fileToBase64 = (file) => {
     })
 }
 
-// Array field handlers
-const addArrayItem = (fieldName, template) => {
-    if (!Array.isArray(form.content_data[fieldName])) {
-        form.content_data[fieldName] = []
-    }
-    form.content_data[fieldName].push({...template})
-}
-
-const removeArrayItem = (fieldName, index) => {
-    if (Array.isArray(form.content_data[fieldName])) {
-        form.content_data[fieldName].splice(index, 1)
-    }
-}
-
-const addService = () => {
-    addArrayItem('services', {
-        title: '',
-        description: '',
-        icon: 'fas fa-star',
-        link: ''
-    })
-}
-
-const addCompanyStat = () => {
-    addArrayItem('company_stats', {
-        number: '',
-        label: '',
-        icon: 'fas fa-chart-line'
-    })
-}
-
-const addTestimonial = () => {
-    addArrayItem('testimonials', {
-        name: '',
-        position: '',
-        content: '',
-        rating: '5',
-        photo: null
-    })
-}
-
-const addSocialLink = () => {
-    addArrayItem('social_links', {
-        platform: '',
-        url: '',
-        label: ''
-    })
-}
-
 const submitForm = () => {
     if (submitting.value) return
 
     submitting.value = true
 
-    // Clean up empty arrays
-    const cleanedContentData = { ...form.content_data }
-    
-    // Clean up arrays
-    if (Array.isArray(cleanedContentData.services)) {
-        cleanedContentData.services = cleanedContentData.services.filter(service => 
-            service.title && service.description
-        )
-    }
-    
-    if (Array.isArray(cleanedContentData.company_stats)) {
-        cleanedContentData.company_stats = cleanedContentData.company_stats.filter(stat => 
-            stat.number && stat.label
-        )
-    }
-    
-    if (Array.isArray(cleanedContentData.testimonials)) {
-        cleanedContentData.testimonials = cleanedContentData.testimonials.filter(testimonial => 
-            testimonial.name && testimonial.content
-        )
-    }
-    
-    if (Array.isArray(cleanedContentData.social_links)) {
-        cleanedContentData.social_links = cleanedContentData.social_links.filter(link => 
-            link.platform && link.url
-        )
-    }
-
     router.put(`/website-builder/${props.websiteContent.id}`, {
         website_name: form.website_name,
         subdomain: form.subdomain,
-        content_data: cleanedContentData
+        content_data: form.content_data
     }, {
         onSuccess: () => {
             submitting.value = false
