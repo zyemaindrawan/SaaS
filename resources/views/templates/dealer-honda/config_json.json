@@ -1,0 +1,91 @@
+{
+    "favicon": null,
+    "products": [
+        {
+            "link": "#",
+            "name": "Honda BRV",
+            "image": "website-assets/products/OccyXvft9OGRSRPF2XNoceZ6IA3iVqoXPDwu7oVf.jpg",
+            "price": ""
+        },
+        {
+            "link": "#",
+            "name": "Honda CRV",
+            "image": "website-assets/products/yu3HVvAQFThvlcIhpw9wOwM6amSvNk7S8apdQybm.webp",
+            "price": ""
+        },
+        {
+            "link": "#",
+            "name": "Honda Brio",
+            "image": "website-assets/products/2cbb6P7aMMr10IsIKPqrfNVZzHKevlZe6XibGuHA.jpg",
+            "price": ""
+        },
+        {
+            "link": "#",
+            "name": "Honda Jazz",
+            "image": "website-assets/products/UDAm6xjDR31lkbwYiZpyElzNbQoDE6ILM9dzLX2s.jpg",
+            "price": ""
+        }
+    ],
+    "hero_title": "Selamat Datang Honda Pradana",
+    "about_image": "website-assets/about-images/XJM3kOAkOcT3i1qIA9SqEDGBtZXwKbUg3SSAHc3B.jpg",
+    "about_title": "Tentang Honda Pradana",
+    "company_logo": "website-assets/company-logos/5VsdPOA7dCcZ4DdGFgPiIYkr16O0eoIgWe4vFvL5.png",
+    "company_name": "Honda Pradana Cikarang",
+    "social_links": [
+        {
+            "url": "https://facebook.com/honda",
+            "label": "fb",
+            "platform": "facebook"
+        },
+        {
+            "url": "https://instagram.com/honda",
+            "label": "ig",
+            "platform": "instagram"
+        },
+        {
+            "url": "https://www.tiktok.com/honda",
+            "label": "vt",
+            "platform": "tiktok"
+        }
+    ],
+    "testimonials": [
+        {
+            "name": "Alfa",
+            "photo": null,
+            "rating": "5",
+            "content": "Eos regione conceptam an, in brute congue regione per, an vel tempor putant mentitum. Ne vis melius docendi, id vim libris",
+            "position": "Bandung"
+        },
+        {
+            "name": "Dino",
+            "photo": null,
+            "rating": "5",
+            "content": "Eos regione conceptam an, in brute congue regione per, an vel tempor putant mentitum. Ne vis melius docendi, id vim libris",
+            "position": "Cibubur"
+        },
+        {
+            "name": "Mahesa",
+            "photo": null,
+            "rating": "5",
+            "content": "Eos regione conceptam an, in brute congue regione per, an vel tempor putant mentitum. Ne vis melius docendi, id vim libris",
+            "position": "Cikarang"
+        }
+    ],
+    "website_name": "Honda Pradana",
+    "about_content": "Lorem ipsum dolor sit amet, mei harum appetere an, te facilisis gloriatur eam. Cu purto movet labitur eos, debet antiopam pericula mei an. Prima fastidii suavitate est eu. In justo laudem inimicus usu, in deleniti temporibus sit. Nam eu possit melius prompta, vel tale summo nonumy te. Has ut munere putant philosophia, veniam possim alterum ad sea, quod suas causae ei sea.",
+    "contact_email": "info@hondapratama.com",
+    "contact_phone": "081122334455",
+    "hero_subtitle": "Dapatkan diskon s/d Rp 50 juta, bonus aksesoris, dan cicilan 0% untuk semua tipe Honda. Proses kredit cepat, unit siap stok.",
+    "gallery_photos": [
+        "website-assets/gallery_photos/FmOhvaeyfhXejAj6ez4GGa5oyxu5SsEw9h1rdq5X.jpg",
+        "website-assets/gallery_photos/kz1WVZKcjaTXvp82f9qpbhx3jREvJUby4LitRe97.jpg",
+        "website-assets/gallery_photos/nasEfqr8zszY5Z7scE7WHaBqThuNkdo2hqNp1c8V.jpg",
+        "website-assets/gallery_photos/Qydizre3Bp5yrgSjoYYlDU6myANvtd1VY4aa7CTH.jpg"
+    ],
+    "company_tagline": "Penjualan & Service Resmi Honda",
+    "contact_address": "Jl. Utama Mandala No. 121 A Cikarang, Jawa Barat 123456",
+    "hero_background": "website-assets/hero-backgrounds/RkjPg8K9FTIP6PtQwS4AcyVhdWrGmzZI84IXkEO1.webp",
+    "whatsapp_number": "6281122334455",
+    "whatsapp_message": "Halo Honda Pradana",
+    "whatsapp_greeting_text": "WA CS Kami"
+}

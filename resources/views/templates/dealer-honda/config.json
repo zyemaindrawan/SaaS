@@ -1,0 +1,478 @@
+{
+    "name": "Dealer Honda",
+    "description": "Template website dealer mobil Honda profesional dengan fitur showcase produk, promo, galeri, dan kontak sales. Desain modern dengan warna merah khas Honda.",
+    "category": "landing",
+    "price": "5250000.00",
+    "is_active": true,
+    "sort_order": 1,
+    "version": "1.0.0",
+    "author": "DR-SaaS",
+    "updated_at": "2025-10-13T04:05:11.787257Z",
+    "fields": [
+        {
+            "key": "website_name",
+            "label": "Website Name",
+            "type": "text",
+            "section": "website",
+            "required": true,
+            "max_length": 255,
+            "placeholder": "Honda Pradana",
+            "value": "Honda Pradana"
+        },
+        {
+            "key": "company_name",
+            "label": "Company Name",
+            "type": "text",
+            "section": "branding",
+            "required": true,
+            "max_length": 255,
+            "placeholder": "Honda Dealer Name",
+            "value": "Honda Pradana Cikarang"
+        },
+        {
+            "key": "company_tagline",
+            "label": "Company Tagline",
+            "type": "text",
+            "section": "branding",
+            "required": false,
+            "max_length": 255,
+            "placeholder": "Tagline perusahaan",
+            "value": "Penjualan & Service Resmi Honda"
+        },
+        {
+            "key": "company_logo",
+            "label": "Company Logo",
+            "type": "image",
+            "section": "branding",
+            "required": false,
+            "max_size_mb": 1,
+            "allowed_types": [
+                "jpg",
+                "jpeg",
+                "png",
+                "webp"
+            ],
+            "storage_path": "website-assets\/company-logos",
+            "value": "website-assets\/company-logos\/5VsdPOA7dCcZ4DdGFgPiIYkr16O0eoIgWe4vFvL5.png"
+        },
+        {
+            "key": "favicon",
+            "label": "Favicon",
+            "type": "image",
+            "section": "branding",
+            "required": false,
+            "max_size_mb": 1,
+            "allowed_types": [
+                "ico",
+                "png"
+            ],
+            "storage_path": "website-assets\/favicons",
+            "value": null
+        },
+        {
+            "key": "hero_title",
+            "label": "Hero Title",
+            "type": "text",
+            "section": "hero",
+            "required": true,
+            "max_length": 255,
+            "placeholder": "Selamat Datang di Dealer Honda",
+            "value": "Selamat Datang Honda Pradana"
+        },
+        {
+            "key": "hero_subtitle",
+            "label": "Hero Subtitle",
+            "type": "textarea",
+            "section": "hero",
+            "required": true,
+            "max_length": 500,
+            "placeholder": "Deskripsi promo dan layanan",
+            "value": "Dapatkan diskon s\/d Rp 50 juta, bonus aksesoris, dan cicilan 0% untuk semua tipe Honda. Proses kredit cepat, unit siap stok."
+        },
+        {
+            "key": "hero_background",
+            "label": "Hero Background Image",
+            "type": "image",
+            "section": "hero",
+            "required": false,
+            "max_size_mb": 1,
+            "allowed_types": [
+                "jpg",
+                "jpeg",
+                "png",
+                "webp"
+            ],
+            "storage_path": "website-assets\/hero-backgrounds",
+            "value": "website-assets\/hero-backgrounds\/RkjPg8K9FTIP6PtQwS4AcyVhdWrGmzZI84IXkEO1.webp"
+        },
+        {
+            "key": "about_title",
+            "label": "About Section Title",
+            "type": "text",
+            "section": "about",
+            "required": false,
+            "max_length": 255,
+            "placeholder": "Tentang Kami",
+            "value": "Tentang Honda Pradana"
+        },
+        {
+            "key": "about_content",
+            "label": "About Content",
+            "type": "textarea",
+            "section": "about",
+            "required": false,
+            "max_length": 2000,
+            "placeholder": "Ceritakan tentang dealer Anda...",
+            "value": "Lorem ipsum dolor sit amet, mei harum appetere an, te facilisis gloriatur eam. Cu purto movet labitur eos, debet antiopam pericula mei an. Prima fastidii suavitate est eu. In justo laudem inimicus usu, in deleniti temporibus sit. Nam eu possit melius prompta, vel tale summo nonumy te. Has ut munere putant philosophia, veniam possim alterum ad sea, quod suas causae ei sea."
+        },
+        {
+            "key": "about_image",
+            "label": "About Image",
+            "type": "image",
+            "section": "about",
+            "required": false,
+            "max_size_mb": 1,
+            "allowed_types": [
+                "jpg",
+                "jpeg",
+                "png",
+                "webp"
+            ],
+            "storage_path": "website-assets\/about-images",
+            "value": "website-assets\/about-images\/XJM3kOAkOcT3i1qIA9SqEDGBtZXwKbUg3SSAHc3B.jpg"
+        },
+        {
+            "key": "gallery_photos",
+            "label": "Gallery Photos",
+            "type": "repeater",
+            "section": "gallery",
+            "required": false,
+            "max_items": 4,
+            "max_size_mb": 1,
+            "allowed_types": [
+                "jpg",
+                "jpeg",
+                "png",
+                "webp"
+            ],
+            "storage_path": "website-assets\/gallery_photos",
+            "help_text": "Upload maksimal 4 foto untuk galeri",
+            "value": [
+                "website-assets\/gallery_photos\/FmOhvaeyfhXejAj6ez4GGa5oyxu5SsEw9h1rdq5X.jpg",
+                "website-assets\/gallery_photos\/kz1WVZKcjaTXvp82f9qpbhx3jREvJUby4LitRe97.jpg",
+                "website-assets\/gallery_photos\/nasEfqr8zszY5Z7scE7WHaBqThuNkdo2hqNp1c8V.jpg",
+                "website-assets\/gallery_photos\/Qydizre3Bp5yrgSjoYYlDU6myANvtd1VY4aa7CTH.jpg"
+            ]
+        },
+        {
+            "key": "products",
+            "label": "Honda Units",
+            "type": "repeater",
+            "section": "products",
+            "required": true,
+            "min_items": 1,
+            "max_items": 4,
+            "help_text": "Daftar unit Honda unggulan (maksimal 4 unit)",
+            "fields": [
+                {
+                    "key": "name",
+                    "label": "Unit Name",
+                    "type": "text",
+                    "required": true,
+                    "max_length": 255,
+                    "placeholder": "Honda Brio"
+                },
+                {
+                    "key": "price",
+                    "label": "Unit Price",
+                    "type": "text",
+                    "required": true,
+                    "max_length": 100,
+                    "placeholder": "Contact Us \/ 200000000"
+                },
+                {
+                    "key": "link",
+                    "label": "WhatsApp Sales Link",
+                    "type": "text",
+                    "required": true,
+                    "max_length": 500,
+                    "placeholder": "https:\/\/wa.me\/6281234567890"
+                },
+                {
+                    "key": "image",
+                    "label": "Unit Image",
+                    "type": "image",
+                    "required": false,
+                    "max_size_mb": 1,
+                    "allowed_types": [
+                        "jpg",
+                        "jpeg",
+                        "png",
+                        "webp"
+                    ],
+                    "storage_path": "website-assets\/products"
+                }
+            ],
+            "value": [
+                {
+                    "name": "Honda P1",
+                    "price": "Contact Us",
+                    "link": "#",
+                    "image": "website-assets\/products\/OccyXvft9OGRSRPF2XNoceZ6IA3iVqoXPDwu7oVf.jpg"
+                },
+                {
+                    "name": "Honda P2",
+                    "price": "Contact Us",
+                    "link": "#",
+                    "image": "website-assets\/products\/yu3HVvAQFThvlcIhpw9wOwM6amSvNk7S8apdQybm.webp"
+                },
+                {
+                    "name": "Honda P3",
+                    "price": "Contact Us",
+                    "link": "#",
+                    "image": "website-assets\/products\/2cbb6P7aMMr10IsIKPqrfNVZzHKevlZe6XibGuHA.jpg"
+                },
+                {
+                    "name": "Honda P4",
+                    "price": "Contact Us",
+                    "link": "#",
+                    "image": "website-assets\/products\/UDAm6xjDR31lkbwYiZpyElzNbQoDE6ILM9dzLX2s.jpg"
+                }
+            ]
+        },
+        {
+            "key": "social_links",
+            "label": "Social Media Links",
+            "type": "repeater",
+            "section": "social",
+            "required": false,
+            "max_items": 10,
+            "help_text": "Link media sosial dealer",
+            "fields": [
+                {
+                    "key": "platform",
+                    "label": "Platform",
+                    "type": "select",
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "facebook",
+                            "label": "Facebook"
+                        },
+                        {
+                            "value": "instagram",
+                            "label": "Instagram"
+                        },
+                        {
+                            "value": "twitter",
+                            "label": "Twitter"
+                        },
+                        {
+                            "value": "linkedin",
+                            "label": "LinkedIn"
+                        },
+                        {
+                            "value": "youtube",
+                            "label": "YouTube"
+                        },
+                        {
+                            "value": "tiktok",
+                            "label": "TikTok"
+                        }
+                    ]
+                },
+                {
+                    "key": "label",
+                    "label": "Label",
+                    "type": "text",
+                    "required": true,
+                    "max_length": 255
+                },
+                {
+                    "key": "url",
+                    "label": "URL",
+                    "type": "text",
+                    "required": true,
+                    "max_length": 500
+                }
+            ],
+            "value": [
+                {
+                    "platform": "facebook",
+                    "label": "fb",
+                    "url": "https:\/\/facebook.com\/honda"
+                },
+                {
+                    "platform": "instagram",
+                    "label": "ig",
+                    "url": "https:\/\/instagram.com\/honda"
+                },
+                {
+                    "platform": "tiktok",
+                    "label": "vt",
+                    "url": "https:\/\/www.tiktok.com\/honda"
+                }
+            ]
+        },
+        {
+            "key": "testimonials",
+            "label": "Testimonials",
+            "type": "repeater",
+            "section": "testimonials",
+            "required": true,
+            "min_items": 1,
+            "max_items": 3,
+            "help_text": "Testimoni pembeli (maksimal 3 testimoni)",
+            "fields": [
+                {
+                    "key": "name",
+                    "label": "Customer Name",
+                    "type": "text",
+                    "required": true,
+                    "max_length": 255
+                },
+                {
+                    "key": "position",
+                    "label": "Location\/City",
+                    "type": "text",
+                    "required": false,
+                    "max_length": 255
+                },
+                {
+                    "key": "content",
+                    "label": "Testimonial Content",
+                    "type": "textarea",
+                    "required": true,
+                    "max_length": 1000
+                },
+                {
+                    "key": "photo",
+                    "label": "Customer Photo",
+                    "type": "image",
+                    "required": false,
+                    "max_size_mb": 1,
+                    "allowed_types": [
+                        "jpg",
+                        "jpeg",
+                        "png",
+                        "webp"
+                    ],
+                    "storage_path": "website-assets\/testimonials"
+                },
+                {
+                    "key": "rating",
+                    "label": "Rating",
+                    "type": "select",
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "1",
+                            "label": "\u2b50"
+                        },
+                        {
+                            "value": "2",
+                            "label": "\u2b50\u2b50"
+                        },
+                        {
+                            "value": "3",
+                            "label": "\u2b50\u2b50\u2b50"
+                        },
+                        {
+                            "value": "4",
+                            "label": "\u2b50\u2b50\u2b50\u2b50"
+                        },
+                        {
+                            "value": "5",
+                            "label": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+                        }
+                    ],
+                    "default": "5"
+                }
+            ],
+            "value": [
+                {
+                    "name": "Alfa",
+                    "position": "Bandung",
+                    "content": "Eos regione conceptam an, in brute congue regione per, an vel tempor putant mentitum. Ne vis melius docendi, id vim libris",
+                    "photo": null,
+                    "rating": "5"
+                },
+                {
+                    "name": "Dino",
+                    "position": "Cibubur",
+                    "content": "Eos regione conceptam an, in brute congue regione per, an vel tempor putant mentitum. Ne vis melius docendi, id vim libris",
+                    "photo": null,
+                    "rating": "5"
+                },
+                {
+                    "name": "Mahesa",
+                    "position": "Cikarang",
+                    "content": "Eos regione conceptam an, in brute congue regione per, an vel tempor putant mentitum. Ne vis melius docendi, id vim libris",
+                    "photo": null,
+                    "rating": "5"
+                }
+            ]
+        },
+        {
+            "key": "contact_address",
+            "label": "Contact Address",
+            "type": "textarea",
+            "section": "contact",
+            "required": false,
+            "max_length": 500,
+            "placeholder": "Alamat dealer",
+            "value": "Jl. Utama Mandala No. 121 A Cikarang, Jawa Barat 123456"
+        },
+        {
+            "key": "contact_email",
+            "label": "Contact Email",
+            "type": "email",
+            "section": "contact",
+            "required": false,
+            "max_length": 255,
+            "placeholder": "email@example.com",
+            "value": "info@hondapratama.com"
+        },
+        {
+            "key": "contact_phone",
+            "label": "Contact Phone",
+            "type": "text",
+            "section": "contact",
+            "required": false,
+            "max_length": 20,
+            "placeholder": "08123456789",
+            "value": "081122334455"
+        },
+        {
+            "key": "whatsapp_number",
+            "label": "WhatsApp Number",
+            "type": "text",
+            "section": "whatsapp",
+            "required": false,
+            "max_length": 20,
+            "placeholder": "628123456789",
+            "help_text": "Format: 628123456789 (tanpa tanda +)",
+            "value": "6281122334455"
+        },
+        {
+            "key": "whatsapp_greeting_text",
+            "label": "WhatsApp Button Text",
+            "type": "text",
+            "section": "whatsapp",
+            "required": false,
+            "max_length": 255,
+            "placeholder": "Chat Sales Kami",
+            "value": "WA CS Kami"
+        },
+        {
+            "key": "whatsapp_message",
+            "label": "WhatsApp Default Message",
+            "type": "textarea",
+            "section": "whatsapp",
+            "required": false,
+            "max_length": 500,
+            "placeholder": "Halo, saya ingin bertanya...",
+            "value": "Halo Honda Pradana"
+        }
+    ]
+}

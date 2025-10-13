@@ -1,0 +1,412 @@
+{
+  "name": "Jasa Cleaning",
+  "description": "Template website jasa cuci sofa, springbed, dan karpet profesional dengan fitur layanan, galeri, testimoni, dan contact form. Cocok untuk bisnis cleaning service.",
+  "category": "services",
+  "price": "2000000.00",
+  "is_active": true,
+  "sort_order": 1,
+  "version": "1.0.0",
+  "author": "DR-SaaS",
+  "updated_at": "2025-10-13T10:00:00Z",
+  "fields": [
+    {
+      "key": "website_name",
+      "label": "Website Name",
+      "type": "text",
+      "section": "website",
+      "required": true,
+      "max_length": 255,
+      "placeholder": "Bersih Maksimal",
+      "value": "Bersih Maksimal"
+    },
+    {
+      "key": "company_name",
+      "label": "Company Name",
+      "type": "text",
+      "section": "branding",
+      "required": true,
+      "max_length": 255,
+      "placeholder": "Nama Perusahaan Cleaning",
+      "value": "Bersih Maksimal"
+    },
+    {
+      "key": "company_tagline",
+      "label": "Company Tagline",
+      "type": "text",
+      "section": "branding",
+      "required": false,
+      "max_length": 255,
+      "placeholder": "Tagline bisnis Anda",
+      "value": "Sofa Bersih Maksimal, Harga Minimal"
+    },
+    {
+      "key": "company_logo",
+      "label": "Company Logo",
+      "type": "image",
+      "section": "branding",
+      "required": false,
+      "max_size_mb": 1,
+      "allowed_types": ["jpg", "jpeg", "png", "webp"],
+      "storage_path": "website-assets/company-logos",
+      "value": "branding/logo.png"
+    },
+    {
+      "key": "favicon",
+      "label": "Favicon",
+      "type": "image",
+      "section": "branding",
+      "required": false,
+      "max_size_mb": 1,
+      "allowed_types": ["ico", "png"],
+      "storage_path": "website-assets/favicons",
+      "value": "website-assets/favicons/clean-icon.png"
+    },
+    {
+      "key": "hero_title",
+      "label": "Hero Title",
+      "type": "text",
+      "section": "hero",
+      "required": true,
+      "max_length": 255,
+      "placeholder": "Judul utama website",
+      "value": "Jasa Cuci Sofa Profesional Panggilan Cepat"
+    },
+    {
+      "key": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "type": "textarea",
+      "section": "hero",
+      "required": true,
+      "max_length": 500,
+      "placeholder": "Deskripsi layanan singkat",
+      "value": "Kami hadir untuk membuat sofa Anda kembali bersih, bebas noda membandel, dan higienis. Garansi 100% Puas!"
+    },
+    {
+      "key": "hero_background",
+      "label": "Hero Background Image",
+      "type": "image",
+      "section": "hero",
+      "required": false,
+      "max_size_mb": 1,
+      "allowed_types": ["jpg", "jpeg", "png", "webp"],
+      "storage_path": "website-assets/hero-backgrounds",
+      "value": "website-assets/hero-backgrounds/sofa-cleaning-background.jpg"
+    },
+    {
+      "key": "about_title",
+      "label": "About Section Title",
+      "type": "text",
+      "section": "about",
+      "required": false,
+      "max_length": 255,
+      "placeholder": "Tentang Kami",
+      "value": "Mengapa Memilih Bersih Maksimal?"
+    },
+    {
+      "key": "about_content",
+      "label": "About Content",
+      "type": "textarea",
+      "section": "about",
+      "required": false,
+      "max_length": 2000,
+      "placeholder": "Ceritakan tentang bisnis Anda...",
+      "value": "Bersih Maksimal hadir untuk memberikan solusi pembersihan terbaik bagi sofa, springbed, dan karpet Anda. Kami menggunakan metode Dry Cleaning yang cepat kering, efektif menghilangkan noda, debu, kuman, dan bau tak sedap. Tim kami terdiri dari tenaga profesional berpengalaman dengan dukungan peralatan modern dan cairan pembersih yang aman. Fokus kami adalah mengembalikan keindahan dan kehigienisan perabotan Anda, menjamin kepuasan maksimal dengan garansi bersih. Area layanan kami mencakup seluruh JABODETABEK."
+    },
+    {
+      "key": "about_image",
+      "label": "About Image",
+      "type": "image",
+      "section": "about",
+      "required": false,
+      "max_size_mb": 1,
+      "allowed_types": ["jpg", "jpeg", "png", "webp"],
+      "storage_path": "website-assets/about-images",
+      "value": null
+    },
+    {
+      "key": "gallery_photos",
+      "label": "Gallery Photos",
+      "type": "repeater",
+      "section": "gallery",
+      "required": false,
+      "max_items": 4,
+      "max_size_mb": 1,
+      "allowed_types": ["jpg", "jpeg", "png", "webp"],
+      "storage_path": "website-assets/gallery_photos",
+      "help_text": "Upload maksimal 4 foto before-after hasil cleaning",
+      "value": [
+        "https://images.unsplash.com/photo-1559869595-6548777e48b4?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1540306161138-028f8f90c427?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1585489626388-b2ac7ce69018?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1582294246194-27921a943714?q=80&w=2070&auto=format&fit=crop"
+      ]
+    },
+    {
+      "key": "products",
+      "label": "Services/Products",
+      "type": "repeater",
+      "section": "products",
+      "required": true,
+      "min_items": 1,
+      "max_items": 4,
+      "help_text": "Daftar layanan cleaning (maksimal 4 layanan)",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Service Name",
+          "type": "text",
+          "required": true,
+          "max_length": 255,
+          "placeholder": "Cuci Sofa"
+        },
+        {
+          "key": "price",
+          "label": "Service Price",
+          "type": "text",
+          "required": true,
+          "max_length": 100,
+          "placeholder": "Mulai Rp 50.000"
+        },
+        {
+          "key": "link",
+          "label": "Service Link/Anchor",
+          "type": "text",
+          "required": true,
+          "max_length": 500,
+          "placeholder": "#layanan-sofa"
+        },
+        {
+          "key": "image",
+          "label": "Service Image",
+          "type": "image",
+          "required": false,
+          "max_size_mb": 1,
+          "allowed_types": ["jpg", "jpeg", "png", "webp"],
+          "storage_path": "website-assets/products"
+        }
+      ],
+      "value": [
+        {
+          "name": "Cuci Sofa Kering (Dry Cleaning)",
+          "price": "Mulai Rp 50.000/dudukan",
+          "link": "#sofa-dry-cleaning",
+          "image": "https://images.unsplash.com/photo-1627915570228-3e46d2966145?q=80&w=2070&auto=format&fit=crop"
+        },
+        {
+          "name": "Penghilang Noda Membandel",
+          "price": "Mulai Rp 75.000/area",
+          "link": "#stain-removal",
+          "image": "https://images.unsplash.com/photo-1549487922-2622f6412089?q=80&w=2070&auto=format&fit=crop"
+        },
+        {
+          "name": "Cuci Springbed & Kasur",
+          "price": "Mulai Rp 150.000/ukuran",
+          "link": "#springbed",
+          "image": "https://images.unsplash.com/photo-1543660506-6992d9d14690?q=80&w=2070&auto=format&fit=crop"
+        },
+        {
+          "name": "Cuci Karpet Area & Kantor",
+          "price": "Mulai Rp 20.000/m2",
+          "link": "#karpet",
+          "image": "https://images.unsplash.com/photo-1579753456381-8079a43586ff?q=80&w=2070&auto=format&fit=crop"
+        }
+      ]
+    },
+    {
+      "key": "social_links",
+      "label": "Social Media Links",
+      "type": "repeater",
+      "section": "social",
+      "required": false,
+      "max_items": 10,
+      "help_text": "Link media sosial bisnis",
+      "fields": [
+        {
+          "key": "platform",
+          "label": "Platform",
+          "type": "select",
+          "required": true,
+          "options": [
+            { "value": "facebook", "label": "Facebook" },
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "twitter", "label": "Twitter" },
+            { "value": "linkedin", "label": "LinkedIn" },
+            { "value": "youtube", "label": "YouTube" },
+            { "value": "tiktok", "label": "TikTok" }
+          ]
+        },
+        {
+          "key": "label",
+          "label": "Label",
+          "type": "text",
+          "required": true,
+          "max_length": 255
+        },
+        {
+          "key": "url",
+          "label": "URL",
+          "type": "text",
+          "required": true,
+          "max_length": 500
+        }
+      ],
+      "value": [
+        {
+          "platform": "facebook",
+          "label": "Bersih Maksimal Official",
+          "url": "https://facebook.com/bersihmaksimal"
+        },
+        {
+          "platform": "instagram",
+          "label": "@bersihmaksimal_id",
+          "url": "https://instagram.com/bersihmaksimal"
+        },
+        {
+          "platform": "youtube",
+          "label": "Tips Kebersihan Sofa",
+          "url": "https://youtube.com/c/BersihMaksimalChannel"
+        }
+      ]
+    },
+    {
+      "key": "testimonials",
+      "label": "Testimonials",
+      "type": "repeater",
+      "section": "testimonials",
+      "required": true,
+      "min_items": 1,
+      "max_items": 3,
+      "help_text": "Testimoni pelanggan (maksimal 3 testimoni)",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Customer Name",
+          "type": "text",
+          "required": true,
+          "max_length": 255
+        },
+        {
+          "key": "position",
+          "label": "Position/Location",
+          "type": "text",
+          "required": false,
+          "max_length": 255
+        },
+        {
+          "key": "content",
+          "label": "Testimonial Content",
+          "type": "textarea",
+          "required": true,
+          "max_length": 1000
+        },
+        {
+          "key": "photo",
+          "label": "Customer Photo",
+          "type": "image",
+          "required": false,
+          "max_size_mb": 1,
+          "allowed_types": ["jpg", "jpeg", "png", "webp"],
+          "storage_path": "website-assets/testimonials"
+        },
+        {
+          "key": "rating",
+          "label": "Rating",
+          "type": "select",
+          "required": true,
+          "options": [
+            { "value": "1", "label": "⭐" },
+            { "value": "2", "label": "⭐⭐" },
+            { "value": "3", "label": "⭐⭐⭐" },
+            { "value": "4", "label": "⭐⭐⭐⭐" },
+            { "value": "5", "label": "⭐⭐⭐⭐⭐" }
+          ],
+          "default": "5"
+        }
+      ],
+      "value": [
+        {
+          "name": "Bapak Rudi",
+          "position": "Pemilik Kafe, Jakarta Pusat",
+          "content": "Sofa kafe saya kembali bersih seperti baru setelah dicuci Bersih Maksimal. Pelayanan cepat dan hasilnya memuaskan. Sangat direkomendasikan!",
+          "photo": "testimonials/rudi.jpg",
+          "rating": "5"
+        },
+        {
+          "name": "Ibu Sari",
+          "position": "Ibu Rumah Tangga, Tangerang Selatan",
+          "content": "Bau apek di sofa kamar anak hilang total! Pengerjaan rapi dan profesional. Terima kasih Bersih Maksimal!",
+          "photo": "testimonials/sari.jpg",
+          "rating": "5"
+        },
+        {
+          "name": "Bapak Anton",
+          "position": "Direktur Pemasaran, Bekasi",
+          "content": "Jasa cuci karpet kantor sangat memuaskan, noda kopi hilang tanpa sisa. Karyawan jadi lebih nyaman bekerja. Top!",
+          "photo": "testimonials/anton.jpg",
+          "rating": "5"
+        }
+      ]
+    },
+    {
+      "key": "contact_address",
+      "label": "Contact Address",
+      "type": "textarea",
+      "section": "contact",
+      "required": false,
+      "max_length": 500,
+      "placeholder": "Area layanan atau alamat kantor",
+      "value": "Area Layanan: Jakarta, Bogor, Depok, Tangerang, Bekasi (JABODETABEK)"
+    },
+    {
+      "key": "contact_email",
+      "label": "Contact Email",
+      "type": "email",
+      "section": "contact",
+      "required": false,
+      "max_length": 255,
+      "placeholder": "email@example.com",
+      "value": "cs@bersihmaksimal.com"
+    },
+    {
+      "key": "contact_phone",
+      "label": "Contact Phone",
+      "type": "text",
+      "section": "contact",
+      "required": false,
+      "max_length": 20,
+      "placeholder": "+628123456789",
+      "value": "+628123456890"
+    },
+    {
+      "key": "whatsapp_number",
+      "label": "WhatsApp Number",
+      "type": "text",
+      "section": "whatsapp",
+      "required": false,
+      "max_length": 20,
+      "placeholder": "628123456789",
+      "help_text": "Format: 628123456789 (tanpa tanda +)",
+      "value": "628123456890"
+    },
+    {
+      "key": "whatsapp_greeting_text",
+      "label": "WhatsApp Button Text",
+      "type": "text",
+      "section": "whatsapp",
+      "required": false,
+      "max_length": 255,
+      "placeholder": "Chat Sekarang",
+      "value": "Chat sekarang & konsultasi gratis!"
+    },
+    {
+      "key": "whatsapp_message",
+      "label": "WhatsApp Default Message",
+      "type": "textarea",
+      "section": "whatsapp",
+      "required": false,
+      "max_length": 500,
+      "placeholder": "Halo, saya ingin bertanya...",
+      "value": "Halo Bersih Maksimal, saya ingin bertanya tentang layanan cuci sofa. Apakah ada promo saat ini?"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+    "name": "Company",
+    "description": "Template website company profile profesional dengan fitur hero, tentang perusahaan, galeri, produk, testimoni, dan kontak. Cocok untuk perusahaan Gas & Oil, konstruksi, dan bisnis korporat lainnya.",
+    "category": "business",
+    "price": "5000000.00",
+    "is_active": true,
+    "sort_order": 2,
+    "version": "1.0.0",
+    "author": "DR-SaaS",
+    "updated_at": "2025-10-13T04:57:55.423852Z",
+    "fields": [
+        {
+            "key": "site_title",
+            "label": "Site Title",
+            "type": "text",
+            "required": true,
+            "default": "Company"
+        },
+        {
+            "key": "site_description",
+            "label": "Site Description",
+            "type": "textarea",
+            "required": false,
+            "default": "Template website company profile profesional dengan fitur hero, tentang perusahaan, galeri, produk, testimoni, dan kontak. Cocok untuk perusahaan Gas & Oil, konstruksi, dan bisnis korporat lainnya."
+        },
+        {
+            "key": "hero_title",
+            "label": "Hero Title",
+            "type": "text",
+            "required": true,
+            "default": "Welcome to Our Website"
+        },
+        {
+            "key": "hero_description",
+            "label": "Hero Description",
+            "type": "textarea",
+            "required": false,
+            "default": "This is a sample template description."
+        },
+        {
+            "key": "main_content",
+            "label": "Main Content",
+            "type": "rich_text",
+            "required": false,
+            "default": "Add your main content here."
+        }
+    ]
+}

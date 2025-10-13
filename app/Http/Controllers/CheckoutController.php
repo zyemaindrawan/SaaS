@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
-use App\Models\Voucher;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
@@ -88,7 +87,6 @@ class CheckoutController extends Controller
 
         $user = Auth::user();
         $validationRules = $this->getValidationRules($template);
-        $validationRules['voucher_code'] = 'nullable|string|max:255';
         
         try {
             $validated = $request->validate($validationRules);
@@ -109,33 +107,8 @@ class CheckoutController extends Controller
         $subtotal = $template->price;
         $platformFee = 4000;
         $discount = 0;
-        $voucherId = null;
 
-        // Handle voucher logic
-        if (!empty($validated['voucher_code'])) {
-            $voucher = Voucher::where('code', strtoupper(trim($validated['voucher_code'])))
-                ->active()
-                ->first();
-
-            if (!$voucher) {
-                throw ValidationException::withMessages([
-                    'voucher_code' => 'The provided voucher is invalid or has expired.',
-                ]);
-            }
-
-            // Check minimum purchase requirement
-            if ($voucher->min_purchase && $subtotal < $voucher->min_purchase) {
-                throw ValidationException::withMessages([
-                    'voucher_code' => 'Minimum purchase amount of Rp ' . number_format($voucher->min_purchase, 0, ',', '.') . ' is required for this voucher.',
-                ]);
-            }
-
-            // Calculate discount using the model method
-            $discount = $voucher->calculateDiscount($subtotal);
-            $voucherId = $voucher->id;
-        }
-
-        // Calculate total after discount
+        // Calculate total for checkout
         $total = $subtotal + $platformFee - $discount;
         $total = max(0, $total); // Ensure total is not negative
 
@@ -161,9 +134,9 @@ class CheckoutController extends Controller
                     throw ValidationException::withMessages(['website_name' => 'Nama website wajib diisi']);
                 }
                 
-                if (empty($validated['subdomain'])) {
-                    throw ValidationException::withMessages(['subdomain' => 'Subdomain wajib diisi']);
-                }
+                // if (empty($validated['subdomain'])) {
+                //     throw ValidationException::withMessages(['subdomain' => 'Subdomain wajib diisi']);
+                // }
 
                 // Create website content
                 $websiteContent = WebsiteContent::create([
@@ -172,7 +145,7 @@ class CheckoutController extends Controller
                     'website_name' => $validated['website_name'],
                     'content_data' => $contentData,
                     'status' => 'draft',
-                    'subdomain' => $validated['subdomain'],
+                    //'subdomain' => $validated['subdomain'],
                     'expires_at' => now()->addYear(),
                 ]);
 
@@ -231,7 +204,6 @@ class CheckoutController extends Controller
                     'platform_fee' => $platformFee,
                     'discount' => $discount,
                     'total' => $total,
-                    'voucher_code' => !empty($validated['voucher_code']) ? $validated['voucher_code'] : null,
                 ];
                 
                 // Log::info('Creating payment', [
@@ -292,112 +264,139 @@ class CheckoutController extends Controller
 
     private function getTemplateFormFields($template)
     {
-        // Base fields untuk semua template
-        $baseFields = [
-            [
-                'key' => 'company_name',
-                'label' => 'Company Name',
-                'type' => 'text',
-                'required' => true,
-                'placeholder' => 'PT. Your Company Name',
-                'section' => 'company'
-            ],
+        return [
             [
                 'key' => 'website_name',
                 'label' => 'Website Name',
                 'type' => 'text',
                 'required' => true,
-                'placeholder' => 'Your Website Name',
-                'section' => 'company'
+                'placeholder' => 'Nama Web Saya',
+                'section' => 'general',
+            ],
+            // [
+            //     'key' => 'subdomain',
+            //     'label' => 'Subdomain',
+            //     'type' => 'subdomain',
+            //     'required' => true,
+            //     'placeholder' => 'demo123',
+            //     'section' => 'general',
+            // ],
+            [
+                'key' => 'company_name',
+                'label' => 'Company Name',
+                'type' => 'text',
+                'required' => true,
+                'placeholder' => 'PT Maju Jaya',
+                'section' => 'branding',
             ],
             [
                 'key' => 'company_tagline',
                 'label' => 'Company Tagline',
                 'type' => 'text',
                 'required' => false,
-                'placeholder' => 'Your company tagline',
-                'section' => 'company'
+                'placeholder' => 'Mays and Wagner',
+                'section' => 'branding',
             ],
             [
-                'key' => 'seo_title',
-                'label' => 'SEO Title',
+                'key' => 'company_logo',
+                'label' => 'Company Logo',
+                'type' => 'file',
+                'required' => false,
+                'section' => 'branding',
+            ],
+            [
+                'key' => 'favicon',
+                'label' => 'Favicon',
+                'type' => 'file',
+                'required' => false,
+                'section' => 'branding',
+            ],
+            [
+                'key' => 'hero_title',
+                'label' => 'Hero Title',
                 'type' => 'text',
                 'required' => true,
-                'placeholder' => 'Website title for search engines',
-                'max_length' => 60,
-                'section' => 'seo'
+                'placeholder' => 'Selamat Datang',
+                'section' => 'hero',
             ],
             [
-                'key' => 'seo_description',
-                'label' => 'SEO Description',
+                'key' => 'hero_subtitle',
+                'label' => 'Hero Subtitle',
                 'type' => 'textarea',
                 'required' => true,
-                'placeholder' => 'Website description for search engines',
-                'max_length' => 160,
-                'section' => 'seo'
+                'placeholder' => 'Assumenda aperiam re',
+                'section' => 'hero',
             ],
             [
-                'key' => 'contact_email',
-                'label' => 'Contact Email',
-                'type' => 'email',
-                'required' => true,
-                'placeholder' => 'contact@company.com',
-                'section' => 'contact'
-            ],
-            [
-                'key' => 'contact_phone',
-                'label' => 'Contact Phone',
-                'type' => 'tel',
-                'required' => true,
-                'placeholder' => '+62 812-3456-7890',
-                'section' => 'contact'
-            ],
-            [
-                'key' => 'contact_address',
-                'label' => 'Complete Address',
-                'type' => 'textarea',
-                'required' => true,
-                'placeholder' => 'Your complete business address',
-                'section' => 'contact'
-            ],
-            [
-                'key' => 'services',
-                'label' => 'Services',
-                'type' => 'repeater',
+                'key' => 'hero_background',
+                'label' => 'Hero Background',
+                'type' => 'file',
                 'required' => false,
+                'section' => 'hero',
+            ],
+            [
+                'key' => 'about_title',
+                'label' => 'About Title',
+                'type' => 'text',
+                'required' => false,
+                'placeholder' => 'Welcome To The World',
+                'section' => 'about',
+            ],
+            [
+                'key' => 'about_content',
+                'label' => 'About Content',
+                'type' => 'textarea',
+                'required' => false,
+                'placeholder' => 'Ceritakan tentang perusahaan Anda...',
+                'section' => 'about',
+            ],
+            [
+                'key' => 'about_image',
+                'label' => 'About Image',
+                'type' => 'file',
+                'required' => false,
+                'section' => 'about',
+            ],
+            [
+                'key' => 'products',
+                'label' => 'Products',
+                'type' => 'repeater',
+                'required' => true,
                 'min_items' => 1,
-                'max_items' => 10,
+                'max_items' => 12,
                 'section' => 'content',
                 'fields' => [
                     [
-                        'key' => 'title',
-                        'label' => 'Service Title',
+                        'key' => 'name',
+                        'label' => 'Product Name',
                         'type' => 'text',
                         'required' => true,
-                        'placeholder' => 'Service name'
                     ],
                     [
-                        'key' => 'description',
-                        'label' => 'Service Description',
-                        'type' => 'textarea',
-                        'required' => true,
-                        'placeholder' => 'Describe your service'
-                    ],
-                    [
-                        'key' => 'icon',
-                        'label' => 'Icon Class',
+                        'key' => 'price',
+                        'label' => 'Product Price',
                         'type' => 'text',
+                        'required' => true,
+                    ],
+                    [
+                        'key' => 'link',
+                        'label' => 'Product Link',
+                        'type' => 'url',
+                        'required' => true,
+                    ],
+                    [
+                        'key' => 'image',
+                        'label' => 'Product Image',
+                        'type' => 'file',
                         'required' => false,
-                        'placeholder' => 'fas fa-chart-line'
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'key' => 'social_links',
-                'label' => 'Social Media Links',
+                'label' => 'Social Links',
                 'type' => 'repeater',
                 'required' => false,
-                'min_items' => 0,
                 'max_items' => 10,
                 'section' => 'social',
                 'fields' => [
@@ -412,318 +411,190 @@ class CheckoutController extends Controller
                             'twitter' => 'Twitter',
                             'linkedin' => 'LinkedIn',
                             'youtube' => 'YouTube',
-                            'tiktok' => 'TikTok'
-                        ]
+                            'tiktok' => 'TikTok',
+                        ],
+                    ],
+                    [
+                        'key' => 'label',
+                        'label' => 'Label',
+                        'type' => 'text',
+                        'required' => true,
                     ],
                     [
                         'key' => 'url',
                         'label' => 'URL',
                         'type' => 'url',
                         'required' => true,
-                        'placeholder' => 'https://facebook.com/yourpage'
+                    ],
+                ],
+            ],
+            [
+                'key' => 'testimonials',
+                'label' => 'Testimonials',
+                'type' => 'repeater',
+                'required' => true,
+                'min_items' => 1,
+                'max_items' => 10,
+                'section' => 'social-proof',
+                'fields' => [
+                    [
+                        'key' => 'name',
+                        'label' => 'Name',
+                        'type' => 'text',
+                        'required' => true,
                     ],
                     [
-                        'key' => 'label',
-                        'label' => 'Display Label',
+                        'key' => 'position',
+                        'label' => 'Position',
                         'type' => 'text',
                         'required' => false,
-                        'placeholder' => 'Follow us on Facebook'
-                    ]
-                ]
+                    ],
+                    [
+                        'key' => 'rating',
+                        'label' => 'Rating',
+                        'type' => 'select',
+                        'required' => true,
+                        'options' => [
+                            '5' => '5',
+                            '4' => '4',
+                            '3' => '3',
+                            '2' => '2',
+                            '1' => '1',
+                        ],
+                    ],
+                    [
+                        'key' => 'content',
+                        'label' => 'Content',
+                        'type' => 'textarea',
+                        'required' => true,
+                    ],
+                    [
+                        'key' => 'photo',
+                        'label' => 'Photo',
+                        'type' => 'file',
+                        'required' => false,
+                    ],
+                ],
             ],
             [
-                'key' => 'primary_color',
-                'label' => 'Primary Color',
-                'type' => 'color',
-                'required' => true,
-                'default' => '#2146ff',
-                'section' => 'design'
-            ],
-            [
-                'key' => 'secondary_color',
-                'label' => 'Secondary Color',
-                'type' => 'color',
+                'key' => 'contact_address',
+                'label' => 'Contact Address',
+                'type' => 'textarea',
                 'required' => false,
-                'default' => '#64748b',
-                'section' => 'design'
+                'section' => 'contact',
             ],
             [
-                'key' => 'subdomain',
-                'label' => 'Website Address',
-                'type' => 'subdomain',
-                'required' => true,
-                'placeholder' => 'yourwebsite',
-                'suffix' => '.oursite.com',
-                'section' => 'settings'
-            ]
+                'key' => 'contact_email',
+                'label' => 'Contact Email',
+                'type' => 'email',
+                'required' => false,
+                'section' => 'contact',
+            ],
+            [
+                'key' => 'contact_phone',
+                'label' => 'Contact Phone',
+                'type' => 'text',
+                'required' => false,
+                'section' => 'contact',
+            ],
+            [
+                'key' => 'whatsapp_number',
+                'label' => 'WhatsApp Number',
+                'type' => 'text',
+                'required' => false,
+                'section' => 'whatsapp',
+            ],
+            [
+                'key' => 'whatsapp_greeting_text',
+                'label' => 'WhatsApp Button Text',
+                'type' => 'text',
+                'required' => false,
+                'section' => 'whatsapp',
+            ],
+            [
+                'key' => 'whatsapp_message',
+                'label' => 'WhatsApp Message',
+                'type' => 'textarea',
+                'required' => false,
+                'section' => 'whatsapp',
+            ],
         ];
-
-        // Template-specific fields berdasarkan kategori
-        $specificFields = $this->getTemplateSpecificFields($template);
-
-        return array_merge($baseFields, $specificFields);
-    }
-
-    private function getTemplateSpecificFields($template)
-    {
-        $fields = [];
-
-        switch ($template->category) {
-            case 'corporate':
-                $fields[] = [
-                    'key' => 'company_stats',
-                    'label' => 'Company Statistics',
-                    'type' => 'repeater',
-                    'required' => false,
-                    'max_items' => 4,
-                    'section' => 'content',
-                    'fields' => [
-                        [
-                            'key' => 'number',
-                            'label' => 'Number',
-                            'type' => 'text',
-                            'required' => true,
-                            'placeholder' => '500+'
-                        ],
-                        [
-                            'key' => 'label',
-                            'label' => 'Label',
-                            'type' => 'text',
-                            'required' => true,
-                            'placeholder' => 'Happy Clients'
-                        ],
-                        [
-                            'key' => 'icon',
-                            'label' => 'Icon',
-                            'type' => 'text',
-                            'required' => false,
-                            'placeholder' => 'fas fa-users'
-                        ]
-                    ]
-                ];
-                break;
-
-            case 'portfolio':
-                $fields[] = [
-                    'key' => 'portfolio_items',
-                    'label' => 'Portfolio Items',
-                    'type' => 'repeater',
-                    'required' => false,
-                    'max_items' => 12,
-                    'section' => 'content',
-                    'fields' => [
-                        [
-                            'key' => 'title',
-                            'label' => 'Project Title',
-                            'type' => 'text',
-                            'required' => true,
-                            'placeholder' => 'Project name'
-                        ],
-                        [
-                            'key' => 'category',
-                            'label' => 'Category',
-                            'type' => 'text',
-                            'required' => true,
-                            'placeholder' => 'Web Design'
-                        ],
-                        [
-                            'key' => 'image_url',
-                            'label' => 'Image URL',
-                            'type' => 'url',
-                            'required' => false,
-                            'placeholder' => 'https://example.com/image.jpg'
-                        ],
-                        [
-                            'key' => 'description',
-                            'label' => 'Description',
-                            'type' => 'textarea',
-                            'required' => false,
-                            'placeholder' => 'Project description'
-                        ]
-                    ]
-                ];
-                break;
-        }
-
-        return $fields;
     }
 
     private function getValidationRules($template)
     {
-        $rules = [
-            // Company Info
+        return [
+            'website_name' => 'required|string|max:255',
+            // subdomain dihapus dari validasi
             'company_name' => 'required|string|max:255',
             'company_tagline' => 'nullable|string|max:255',
-            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
-            
-            // Website Basics
-            'website_name' => 'required|string|max:255',
-            'subdomain' => 'required|string|min:3|max:50|regex:/^[a-z0-9-]+$/|unique:website_contents,subdomain',
-            'font_family' => 'required|string|in:inter,poppins,nunito,roboto',
-            'border_radius' => 'required|string|in:none,small,medium,large',
-            
-            // Colors
-            'primary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'secondary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'accent_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'whatsapp_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            
-            // SEO
-            'seo_title' => 'required|string|max:60',
-            'seo_description' => 'required|string|max:160',
-            'seo_keywords' => 'required|string|max:500',
-            'robots_meta' => 'required|string',
+            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
             'favicon' => 'nullable|file|mimes:ico,png|max:1024',
-            'og_image' => 'nullable|image|max:4096',
-            
-            // Contact
-            'contact_email' => 'required|email|max:255',
-            'contact_phone' => 'required|string|max:20',
-            'contact_address' => 'required|string|max:500',
-            'contact_title' => 'nullable|string|max:255',
-            
-            // Hero Section
-            'hero_title' => 'required|string|max:255',
-            'hero_subtitle' => 'required|string|max:500',
-            'hero_background' => 'nullable|image|max:6144',
-            'hero_cta_text' => 'required|string|max:50',
-            'hero_cta_link' => 'required|string|max:255',
-            
-            // About Section
+            // 'hero_title' => 'required|string|max:255',
+            // 'hero_subtitle' => 'required|string|max:500',
+            // 'hero_background' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
             'about_title' => 'nullable|string|max:255',
             'about_content' => 'nullable|string|max:2000',
-            'about_image' => 'nullable|image|max:4096',
+            'about_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
             
-            // Services Section
-            'services_title' => 'required|string|max:255',
-            'services_subtitle' => 'nullable|string|max:500',
-            'services' => 'required|array|min:1|max:10',
-            'services.*.title' => 'required|string|max:255',
-            'services.*.description' => 'required|string|max:1000',
-            'services.*.icon' => 'required|string|max:100',
-            'services.*.link' => 'required|string|max:255',
+            // Gallery photos - maksimal 4 items
+            'gallery_photos' => 'nullable|array|max:4',
+            'gallery_photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
             
-            // Company Stats
-            'company_stats' => 'required|array|min:1|max:6',
-            'company_stats.*.icon' => 'required|string|max:100',
-            'company_stats.*.label' => 'required|string|max:100',
-            'company_stats.*.number' => 'required|string|max:20',
+            // Products - maksimal 4 items
+            'products' => 'required|array|min:1|max:4',
+            'products.*.name' => 'required|string|max:255',
+            'products.*.price' => 'required|string|max:100',
+            'products.*.link' => 'required|string|max:500',
+            'products.*.image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
             
-            // Social Media
             'social_links' => 'nullable|array|max:10',
             'social_links.*.platform' => 'required|string|in:facebook,instagram,twitter,linkedin,youtube,tiktok',
-            'social_links.*.url' => 'required|url|max:500',
             'social_links.*.label' => 'required|string|max:255',
+            'social_links.*.url' => 'required|url|max:500',
             
-            // Testimonials
-            'testimonials_title' => 'required|string|max:255',
-            'testimonials' => 'required|array|min:1|max:10',
+            // Testimonials - maksimal 3 items
+            'testimonials' => 'required|array|min:1|max:3',
             'testimonials.*.name' => 'required|string|max:255',
-            'testimonials.*.photo' => 'nullable|image|max:2048',
+            'testimonials.*.photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
             'testimonials.*.rating' => 'required|string|in:1,2,3,4,5',
             'testimonials.*.content' => 'required|string|max:1000',
-            'testimonials.*.position' => 'required|string|max:255',
+            'testimonials.*.position' => 'nullable|string|max:255',
             
-            // Gallery
-            'gallery_title' => 'nullable|string|max:255',
-            'gallery_photos' => 'nullable|array|max:12',
-            'gallery_photos.*' => 'nullable|image|max:4096',
-            
-            // WhatsApp Integration
-            'whatsapp_enabled' => 'required|boolean',
-            'whatsapp_number' => 'nullable|required_if:whatsapp_enabled,true|string|max:20',
-            'whatsapp_message' => 'nullable|required_if:whatsapp_enabled,true|string|max:500',
-            'whatsapp_position' => 'nullable|required_if:whatsapp_enabled,true|string|in:bottom-left,bottom-right',
+            'contact_address' => 'nullable|string|max:500',
+            'contact_email' => 'nullable|email|max:255',
+            'contact_phone' => 'nullable|string|max:20',
+            'whatsapp_number' => 'nullable|string|max:20',
             'whatsapp_greeting_text' => 'nullable|string|max:255',
-            
-            // Analytics
-            'google_analytics' => 'nullable|string|max:50',
-            'google_tag_manager' => 'nullable|string|max:50',
-            
-            // Form Control
-            'agree_terms' => 'required|accepted',
-            'voucher_code' => 'nullable|string|max:255',
+            'whatsapp_message' => 'nullable|string|max:500',
         ];
-
-        // Template-specific validation rules
-        if ($template->category === 'corporate') {
-            // Company Stats
-            $rules['company_stats'] = 'required|array|min:1|max:4';
-            $rules['company_stats.*.number'] = 'required|string|max:20';
-            $rules['company_stats.*.label'] = 'required|string|max:100';
-            $rules['company_stats.*.icon'] = 'required|string|max:100';
-            
-            // Hero section is required for corporate
-            $rules['hero_title'] = 'required|string|max:255';
-            $rules['hero_subtitle'] = 'required|string|max:500';
-            $rules['hero_background'] = 'required|image|max:6144';
-            
-            // About section is required for corporate
-            $rules['about_title'] = 'nullable|string|max:255';
-            $rules['about_content'] = 'nullable|string|max:2000';
-            $rules['about_image'] = 'nullable|image|max:4096';
-            
-            // Services section is required
-            $rules['services'] = 'required|array|min:3|max:10';
-            $rules['services.*.title'] = 'required|string|max:255';
-            $rules['services.*.description'] = 'required|string|min:50|max:1000';
-            $rules['services.*.icon'] = 'required|string|max:100';
-            $rules['services.*.link'] = 'required|string|max:255';
-        }
-
-        if ($template->category === 'dealer') {
-            $rules['cars'] = 'nullable|array|max:50';
-            $rules['cars.*.name'] = 'required_with:cars|string|max:255';
-            $rules['cars.*.type'] = 'nullable|string|max:50';
-            $rules['cars.*.year'] = 'nullable|string|max:10';
-            $rules['cars.*.image'] = 'nullable';
-            $rules['cars.*.price'] = 'nullable|string|max:255';
-            $rules['cars.*.features'] = 'nullable|string|max:2000';
-            $rules['cars.*.transmission'] = 'nullable|string|max:50';
-            $rules['cars.*.whatsapp_sales'] = 'nullable|string|max:30';
-
-            $rules['promo_banner'] = 'nullable';
-            $rules['promo_title'] = 'nullable|string|max:255';
-            $rules['promo_description'] = 'nullable|string|max:5000';
-        }
-
-        // if ($template->category === 'portfolio') {
-        //     $rules['portfolio_items'] = 'nullable|array|max:12';
-        //     $rules['portfolio_items.*.title'] = 'required|string|max:255';
-        //     $rules['portfolio_items.*.category'] = 'required|string|max:100';
-        //     'portfolio_items.*.image_url' => 'nullable|url|max:500';
-        //     'portfolio_items.*.description' => 'nullable|string|max:1000';
-        // }
-
-        return $rules;
     }
 
     private function processContentData($validated, $template)
     {
-        // Process dan clean up data sebelum disimpan
         $contentData = $validated;
 
-        // Remove non-content fields
-        unset($contentData['agree_terms']);
-        unset($contentData['voucher_code']);
-        // Don't unset subdomain here since we need it for validation
-        
-        // Process repeater fields
-        if (isset($contentData['services'])) {
-            $contentData['services'] = array_values(array_filter($contentData['services'], function ($service) {
-                return !empty($service['title']) && !empty($service['description']);
-            }));
+        if (isset($contentData['products'])) {
+            $processedProducts = [];
+
+            foreach ($contentData['products'] as $product) {
+                if (empty($product['name'])) {
+                    continue;
+                }
+
+                if (array_key_exists('image', $product)) {
+                    $product['image'] = $this->storeUploadedFile($product['image'], 'website-assets/products');
+                }
+
+                $processedProducts[] = $product;
+            }
+
+            $contentData['products'] = array_values($processedProducts);
         }
 
         if (isset($contentData['social_links'])) {
             $contentData['social_links'] = array_values(array_filter($contentData['social_links'], function ($link) {
                 return !empty($link['platform']) && !empty($link['url']);
-            }));
-        }
-
-        if (isset($contentData['company_stats'])) {
-            $contentData['company_stats'] = array_values(array_filter($contentData['company_stats'], function ($stat) {
-                return !empty($stat['label']) && !empty($stat['number']);
             }));
         }
 
@@ -745,36 +616,23 @@ class CheckoutController extends Controller
             $contentData['testimonials'] = array_values($processedTestimonials);
         }
 
-        if (isset($contentData['cars'])) {
-            $processedCars = [];
-
-            foreach ($contentData['cars'] as $car) {
-                if (empty($car['name'])) {
-                    continue;
-                }
-
-                if (array_key_exists('image_preview', $car)) {
-                    unset($car['image_preview']);
-                }
-
-                if (array_key_exists('image', $car)) {
-                    $car['image'] = $this->storeUploadedFile($car['image'], 'website-assets/cars');
-                }
-
-                $processedCars[] = $car;
-            }
-
-            $contentData['cars'] = array_values($processedCars);
-        }
-
-        // Store single image/file fields
         $fileFields = [
             'company_logo' => 'website-assets/company-logos',
             'favicon' => 'website-assets/favicons',
-            'og_image' => 'website-assets/og-images',
             'hero_background' => 'website-assets/hero-backgrounds',
             'about_image' => 'website-assets/about-images',
         ];
+
+        // Process gallery photos
+        if (isset($contentData['gallery_photos'])) {
+            $processedGallery = [];
+            foreach ($contentData['gallery_photos'] as $photo) {
+                if ($photo) {
+                    $processedGallery[] = $this->storeUploadedFile($photo, 'website-assets/gallery_photos');
+                }
+            }
+            $contentData['gallery_photos'] = array_values(array_filter($processedGallery));
+        }
 
         foreach ($fileFields as $field => $directory) {
             if (array_key_exists($field, $contentData)) {
@@ -782,42 +640,9 @@ class CheckoutController extends Controller
             }
         }
 
-        if (array_key_exists('promo_banner', $contentData)) {
-            $contentData['promo_banner'] = $this->storeUploadedFile($contentData['promo_banner'], 'website-assets/promo-banners');
-        }
-
-        // Process gallery photos
-        if (isset($contentData['gallery_photos']) && is_array($contentData['gallery_photos'])) {
-            $galleryPaths = [];
-
-            foreach ($contentData['gallery_photos'] as $photo) {
-                $stored = $this->storeUploadedFile($photo, 'website-assets/gallery');
-
-                if ($stored) {
-                    $galleryPaths[] = $stored;
-                }
-            }
-
-            $contentData['gallery_photos'] = $galleryPaths;
-        }
-
-        // Set default values jika tidak disediakan
-        $defaults = [
-            'font_family' => 'inter',
-            'border_radius' => 'medium',
-            'whatsapp_enabled' => false,
-            'whatsapp_position' => 'bottom-right',
-            'robots_meta' => 'index,follow',
-        ];
-
-        foreach ($defaults as $key => $value) {
-            if (!isset($contentData[$key])) {
-                $contentData[$key] = $value;
-            }
-        }
-
         return $contentData;
     }
+
 
     private function storeUploadedFile($value, string $directory): ?string
     {

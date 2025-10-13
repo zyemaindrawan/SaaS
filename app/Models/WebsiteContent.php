@@ -61,12 +61,14 @@ class WebsiteContent extends Model
 
     public function getPublicUrl(): string
     {
+        // if ($this->custom_domain) {
+        //     return "https://{$this->custom_domain}";
+        // }
+
         if ($this->custom_domain) {
             return "https://{$this->custom_domain}";
-        }
-        
-        if ($this->subdomain) {
-            return "https://{$this->subdomain}." . config('app.domain');
+        } else {
+            return "/preview/{$this->id}";
         }
         
         return route('website.view', $this->id);
