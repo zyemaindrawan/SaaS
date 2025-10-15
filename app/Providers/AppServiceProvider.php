@@ -5,20 +5,20 @@ namespace App\Providers;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use App\Models\User;
+use App\Models\Payment;
+use App\Models\WebsiteContent;
+use App\Observers\UserObserver;
+use App\Observers\PaymentObserver;
+use App\Observers\WebsiteContentObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
@@ -27,5 +27,10 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.url') && str_starts_with(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
+
+        // Register Observer
+        User::observe(UserObserver::class);
+        Payment::observe(PaymentObserver::class);
+        WebsiteContent::observe(WebsiteContentObserver::class);
     }
 }

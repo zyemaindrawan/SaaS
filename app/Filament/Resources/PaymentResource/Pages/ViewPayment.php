@@ -13,6 +13,8 @@ use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Actions\Action as InfolistAction;
+use Illuminate\Support\Facades\Auth;
 
 class ViewPayment extends ViewRecord
 {
@@ -93,7 +95,7 @@ class ViewPayment extends ViewRecord
                         [
                             'refund_amount' => $refundAmount,
                             'original_amount' => $this->record->final_amount,
-                            'processed_by' => auth()->user()?->name ?? 'System',
+                            'processed_by' => Auth::check() ? Auth::user()->name : 'System',
                         ]
                     );
                     
@@ -151,8 +153,15 @@ class ViewPayment extends ViewRecord
                         TextEntry::make('user.name')
                             ->label('Customer')
                             ->icon('heroicon-o-user')
-                            ->openUrlInNewTab()
-                            ->color('primary'),
+                            ->color('primary')
+                            ->action(
+                                InfolistAction::make('viewUser')
+                                    ->modalHeading(fn ($record) => "User Details: {$record->user->name}")
+                                    ->modalContent(fn ($record) => view('filament.infolists.user-details', ['user' => $record->user]))
+                                    ->modalWidth('xl')
+                                    ->modalSubmitAction(false)
+                                    ->modalCancelActionLabel('Close')
+                            ),
                         
                         TextEntry::make('websiteContent.template.name')
                             ->label('Template')
@@ -208,65 +217,65 @@ class ViewPayment extends ViewRecord
                             ->color('success'),
                     ]),
 
-                Section::make('Timeline & Dates')
-                    ->icon('heroicon-o-calendar')
-                    ->columns(2)
-                    ->schema([
-                        TextEntry::make('created_at')
-                            ->label('Created At')
-                            ->icon('heroicon-o-plus-circle')
-                            ->dateTime('M j, Y \a\t g:i A')
-                            ->color('info'),
+                // Section::make('Timeline & Dates')
+                //     ->icon('heroicon-o-calendar')
+                //     ->columns(2)
+                //     ->schema([
+                //         TextEntry::make('created_at')
+                //             ->label('Created At')
+                //             ->icon('heroicon-o-plus-circle')
+                //             ->dateTime('M j, Y \a\t g:i A')
+                //             ->color('info'),
                         
-                        TextEntry::make('paid_at')
-                            ->label('Paid At')
-                            ->icon('heroicon-o-check-circle')
-                            ->dateTime('M j, Y \a\t g:i A')
-                            ->placeholder('Not paid yet')
-                            ->color('success'),
+                //         TextEntry::make('paid_at')
+                //             ->label('Paid At')
+                //             ->icon('heroicon-o-check-circle')
+                //             ->dateTime('M j, Y \a\t g:i A')
+                //             ->placeholder('Not paid yet')
+                //             ->color('success'),
                         
-                        TextEntry::make('expired_at')
-                            ->label('Expires At')
-                            ->icon('heroicon-o-calendar-days')
-                            ->dateTime('M j, Y \a\t g:i A')
-                            ->color(fn ($record): string => 
-                                $record->expired_at && $record->expired_at->isPast() ? 'danger' : 'warning'
-                            ),
+                //         TextEntry::make('expired_at')
+                //             ->label('Expires At')
+                //             ->icon('heroicon-o-calendar-days')
+                //             ->dateTime('M j, Y \a\t g:i A')
+                //             ->color(fn ($record): string => 
+                //                 $record->expired_at && $record->expired_at->isPast() ? 'danger' : 'warning'
+                //             ),
                         
-                        TextEntry::make('transaction_time')
-                            ->label('Transaction Time')
-                            ->icon('heroicon-o-clock')
-                            ->dateTime('M j, Y \a\t g:i A')
-                            ->placeholder('No transaction time')
-                            ->color('gray'),
-                    ]),
+                //         // TextEntry::make('transaction_time')
+                //         //     ->label('Transaction Time')
+                //         //     ->icon('heroicon-o-clock')
+                //         //     ->dateTime('M j, Y \a\t g:i A')
+                //         //     ->placeholder('No transaction time')
+                //         //     ->color('gray'),
+                //     ]),
 
-                Section::make('Payment Methods & Gateway')
-                    ->icon('heroicon-o-credit-card')
-                    ->columns(3)
-                    ->schema([
-                        TextEntry::make('payment_type')
-                            ->label('Payment Method')
-                            ->icon('heroicon-o-credit-card')
-                            ->placeholder('Not specified')
-                            ->badge()
-                            ->color('blue'),
+                // Section::make('Payment Methods & Gateway')
+                //     ->icon('heroicon-o-credit-card')
+                //     ->columns(3)
+                //     ->schema([
+                //         TextEntry::make('payment_type')
+                //             ->label('Payment Method')
+                //             ->icon('heroicon-o-credit-card')
+                //             ->placeholder('Not specified')
+                //             ->badge()
+                //             ->color('blue'),
                         
-                        TextEntry::make('gross_amount')
-                            ->label('Gross Amount')
-                            ->icon('heroicon-o-calculator')
-                            ->money('IDR'),
+                //         TextEntry::make('gross_amount')
+                //             ->label('Gross Amount')
+                //             ->icon('heroicon-o-calculator')
+                //             ->money('IDR'),
                         
-                        IconEntry::make('has_midtrans_data')
-                            ->label('Gateway Data Available')
-                            ->getStateUsing(fn ($record): bool => !empty($record->midtrans_data))
-                            ->boolean()
-                            ->trueIcon('heroicon-o-check-circle')
-                            ->falseIcon('heroicon-o-x-circle')
-                            ->trueColor('success')
-                            ->falseColor('danger'),
+                //         IconEntry::make('has_midtrans_data')
+                //             ->label('Gateway Data Available')
+                //             ->getStateUsing(fn ($record): bool => !empty($record->midtrans_data))
+                //             ->boolean()
+                //             ->trueIcon('heroicon-o-check-circle')
+                //             ->falseIcon('heroicon-o-x-circle')
+                //             ->trueColor('success')
+                //             ->falseColor('danger'),
 
-                    ]),
+                //     ]),
 
                 Section::make('Payment Gateway Response')
                     ->icon('heroicon-o-server')
@@ -304,42 +313,42 @@ class ViewPayment extends ViewRecord
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('Related Information')
-                    ->icon('heroicon-o-link')
-                    ->collapsed()
-                    ->columns(2)
-                    ->schema([
-                        TextEntry::make('user.email')
-                            ->label('Customer Email')
-                            ->icon('heroicon-o-envelope')
-                            ->copyable(),
+                // Section::make('Related Information')
+                //     ->icon('heroicon-o-link')
+                //     ->collapsed()
+                //     ->columns(2)
+                //     ->schema([
+                //         TextEntry::make('user.email')
+                //             ->label('Customer Email')
+                //             ->icon('heroicon-o-envelope')
+                //             ->copyable(),
                         
-                        TextEntry::make('user.phone')
-                            ->label('Customer Phone')
-                            ->icon('heroicon-o-phone')
-                            ->copyable()
-                            ->placeholder('No phone number'),
+                //         TextEntry::make('user.phone')
+                //             ->label('Customer Phone')
+                //             ->icon('heroicon-o-phone')
+                //             ->copyable()
+                //             ->placeholder('No phone number'),
                         
-                        TextEntry::make('websiteContent.subdomain')
-                            ->label('Website Subdomain')
-                            ->icon('heroicon-o-link')
-                            ->formatStateUsing(fn (?string $state): string => 
-                                $state ? $state . '.' . config('app.domain') : 'Not set'
-                            )
-                            ->url(fn ($record) => $record->websiteContent?->getPublicUrl())
-                            ->openUrlInNewTab(),
+                //         TextEntry::make('websiteContent.subdomain')
+                //             ->label('Website Subdomain')
+                //             ->icon('heroicon-o-link')
+                //             ->formatStateUsing(fn (?string $state): string => 
+                //                 $state ? $state . '.' . config('app.domain') : 'Not set'
+                //             )
+                //             ->url(fn ($record) => $record->websiteContent?->getPublicUrl())
+                //             ->openUrlInNewTab(),
                         
-                        TextEntry::make('websiteContent.status')
-                            ->label('Website Status')
-                            ->icon('heroicon-o-globe-alt')
-                            ->badge()
-                            ->color(fn (?string $state): string => match($state) {
-                                'active' => 'success',
-                                'suspended' => 'danger',
-                                'paid' => 'info',
-                                default => 'gray',
-                            }),
-                    ]),
+                //         TextEntry::make('websiteContent.status')
+                //             ->label('Website Status')
+                //             ->icon('heroicon-o-globe-alt')
+                //             ->badge()
+                //             ->color(fn (?string $state): string => match($state) {
+                //                 'active' => 'success',
+                //                 'suspended' => 'danger',
+                //                 'paid' => 'info',
+                //                 default => 'gray',
+                //             }),
+                //     ]),
 
             ]);
     }

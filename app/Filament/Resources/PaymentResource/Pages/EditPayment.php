@@ -246,7 +246,7 @@ class EditPayment extends EditRecord
         $duplicate->code = Payment::generateCode();
         $duplicate->status = 'pending';
         $duplicate->paid_at = null;
-        $duplicate->transaction_time = null;
+        //$duplicate->transaction_time = null;
         $duplicate->midtrans_data = null;
         $duplicate->save();
         

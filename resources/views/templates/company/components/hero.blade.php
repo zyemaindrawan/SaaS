@@ -1,14 +1,14 @@
 @php
     $heroTitle = $content['about_title'] ?? 'Company Name';
     $WebsiteName = $content['website_name'] ?? 'Nama Website';
-    $heroBackground = $content['about_image'] ?? null;
+    $heroBackground = resolveAssetPath($content['about_image']) ?? null;
 @endphp
 
 <section id="home" class="relative bg-gray-900 text-white min-h-[600px] flex items-center">
     <!-- Background Image -->
     @if($heroBackground)
         <div class="absolute inset-0">
-            <img src="{{ $heroBackground }}" alt="Hero Background" class="w-full h-full object-cover opacity-40">
+            <img src="{{ $heroBackground }}" class="w-full h-full object-cover opacity-40">
         </div>
     @endif
     

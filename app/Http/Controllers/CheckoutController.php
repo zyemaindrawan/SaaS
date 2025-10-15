@@ -107,9 +107,30 @@ class CheckoutController extends Controller
         $subtotal = $template->price;
         $platformFee = 4000;
         $discount = 0;
+        
+        // Handle voucher discount
+        $voucherCode = $validated['voucher_code'] ?? null;
+        $voucherDiscount = $validated['voucher_discount'] ?? 0;
+        
+        // Validate voucher if provided
+        if ($voucherCode && $voucherDiscount > 0) {
+            $voucher = \App\Models\Voucher::where('code', strtoupper(trim($voucherCode)))
+                ->active()
+                ->first();
+                
+            if ($voucher && $voucher->isValid()) {
+                // Recalculate discount to ensure it's accurate
+                $calculatedDiscount = $voucher->calculateDiscount($subtotal);
+                $voucherDiscount = $calculatedDiscount;
+            } else {
+                // Invalid voucher, reset
+                $voucherCode = null;
+                $voucherDiscount = 0;
+            }
+        }
 
         // Calculate total for checkout
-        $total = $subtotal + $platformFee - $discount;
+        $total = $subtotal + $platformFee - $voucherDiscount;
         $total = max(0, $total); // Ensure total is not negative
 
         DB::beginTransaction();
@@ -204,6 +225,8 @@ class CheckoutController extends Controller
                     'platform_fee' => $platformFee,
                     'discount' => $discount,
                     'total' => $total,
+                    'voucher_code' => $voucherCode,
+                    'voucher_discount' => $voucherDiscount,
                 ];
                 
                 // Log::info('Creating payment', [
@@ -567,6 +590,10 @@ class CheckoutController extends Controller
             'whatsapp_number' => 'nullable|string|max:20',
             'whatsapp_greeting_text' => 'nullable|string|max:255',
             'whatsapp_message' => 'nullable|string|max:500',
+            
+            // Voucher fields
+            'voucher_code' => 'nullable|string|max:255',
+            'voucher_discount' => 'nullable|numeric|min:0',
         ];
     }
 

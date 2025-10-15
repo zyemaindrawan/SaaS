@@ -708,6 +708,7 @@
                         :form-data="formData"
                         :submitting="submitting"
                         @submit="showConfirmation"
+                        @voucherApplied="handleVoucherApplied"
                     />
                 </div>
             </div>
@@ -792,6 +793,9 @@ const formData = reactive({
     whatsapp_number: '',
     whatsapp_greeting_text: '',
     whatsapp_message: '',
+    // Voucher data
+    voucher_code: '',
+    voucher_discount: 0,
 })
 
 productPreviews.value = formData.products.map(() => null)
@@ -1129,6 +1133,12 @@ const closeErrorDialog = () => {
 const retrySubmission = () => {
     closeErrorDialog()
     showConfirmation()
+}
+
+// Handle voucher applied event from OrderSummary
+const handleVoucherApplied = (voucherData) => {
+    formData.voucher_code = voucherData.code
+    formData.voucher_discount = voucherData.discount
 }
 
 onBeforeUnmount(() => {

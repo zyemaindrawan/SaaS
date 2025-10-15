@@ -23,14 +23,17 @@ class PaymentService
     {
         $user = $websiteContent->user;
 
-        // Calculate gross_amount as (amount + fee) - discount
-        $grossAmount = $pricingDetails['subtotal'] + $pricingDetails['platform_fee'] - $pricingDetails['discount'];
-
-        // Ensure gross_amount is not negative
-        $grossAmount = max(0, $grossAmount);
-
-        // final_amount is the same as gross_amount for Midtrans
-        $finalAmount = $grossAmount;
+        // Calculate amounts step by step
+        $baseAmount = $pricingDetails['subtotal'] + $pricingDetails['platform_fee']; // Template price + platform fee
+        $discount = $pricingDetails['discount'] ?? 0; // Regular discount
+        $voucherDiscount = $pricingDetails['voucher_discount'] ?? 0; // Voucher discount
+        
+        // Calculate the final amount user will pay (base - all discounts)
+        $finalAmount = max(0, $baseAmount - $discount - $voucherDiscount);
+        
+        // gross_amount should be the same as final_amount (what user actually pays)
+        // This is used by Midtrans and displayed to user
+        $grossAmount = $finalAmount;
 
         // Create payment record
         $payment = Payment::create([
@@ -42,6 +45,7 @@ class PaymentService
             'discount' => $pricingDetails['discount'],
             'gross_amount' => $grossAmount,
             'voucher_code' => $pricingDetails['voucher_code'] ?? null,
+            'voucher_discount' => $pricingDetails['voucher_discount'] ?? 0,
             'final_amount' => $finalAmount,
             'status' => 'pending',
             'expired_at' => now()->addHours(2), // 2 Jam
@@ -84,8 +88,19 @@ class PaymentService
                 'id' => 'discount',
                 'price' => -1 * (int) $payment->discount, // Negative value for discount
                 'quantity' => 1,
-                'name' => 'Discount' . ($payment->voucher_code ? ' (' . $payment->voucher_code . ')' : ''),
+                'name' => 'Discount',
                 'category' => 'Discount',
+            ];
+        }
+        
+        // Add voucher discount item if applicable
+        if ($payment->voucher_discount > 0) {
+            $itemDetails[] = [
+                'id' => 'voucher_discount',
+                'price' => -1 * (int) $payment->voucher_discount, // Negative value for discount
+                'quantity' => 1,
+                'name' => 'Voucher Discount' . ($payment->voucher_code ? ' (' . $payment->voucher_code . ')' : ''),
+                'category' => 'Voucher',
             ];
         }
 

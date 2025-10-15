@@ -90,7 +90,7 @@ class PaymentResource extends Resource
 
                 Section::make('Status & Timeline')
                     ->icon('heroicon-o-clock')
-                    ->columns(2)
+                    ->columns(3)
                     ->schema([
                         Forms\Components\Select::make('status')
                             ->options([
@@ -107,7 +107,7 @@ class PaymentResource extends Resource
                         
                         Forms\Components\DateTimePicker::make('paid_at'),
 
-                        Forms\Components\DateTimePicker::make('transaction_time'),
+                        //Forms\Components\DateTimePicker::make('transaction_time'),
                     ]),
 
                 Section::make('Payment Gateway Response')
