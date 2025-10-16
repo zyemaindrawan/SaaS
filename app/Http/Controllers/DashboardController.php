@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\WebsiteContentService;
 use App\Services\TemplateService;
 use App\Models\Payment;
+use App\Models\WebsiteContent;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -41,10 +42,30 @@ class DashboardController extends Controller
                 ];
             });
 
+        // Get user's drafts (limit to 5 most recent)
+        $drafts = WebsiteContent::where('user_id', $user->id)
+            ->whereIn('status', ['draft', 'previewed'])
+            ->with('template')
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($draft) {
+                return [
+                    'id' => $draft->id,
+                    'website_name' => $draft->website_name,
+                    'template_name' => $draft->template->name ?? 'Unknown Template',
+                    'template_slug' => $draft->template_slug,
+                    'status' => $draft->status,
+                    'created_at' => $draft->created_at->format('M j, Y'),
+                    'updated_at' => $draft->updated_at->format('M j, Y g:i A'),
+                ];
+            });
+
         return Inertia::render('Dashboard', [
             'websites' => $websites,
             'stats' => $stats,
             'invoices' => $invoices,
+            'drafts' => $drafts,
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),

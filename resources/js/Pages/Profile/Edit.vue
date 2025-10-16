@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import DeleteUserForm from './Partials/DeleteUserForm.vue';
+//import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
@@ -120,7 +120,7 @@ defineProps({
 
                 <!-- Danger Zone -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
+                    <!-- <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
                         <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
                             <h3 class="text-lg font-semibold text-white flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -137,7 +137,7 @@ defineProps({
 
                             <DeleteUserForm class="space-y-4" />
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Account Stats -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-6">

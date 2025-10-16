@@ -4,12 +4,9 @@
 
         <PageLoader :show="loading" />
 
-        <ConfirmationDialog
+        <SimpleConfirmationDialog
             :show="showConfirmDialog"
             :loading="submitting"
-            :template="template"
-            :form-data="formData"
-            :pricing="pricing"
             @confirm="submitForm"
             @cancel="showConfirmDialog = false"
         />
@@ -42,8 +39,8 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2">
+            <div class="max-w-4xl mx-auto">
+                <div>
                     <form @submit.prevent="showConfirmation" class="space-y-8">
                         <!-- Website Details -->
                         <div class="bg-white shadow-sm rounded-lg p-6">
@@ -695,21 +692,18 @@
                                 class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 :disabled="submitting"
                             >
-                                Pratinjau &amp; Lanjutkan
+                                <svg v-if="submitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <svg v-else class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                {{ submitting ? 'Menyimpan...' : 'Simpan & Pratinjau' }}
                             </button>
                         </div>
                     </form>
-                </div>
-
-                <div>
-                    <OrderSummary
-                        :template="template"
-                        :pricing="pricing"
-                        :form-data="formData"
-                        :submitting="submitting"
-                        @submit="showConfirmation"
-                        @voucherApplied="handleVoucherApplied"
-                    />
                 </div>
             </div>
         </div>
@@ -721,18 +715,16 @@ import { ref, reactive, computed, toRaw, onBeforeUnmount } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import PageLoader from '@/Components/PageLoader.vue'
-import ConfirmationDialog from '@/Components/ConfirmationDialog.vue'
+import SimpleConfirmationDialog from '@/Components/SimpleConfirmationDialog.vue'
 import ErrorDialog from '@/Components/ErrorDialog.vue'
 import InputLabel from '@/Components/InputLabel.vue'
 import TextInput from '@/Components/TextInput.vue'
 import InputError from '@/Components/InputError.vue'
-import OrderSummary from '@/Components/OrderSummary.vue'
-
 const props = defineProps({
     template: Object,
     user: Object,
-    pricing: Object,
     form_fields: Array,
+    pricing: Object,
 })
 
 const loading = ref(false)
@@ -793,9 +785,7 @@ const formData = reactive({
     whatsapp_number: '',
     whatsapp_greeting_text: '',
     whatsapp_message: '',
-    // Voucher data
-    voucher_code: '',
-    voucher_discount: 0,
+
 })
 
 productPreviews.value = formData.products.map(() => null)
@@ -1133,12 +1123,6 @@ const closeErrorDialog = () => {
 const retrySubmission = () => {
     closeErrorDialog()
     showConfirmation()
-}
-
-// Handle voucher applied event from OrderSummary
-const handleVoucherApplied = (voucherData) => {
-    formData.voucher_code = voucherData.code
-    formData.voucher_discount = voucherData.discount
 }
 
 onBeforeUnmount(() => {

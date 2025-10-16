@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WebsiteContent;
 use App\Services\TemplateService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
@@ -208,12 +209,24 @@ class PreviewController extends Controller
      */
     public function show(WebsiteContent $websiteContent)
     {
-        try {
-            $this->authorize('view', $websiteContent);
-        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-            // Allow viewing for demo purposes
+        $user = Auth::user();
+
+        // Verify ownership for authenticated users
+        if ($user && $websiteContent->user_id !== $user->id) {
+            abort(403, 'Unauthorized access to preview');
         }
-        
+
+        // Check if website content exists and is in valid status for preview
+        if (!in_array($websiteContent->status, ['draft', 'previewed', 'paid', 'active'])) {
+            return redirect()->route('drafts.index')
+                ->with('error', 'Website content not available for preview');
+        }
+
+        // Update status to 'previewed' if it's currently 'draft'
+        if ($websiteContent->status === 'draft') {
+            $websiteContent->update(['status' => 'previewed']);
+        }
+
         return $this->showPreview($websiteContent);
     }
 
@@ -447,5 +460,57 @@ class PreviewController extends Controller
         }
         
         return [];
+    }
+
+    private function processImageUrls($contentData)
+    {
+        if (!is_array($contentData)) {
+            return $contentData;
+        }
+
+        foreach ($contentData as $key => $value) {
+            if (is_string($value) && $this->isImagePath($value)) {
+                // Convert storage path to accessible URL
+                $contentData[$key] = $this->getImageUrl($value);
+            } elseif (is_array($value)) {
+                // Recursively process nested arrays
+                $contentData[$key] = $this->processImageUrls($value);
+            }
+        }
+
+        return $contentData;
+    }
+
+    private function isImagePath($path)
+    {
+        if (!is_string($path)) {
+            return false;
+        }
+
+        // Check if it's already a full URL
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return false;
+        }
+
+        // Check if it's a storage path
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico'];
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        
+        return in_array($extension, $imageExtensions);
+    }
+
+    private function getImageUrl($path)
+    {
+        if (!$path) {
+            return null;
+        }
+
+        // If it's already a full URL, return as is
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        // Convert storage path to accessible URL
+        return asset('storage/' . ltrim($path, '/'));
     }
 }

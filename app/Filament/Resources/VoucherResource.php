@@ -192,9 +192,9 @@ class VoucherResource extends Resource
             ->filters([])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->modalWidth('5xl'),
+                    ->modalWidth('2xl'),
                 Tables\Actions\EditAction::make()
-                    ->modalWidth('5xl'),
+                    ->modalWidth('2xl'),
                 Tables\Actions\DeleteAction::make()
                     ->requiresConfirmation(),
             ])

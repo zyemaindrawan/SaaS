@@ -29,6 +29,10 @@ const props = defineProps({
     invoices: {
         type: Array,
         default: () => []
+    },
+    drafts: {
+        type: Array,
+        default: () => []
     }
 });
 
@@ -73,6 +77,26 @@ const formatDate = (dateString) => {
 const formatPrice = (price) => {
     return 'Rp ' + new Intl.NumberFormat('id-ID').format(price);
 };
+
+const getDraftStatusClass = (status) => {
+    const classes = {
+        'draft': 'bg-yellow-100 text-yellow-800',
+        'previewed': 'bg-blue-100 text-blue-800',
+        'paid': 'bg-green-100 text-green-800',
+        'active': 'bg-green-100 text-green-800'
+    }
+    return classes[status] || 'bg-gray-100 text-gray-800'
+}
+
+const getDraftStatusText = (status) => {
+    const texts = {
+        'draft': 'Draft',
+        'previewed': 'Previewed',
+        'paid': 'Paid',
+        'active': 'Active'
+    }
+    return texts[status] || status
+}
 </script>
 
 <template>
@@ -177,7 +201,7 @@ const formatPrice = (price) => {
                                                 :class="getStatusColor(invoice.status)"
                                             />
                                             <span
-                                                class="text-sm font-medium capitalize"
+                                                class="text-sm font-medium capitalize py-2 px-2 rounded-md"
                                                 :class="getStatusColor(invoice.status)"
                                             >
                                                 {{ invoice.status }}
@@ -203,6 +227,83 @@ const formatPrice = (price) => {
                             class="text-blue-600 hover:text-blue-800 text-sm font-medium"
                         >
                             View all invoices →
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Drafts Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+                <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <PencilIcon class="w-6 h-6 mr-3" />
+                        Recent Drafts
+                    </h2>
+                </div>
+
+                <div class="p-6">
+                    <div v-if="drafts.length > 0" class="space-y-4">
+                        <div
+                            v-for="draft in drafts"
+                            :key="draft.id"
+                            class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-200"
+                        >
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <h3 class="font-semibold text-gray-900">
+                                            {{ draft.website_name }}
+                                        </h3>
+                                        <span 
+                                            :class="getDraftStatusClass(draft.status)"
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                        >
+                                            {{ getDraftStatusText(draft.status) }}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-1">
+                                        Template: {{ draft.template_name }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        Updated: {{ draft.updated_at }}
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center space-x-2">
+                                    <Link
+                                        :href="`/preview/${draft.id}`"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                    >
+                                        <EyeIcon class="w-4 h-4 mr-1" />
+                                        Preview
+                                    </Link>
+                                    <Link
+                                        :href="`/drafts/${draft.id}`"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                    >
+                                        Continue
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else class="text-center py-8">
+                        <PencilIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No drafts yet</h3>
+                        <p class="text-gray-600">
+                            Your website drafts will appear here when you start creating.
+                        </p>
+                    </div>
+
+                    <div v-if="drafts.length >= 5" class="text-center mt-4">
+                        <Link
+                            href="/drafts"
+                            class="text-purple-600 hover:text-purple-800 text-sm font-medium"
+                        >
+                            View all drafts →
                         </Link>
                     </div>
                 </div>

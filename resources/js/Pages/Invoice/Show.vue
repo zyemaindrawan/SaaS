@@ -118,6 +118,9 @@
                                         <span v-else-if="paymentProcessing">
                                             Processing Payment...
                                         </span>
+                                        <span v-else-if="isPaymentPaid">
+                                            Payment Completed
+                                        </span>
                                         <span v-else-if="!props.snapToken">
                                             Generating Payment Token...
                                         </span>
@@ -127,7 +130,7 @@
                                     </button>
 
                                     <!-- Debug Info (only in development) -->
-                                    <div v-if="isDevelopment" class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2 text-xs">
+                                    <!-- <div v-if="isDevelopment" class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2 text-xs">
                                         <div class="text-yellow-800">
                                             <strong>Debug Info:</strong><br>
                                             Snap Token: {{ props.snapToken ? 'Available' : 'Not Available' }}<br>
@@ -135,10 +138,10 @@
                                             Expired: {{ isPaymentExpired ? 'Yes' : 'No' }}<br>
                                             Processing: {{ paymentProcessing ? 'Yes' : 'No' }}
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <!-- Expiry Warning -->
-                                    <div v-if="timeUntilExpiry && !isPaymentExpired" class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
+                                    <div v-if="timeUntilExpiry && !isPaymentExpired && !isPaymentPaid" class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
                                         <div class="flex items-center text-sm text-yellow-800">
                                             <ClockIcon class="w-4 h-4 mr-2" />
                                             <span class="font-medium">Payment expires in {{ timeUntilExpiry }}</span>
@@ -146,20 +149,20 @@
                                     </div>
 
                                     <!-- Expired Notice -->
-                                    <div v-if="isPaymentExpired" class="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
+                                    <div v-if="isPaymentExpired && !isPaymentPaid" class="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
                                         <div class="flex items-center text-sm text-red-800">
                                             <ExclamationTriangleIcon class="w-4 h-4 mr-2" />
-                                            <span class="font-medium">This payment has expired. Please contact support.</span>
+                                            <span class="font-medium">This payment has expired. Please contact us.</span>
                                         </div>
                                     </div>
 
                                     <!-- No Token Notice -->
-                                    <div v-if="!props.snapToken && !isPaymentExpired" class="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2">
+                                    <!-- <div v-if="!props.snapToken && !isPaymentExpired" class="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2">
                                         <div class="flex items-center text-sm text-orange-800">
                                             <ExclamationTriangleIcon class="w-4 h-4 mr-2" />
                                             <span class="font-medium">Payment token is being generated. Please wait...</span>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <!-- Order Details -->
@@ -180,6 +183,11 @@
                                                 <span class="text-gray-500">{{ formatPrice(payment.fee) }}</span>
                                             </div>
 
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-500">Voucher Discount</span>
+                                                <span class="text-gray-500">{{ formatPrice(payment.voucher_discount) }}</span>
+                                            </div>
+
                                             <!-- Subtotal -->
                                             <div class="flex justify-between text-sm border-t border-gray-100 pt-2">
                                                 <span class="text-gray-600 font-medium">Subtotal</span>
@@ -187,9 +195,9 @@
                                             </div>
 
                                             <!-- Voucher Discount -->
-                                            <div v-if="payment.voucher_code && payment.discount > 0" class="flex justify-between text-sm">
+                                            <div v-if="payment.voucher_code" class="flex justify-between text-sm">
                                                 <span class="text-green-600">Voucher ({{ payment.voucher_code }})</span>
-                                                <span class="text-green-600 font-medium">-{{ formatPrice(payment.discount) }}</span>
+                                                <span class="text-green-600 font-medium">-{{ formatPrice(payment.voucher_discount) }}</span>
                                             </div>
 
                                             <hr class="border-gray-200">
@@ -223,10 +231,10 @@
                                                     <CopyButton :text="payment.code" size="sm" />
                                                 </div>
                                             </div>
-                                            <div class="flex justify-between">
+                                            <!-- <div class="flex justify-between">
                                                 <span class="text-gray-600">Website Address:</span>
                                                 <span class="font-medium text-blue-600">{{ props.website_content.subdomain }}.oursite.com</span>
-                                            </div>
+                                            </div> -->
                                             <div class="flex justify-between">
                                                 <span class="text-gray-600">Payment Expires:</span>
                                                 <span class="font-medium text-orange-600">{{ formatDateTime(payment.expired_at) }} WIB</span>
@@ -291,6 +299,10 @@ const isDevelopment = computed(() => {
 
 const isPaymentExpired = computed(() => {
     return new Date() > new Date(props.payment.expired_at)
+})
+
+const isPaymentPaid = computed(() => {
+    return props.payment.status === 'paid'
 })
 
 // Methods

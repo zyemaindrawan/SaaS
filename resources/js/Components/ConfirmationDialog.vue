@@ -64,10 +64,6 @@
                                                 <span class="text-gray-500">Website Address:</span>
                                                 <span class="font-medium text-blue-600">{{ formData.subdomain }}.oursite.com</span>
                                             </div>
-                                            <div v-if="formData.contact_email" class="flex justify-between">
-                                                <span class="text-gray-500">Contact Email:</span>
-                                                <span class="font-medium">{{ formData.contact_email }}</span>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -85,12 +81,6 @@
                                                 <span class="text-gray-500">{{ formatPrice(pricing.platform_fee) }}</span>
                                             </div>
                                             
-                                            <!-- Subtotal -->
-                                            <div v-if="pricing.subtotal > 0" class="flex justify-between text-sm border-t border-gray-100 pt-2">
-                                                <span class="text-gray-600 font-medium">Subtotal:</span>
-                                                <span class="font-medium">{{ formatPrice(pricing.total) }}</span>
-                                            </div>
-                                            
                                             <!-- Voucher Discount -->
                                             <div v-if="formData.voucher_code && formData.voucher_discount > 0" class="flex justify-between text-sm">
                                                 <span class="text-green-600">Voucher ({{ formData.voucher_code }}):</span>
@@ -103,10 +93,13 @@
                                                     <span class="text-lg font-bold text-gray-900">Total Amount:</span>
                                                     <div class="text-right">
                                                         <div v-if="formData.voucher_discount > 0" class="text-sm text-gray-500 line-through">
-                                                            {{ formatPrice(pricing.total) }}
+                                                            {{ formatPrice(subtotalAmount) }}
                                                         </div>
                                                         <div class="text-xl font-bold" :class="finalTotal > 0 ? 'text-green-600' : 'text-blue-600'">
                                                             {{ finalTotal > 0 ? formatPrice(finalTotal) : 'FREE' }}
+                                                        </div>
+                                                        <div v-if="formData.voucher_discount > 0" class="text-xs text-green-600 font-medium mt-1">
+                                                            💰 You save {{ formatPrice(formData.voucher_discount) }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -181,11 +174,17 @@ defineEmits(['confirm', 'cancel'])
 
 const placeholderImage = '/images/template-placeholder.jpg'
 
-// Calculate final total after voucher discount
+// Calculate subtotal (Template Price + Platform Fee) - match DraftOrderSummary behavior
+const subtotalAmount = computed(() => {
+    // Get the original total before voucher discount by adding voucher back to current total
+    // This ensures consistency with DraftOrderSummary which shows pricing.total
+    const originalTotal = props.pricing.total + (props.formData.voucher_discount || 0)
+    return originalTotal
+})
+
+// Final total is already calculated in finalPricing from Show.vue
 const finalTotal = computed(() => {
-    const baseTotal = props.pricing.total || 0
-    const discount = props.formData.voucher_discount || 0
-    return Math.max(0, baseTotal - discount)
+    return Math.max(0, props.pricing.total)
 })
 
 const formatCategory = (category) => {

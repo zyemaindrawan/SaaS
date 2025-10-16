@@ -102,6 +102,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/templates/{template:slug}/checkout', [CheckoutController::class, 'process'])
         ->name('templates.checkout.process');
 
+    // Draft management routes
+    Route::get('/drafts', [App\Http\Controllers\DraftController::class, 'index'])
+        ->name('drafts.index');
+
+    Route::get('/drafts/{websiteContent}', [App\Http\Controllers\DraftController::class, 'show'])
+        ->name('drafts.show');
+
+    Route::post('/drafts/{websiteContent}/confirm-payment', [CheckoutController::class, 'confirmPayment'])
+        ->name('drafts.confirm-payment');
+
+    Route::patch('/drafts/{websiteContent}/status', [App\Http\Controllers\DraftController::class, 'updateStatus'])
+        ->name('drafts.update-status');
+
     // Invoice routes
     Route::get('/invoice/{code}', [InvoiceController::class, 'show'])
         ->name('invoice.show');

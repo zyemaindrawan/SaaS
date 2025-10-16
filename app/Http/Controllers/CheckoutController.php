@@ -207,53 +207,24 @@ class CheckoutController extends Controller
                 throw $e;
             }
 
-            // Handle free templates or if total is 0 after discount
-            if ($total <= 0) {
-                $websiteContent->update(['status' => 'paid']);
+            // Store pricing details in session for later use
+            session(['checkout_pricing' => [
+                'subtotal' => $subtotal,
+                'platform_fee' => $platformFee,
+                'discount' => $discount,
+                'total' => $total,
+                'voucher_code' => $voucherCode,
+                'voucher_discount' => $voucherDiscount,
+            ]]);
 
-                DB::commit();
-
-                // For free templates, redirect to content edit page
-                return redirect()->route('content.edit', $websiteContent->id)
-                    ->with('success', 'Template activated successfully!');
-            }
-
-            try {
-                // Create payment with Midtrans
-                $pricingDetails = [
-                    'subtotal' => $subtotal,
-                    'platform_fee' => $platformFee,
-                    'discount' => $discount,
-                    'total' => $total,
-                    'voucher_code' => $voucherCode,
-                    'voucher_discount' => $voucherDiscount,
-                ];
-                
-                // Log::info('Creating payment', [
-                //     'website_content_id' => $websiteContent->id,
-                //     'pricing_details' => $pricingDetails
-                // ]);
-
-                $payment = $this->paymentService->createPayment($websiteContent, $pricingDetails);
-
-                // Log::info('Payment created successfully', [
-                //     'payment_id' => $payment->id,
-                //     'payment_code' => $payment->code
-                // ]);
-            } catch (\Exception $e) {
-                Log::error('Failed to create payment', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                    'pricing_details' => $pricingDetails
-                ]);
-                throw $e;
-            }
+            // Update status to 'draft' for all templates (free or paid)
+            $websiteContent->update(['status' => 'draft']);
 
             DB::commit();
 
-            // Redirect to invoice page for paid templates
-            return redirect()->route('invoice.show', $payment->code)
-                ->with('success', 'Order created successfully! Please complete your payment.');
+            // Redirect to drafts page for review and confirmation
+            return redirect()->route('drafts.show', $websiteContent->id)
+                ->with('success', 'Draft website berhasil disimpan! Silakan pratinjau dan konfirmasi untuk melanjutkan.');
 
         } catch (ValidationException $e) {
             DB::rollback();
@@ -696,5 +667,102 @@ class CheckoutController extends Controller
         }
 
         return null;
+    }
+
+    public function confirmPayment(Request $request, WebsiteContent $websiteContent)
+    {
+        $user = Auth::user();
+
+        Log::info('confirmPayment called', [
+            'user_id' => $user->id,
+            'website_content_id' => $websiteContent->id,
+            'status' => $websiteContent->status
+        ]);
+
+        // Verify ownership
+        if ($websiteContent->user_id !== $user->id) {
+            Log::warning('Unauthorized access attempt', [
+                'user_id' => $user->id,
+                'website_content_id' => $websiteContent->id,
+                'actual_owner' => $websiteContent->user_id
+            ]);
+            abort(403, 'Unauthorized access');
+        }
+
+        // Check if website content is in draft status
+        if ($websiteContent->status !== 'draft') {
+            Log::warning('Website content not in draft status', [
+                'status' => $websiteContent->status
+            ]);
+            return redirect()->route('drafts.show', $websiteContent->id)
+                ->with('error', 'Website content is not in draft status');
+        }
+
+        // Get pricing details from session
+        $pricingDetails = session('checkout_pricing');
+        Log::info('Pricing details from session', [
+            'pricing_details' => $pricingDetails
+        ]);
+        
+        if (!$pricingDetails) {
+            Log::warning('Pricing information not found in session');
+            return redirect()->route('drafts.show', $websiteContent->id)
+                ->with('error', 'Pricing information not found. Please restart the checkout process.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Handle free templates or if total is 0 after discount
+            if ($pricingDetails['total'] <= 0) {
+                Log::info('Processing free template', [
+                    'total' => $pricingDetails['total']
+                ]);
+                
+                $websiteContent->update(['status' => 'paid']);
+
+                DB::commit();
+
+                // Clear pricing session
+                session()->forget('checkout_pricing');
+
+                // For free templates, redirect to content edit page
+                return redirect()->route('content.edit', $websiteContent->id)
+                    ->with('success', 'Template berhasil diaktifkan secara gratis!');
+            }
+
+            Log::info('Processing paid template', [
+                'total' => $pricingDetails['total']
+            ]);
+
+            // Create payment with Midtrans for paid templates
+            $payment = $this->paymentService->createPayment($websiteContent, $pricingDetails);
+
+            Log::info('Payment created successfully', [
+                'payment_code' => $payment->code
+            ]);
+
+            DB::commit();
+
+            // Clear pricing session
+            session()->forget('checkout_pricing');
+
+            // Redirect to invoice page for paid templates
+            return redirect()->route('invoice.show', $payment->code)
+                ->with('success', 'Order berhasil dibuat! Silakan selesaikan pembayaran Anda.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            Log::error('Confirm payment error', [
+                'user_id' => $user->id,
+                'website_content_id' => $websiteContent->id,
+                'error_message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('drafts.show', $websiteContent->id)
+                ->with('error', 'Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.');
+        }
     }
 }
