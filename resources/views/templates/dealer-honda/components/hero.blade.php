@@ -1,6 +1,6 @@
 @php
     $heroTitle = $content['about_title'] ?? 'Dealer Resmi Honda Terpercaya di Indonesia';
-    $WebsiteName = $content['website_name'] ?? 'Nama Website';
+    $WebsiteName = $website->website_name ?? 'Nama Website';
     $heroBackground = $content['about_image'] ?? null;
 @endphp
 

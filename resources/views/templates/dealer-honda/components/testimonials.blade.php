@@ -29,7 +29,7 @@
                     <!-- Customer Photo -->
                     <div class="flex items-center mb-6">
                         @if(!empty($testi['photo']))
-                            <img src="{{ asset('storage/' . $testi['photo']) }}" alt="{{ $testi['name'] }}" class="w-16 h-16 rounded-full object-cover mr-4 border-4 border-honda-red">
+                            <img src="{{ resolveAssetPath($testi['photo']) }}" alt="{{ $testi['name'] }}" class="w-16 h-16 rounded-full object-cover mr-4 border-4 border-honda-red">
                         @else
                             <div class="w-16 h-16 rounded-full bg-honda-red flex items-center justify-center text-white text-2xl font-bold mr-4">
                                 {{ substr($testi['name'], 0, 1) }}

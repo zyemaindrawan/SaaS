@@ -36,14 +36,35 @@ const props = defineProps({
     }
 });
 
-const userWebsites = computed(() => props.websites?.data || []);
+// Filtered website collections
+const userWebsites = computed(() => {
+    const websites = props.websites?.data || [];
+    return websites.filter(website => 
+        ['active', 'processing', 'expired', 'suspended'].includes(website.status)
+    );
+});
+
+const draftWebsites = computed(() => {
+    const websites = props.websites?.data || [];
+    return websites.filter(website => 
+        ['draft', 'previewed'].includes(website.status)
+    );
+});
+
+const allWebsites = computed(() => props.websites?.data || []);
 
 const getStatusIcon = (status) => {
     switch (status) {
         case 'active':
             return CheckCircleIcon;
+        case 'processing':
         case 'paid':
             return ClockIcon;
+        case 'draft':
+        case 'previewed':
+            return PencilIcon;
+        case 'expired':
+        case 'suspended':
         case 'pending':
             return ExclamationTriangleIcon;
         default:
@@ -55,10 +76,17 @@ const getStatusColor = (status) => {
     switch (status) {
         case 'active':
             return 'text-green-600 bg-green-100';
+        case 'processing':
         case 'paid':
             return 'text-blue-600 bg-blue-100';
-        case 'pending':
+        case 'draft':
             return 'text-yellow-600 bg-yellow-100';
+        case 'previewed':
+            return 'text-purple-600 bg-purple-100';
+        case 'expired':
+        case 'suspended':
+        case 'pending':
+            return 'text-red-600 bg-red-100';
         default:
             return 'text-gray-600 bg-gray-100';
     }
@@ -158,80 +186,6 @@ const getDraftStatusText = (status) => {
                 </div>
             </div>
 
-            <!-- Latest Invoices Section -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-                <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-                    <h2 class="text-xl font-bold text-white flex items-center">
-                        <ReceiptRefundIcon class="w-6 h-6 mr-3" />
-                        Latest Invoices
-                    </h2>
-                </div>
-
-                <div class="p-6">
-                    <div v-if="invoices.length > 0" class="space-y-4">
-                        <div
-                            v-for="invoice in invoices.slice(0, 5)"
-                            :key="invoice.code"
-                            class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-200"
-                        >
-                            <Link :href="`/invoice/${invoice.code}`" class="block">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                                            <ReceiptRefundIcon class="w-5 h-5 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold text-gray-900">
-                                                Invoice #{{ invoice.code }}
-                                            </h3>
-                                            <p class="text-sm text-gray-600">
-                                                {{ formatDate(invoice.created_at) }}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="text-right">
-                                        <p class="font-bold text-lg text-gray-900">
-                                            {{ formatPrice(invoice.gross_amount) }}
-                                        </p>
-                                        <div class="flex items-center mt-1">
-                                            <component
-                                                :is="getStatusIcon(invoice.status)"
-                                                class="w-4 h-4 mr-1"
-                                                :class="getStatusColor(invoice.status)"
-                                            />
-                                            <span
-                                                class="text-sm font-medium capitalize py-2 px-2 rounded-md"
-                                                :class="getStatusColor(invoice.status)"
-                                            >
-                                                {{ invoice.status }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        </div>
-                    </div>
-
-                    <div v-else class="text-center py-8">
-                        <ReceiptRefundIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">No invoices yet</h3>
-                        <p class="text-gray-600">
-                            Your invoice history will appear here once you make purchases.
-                        </p>
-                    </div>
-
-                    <div v-if="invoices.length > 5" class="text-center mt-4">
-                        <Link
-                            href="/invoices"
-                            class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                        >
-                            View all invoices →
-                        </Link>
-                    </div>
-                </div>
-            </div>
-
             <!-- Recent Drafts Section -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
                 <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
@@ -242,9 +196,9 @@ const getDraftStatusText = (status) => {
                 </div>
 
                 <div class="p-6">
-                    <div v-if="drafts.length > 0" class="space-y-4">
+                    <div v-if="draftWebsites.length > 0" class="space-y-4">
                         <div
-                            v-for="draft in drafts"
+                            v-for="draft in draftWebsites.slice(0, 5)"
                             :key="draft.id"
                             class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-200"
                         >
@@ -255,17 +209,17 @@ const getDraftStatusText = (status) => {
                                             {{ draft.website_name }}
                                         </h3>
                                         <span 
-                                            :class="getDraftStatusClass(draft.status)"
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                            :class="getStatusColor(draft.status)"
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize"
                                         >
-                                            {{ getDraftStatusText(draft.status) }}
+                                            {{ draft.status }}
                                         </span>
                                     </div>
                                     <p class="text-sm text-gray-600 mb-1">
-                                        Template: {{ draft.template_name }}
+                                        {{ draft.subdomain }}
                                     </p>
                                     <p class="text-xs text-gray-500">
-                                        Updated: {{ draft.updated_at }}
+                                        Updated: {{ formatDate(draft.updated_at) }}
                                     </p>
                                 </div>
 
@@ -280,7 +234,7 @@ const getDraftStatusText = (status) => {
                                         Preview
                                     </Link>
                                     <Link
-                                        :href="`/drafts/${draft.id}`"
+                                        :href="`/website-builder/${draft.id}/edit`"
                                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                                     >
                                         Continue
@@ -298,7 +252,7 @@ const getDraftStatusText = (status) => {
                         </p>
                     </div>
 
-                    <div v-if="drafts.length >= 5" class="text-center mt-4">
+                    <div v-if="draftWebsites.length > 5" class="text-center mt-4">
                         <Link
                             href="/drafts"
                             class="text-purple-600 hover:text-purple-800 text-sm font-medium"
@@ -309,8 +263,8 @@ const getDraftStatusText = (status) => {
                 </div>
             </div>
 
-            <!-- Dashboard Content -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Your Websites Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
                 <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <DocumentTextIcon class="w-6 h-6 mr-3" />
@@ -344,10 +298,10 @@ const getDraftStatusText = (status) => {
                                         </span>
                                     </div>
                                     <p class="text-sm text-gray-600">
-                                        {{ website.subdomain }}.oursite.com
+                                        {{ website.custom_domain }}
                                     </p>
                                     <p class="text-xs text-gray-500 mt-1">
-                                        Created: {{ formatDate(website.created_at) }}
+                                        Expired: {{ formatDate(website.expires_at) }}
                                     </p>
                                 </div>
                             </div>
@@ -356,7 +310,7 @@ const getDraftStatusText = (status) => {
                                 <div class="flex gap-2">
                                     <Link
                                         v-if="website.status === 'active'"
-                                        :href="`https://${website.subdomain}.oursite.com`"
+                                        :href="`https://${website.custom_domain}`"
                                         target="_blank"
                                         class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition duration-200 flex items-center justify-center"
                                     >
@@ -364,29 +318,29 @@ const getDraftStatusText = (status) => {
                                         View Website
                                     </Link>
 
-                                    <Link
-                                        v-if="website.status === 'paid'"
+                                    <!-- <Link
+                                        v-if="website.status === 'processing'"
                                         :href="`/preview/${website.id}`"
                                         class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition duration-200 flex items-center justify-center"
                                     >
                                         <EyeIcon class="w-4 h-4 mr-1" />
                                         Preview
-                                    </Link>
+                                    </Link> -->
 
-                                    <Link
+                                    <!-- <Link
                                         :href="`/website-builder/${website.id}/edit`"
                                         class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition duration-200 flex items-center justify-center"
                                     >
                                         <PencilIcon class="w-4 h-4 mr-1" />
                                         Edit Content
-                                    </Link>
+                                    </Link> -->
                                 </div>
 
                                 <span
-                                    v-if="website.status === 'pending'"
-                                    class="bg-gray-300 text-gray-600 text-center py-2 px-4 rounded-lg text-sm font-medium"
+                                    v-if="['expired', 'suspended'].includes(website.status)"
+                                    class="bg-red-300 text-red-800 text-center py-2 px-4 rounded-lg text-sm font-medium"
                                 >
-                                    Pending Payment
+                                    {{ website.status === 'expired' ? 'Expired' : 'Suspended' }}
                                 </span>
                             </div>
                         </div>
@@ -395,9 +349,9 @@ const getDraftStatusText = (status) => {
                     <div v-else class="text-center py-12">
                         <DocumentTextIcon class="mx-auto h-16 w-16 text-gray-400 mb-4" />
 
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">No websites yet</h3>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">No active websites yet</h3>
                         <p class="text-gray-600 mb-6">
-                            Get started by creating your first website using our templates.
+                            Your active websites will appear here once they are published.
                         </p>
 
                         <Link
@@ -413,8 +367,81 @@ const getDraftStatusText = (status) => {
                 </div>
             </div>
 
+            <!-- Latest Invoices Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <ReceiptRefundIcon class="w-6 h-6 mr-3" />
+                        Latest Invoices
+                    </h2>
+                </div>
+
+                <div class="p-6">
+                    <div v-if="invoices.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div
+                            v-for="invoice in invoices.slice(0, 5)"
+                            :key="invoice.code"
+                            class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-200"
+                        >
+                            <Link :href="`/invoice/${invoice.code}`" class="block">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                                            <ReceiptRefundIcon class="w-5 h-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-gray-900">
+                                                #{{ invoice.code }}
+                                            </h3>
+                                            <p class="text-sm text-gray-600">
+                                                {{ formatDate(invoice.created_at) }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-right">
+                                        <p class="font-bold text-sm text-gray-900">
+                                            {{ formatPrice(invoice.gross_amount) }}
+                                        </p>
+                                        <div class="flex items-center justify-center mt-2">
+                                            <span
+                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold capitalize"
+                                                :class="getStatusColor(invoice.status)"
+                                            >
+                                                <component
+                                                    :is="getStatusIcon(invoice.status)"
+                                                    class="w-3 h-3 mr-1"
+                                                />
+                                                {{ invoice.status }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div v-else class="text-center py-8">
+                        <ReceiptRefundIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No invoices yet</h3>
+                        <p class="text-gray-600">
+                            Your invoice history will appear here once you make purchases.
+                        </p>
+                    </div>
+
+                    <div v-if="invoices.length > 5" class="text-center mt-4">
+                        <Link
+                            href="/invoices"
+                            class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        >
+                            View all invoices →
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
             <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
@@ -422,7 +449,7 @@ const getDraftStatusText = (status) => {
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Total Websites</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ stats.total_websites || 0 }}</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ allWebsites.length }}</p>
                         </div>
                     </div>
                 </div>
@@ -433,21 +460,37 @@ const getDraftStatusText = (status) => {
                             <CheckCircleIcon class="w-6 h-6 text-white" />
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Active Websites</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ stats.active_websites || 0 }}</p>
+                            <p class="text-sm font-medium text-gray-600">Active/Processing</p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                {{ allWebsites.filter(w => ['active', 'processing'].includes(w.status)).length }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center">
-                            <ClockIcon class="w-6 h-6 text-white" />
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <PencilIcon class="w-6 h-6 text-white" />
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Pending</p>
+                            <p class="text-sm font-medium text-gray-600">Draft/Previewed</p>
                             <p class="text-2xl font-bold text-gray-900">
-                                {{ (stats.draft_websites || 0) + (stats.processing_websites || 0) }}
+                                {{ allWebsites.filter(w => ['draft', 'previewed'].includes(w.status)).length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                            <ExclamationTriangleIcon class="w-6 h-6 text-white" />
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Expired/Suspended</p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                {{ allWebsites.filter(w => ['expired', 'suspended'].includes(w.status)).length }}
                             </p>
                         </div>
                     </div>

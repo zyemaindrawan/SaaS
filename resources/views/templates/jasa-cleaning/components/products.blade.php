@@ -26,7 +26,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             @foreach($products as $index => $product)
                 @php
-                    $productImage = resolveAssetPath3($product['image'] ?? null);
+                    $productImage = resolveAssetPath($product['image'] ?? null);
                 @endphp
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 group">
                     <!-- Service Image -->

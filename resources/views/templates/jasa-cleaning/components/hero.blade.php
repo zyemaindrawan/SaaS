@@ -1,6 +1,6 @@
 @php
     $heroTitle = $content['about_title'] ?? 'Jasa Cuci Sofa Profesional';
-    $WebsiteName = $content['website_name'] ?? 'Nama Website';
+    $WebsiteName = $website->website_name ?? 'Nama Website';
     $heroBackground = $content['about_image'] ?? null;
 @endphp
 

@@ -10,6 +10,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\WebsiteBuilderController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\Api\WebsiteBuilderFileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -90,6 +91,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/website-builder/{websiteContent}/preview', [WebsiteBuilderController::class, 'preview'])
         ->name('website-builder.preview');
+
+    // Website Builder File Upload - back in web routes with proper JSON handling
+    Route::post('/api/website-builder/upload-file', [WebsiteBuilderFileController::class, 'uploadFile'])
+        ->name('website-builder.upload-file');
 
     // Alias for content.edit (used in CheckoutController)
     Route::get('/content/{websiteContent}/edit', [WebsiteBuilderController::class, 'edit'])

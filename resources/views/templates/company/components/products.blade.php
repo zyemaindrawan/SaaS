@@ -20,7 +20,7 @@
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
                     <!-- Product Image -->
                     @if(!empty($product['image']))
-                        <img src="{{ asset('storage/' . $product['image']) }}" alt="{{ $product['name'] }}" class="w-full h-56 object-cover">
+                        <img src="{{ resolveAssetPath($product['image']) }}" alt="{{ $product['name'] }}" class="w-full h-56 object-cover">
                     @else
                         <div class="w-full h-56 bg-gray-200 flex items-center justify-center">
                             <span class="text-gray-400 text-sm">No Image</span>
@@ -32,10 +32,10 @@
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">
                             {{ $product['name'] }}
                         </h3>
-                        <p class="text-2xl font-bold text-blue-600 mb-4">
-                            Rp {{ number_format($product['price'], 0, ',', '.') }}
+                        <p class="text-md font-bold text-blue-600 mb-4">
+                            {{ $product['price'] ?? ' '}}
                         </p>
-                        <a href="{{ $product['link'] }}" target="_blank" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                        <a href="{{ $product['link'] }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
                             Order Now
                         </a>
                     </div>

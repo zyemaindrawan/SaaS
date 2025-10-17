@@ -1,5 +1,5 @@
 @php
-    $websiteName = $content['website_name'] ?? 'Company Website';
+    $websiteName = $website->website_name ?? 'Company Website';
     $companyName = $content['company_name'] ?? 'Company';
     $title = $websiteName . ' - ' . $companyName;
     $description = $content['hero_subtitle'] ?? 'Website perusahaan profesional';

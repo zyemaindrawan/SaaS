@@ -16,9 +16,7 @@ class UpdateWebsiteContentRequest extends FormRequest
         return [
             'website_name' => 'required|string|max:255',
             'content_data' => 'required|array',
-            'content_data.*' => 'nullable',
-            'subdomain' => 'nullable|string|max:255|unique:website_contents,subdomain,' . $this->route('websiteContent')->id,
-            'custom_domain' => 'nullable|string|max:255|unique:website_contents,custom_domain,' . $this->route('websiteContent')->id
+            'content_data.*' => 'nullable'
         ];
     }
 
@@ -26,9 +24,7 @@ class UpdateWebsiteContentRequest extends FormRequest
     {
         return [
             'website_name.required' => 'Website name is required',
-            'content_data.required' => 'Content data is required',
-            'subdomain.unique' => 'This subdomain is already taken',
-            'custom_domain.unique' => 'This domain is already registered'
+            'content_data.required' => 'Content data is required'
         ];
     }
 }

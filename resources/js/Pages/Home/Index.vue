@@ -197,9 +197,9 @@ const features = [
 
 const plans = [
   {
-    name: 'Restaurant',
-    slug: 'restaurant',
-    description: 'Template Website Restoran Modern',
+    name: 'Landing Page',
+    slug: 'landing-page',
+    description: 'Template Website Landing Page Modern',
     price: 'Rp 2.000.000',
     originalPrice: 'Rp 2.999.000',
     features: [

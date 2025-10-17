@@ -204,6 +204,8 @@
                             :pricing="pricing"
                             :form-data="{}"
                             :loading="form.processing"
+                            :website-status="websiteContent.status"
+                            :payment="payment"
                             @voucher-applied="handleVoucherApplied"
                             @confirm-payment="showConfirmation"
                         />
@@ -255,6 +257,7 @@ const props = defineProps({
     template: Object,
     pricing: Object,
     user: Object,
+    payment: Object,
     breadcrumbs: Array
 })
 

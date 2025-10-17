@@ -13,7 +13,7 @@
             "key": "site_title",
             "label": "Site Title",
             "type": "text",
-            "required": true,
+            "required": false,
             "default": "Company"
         },
         {
@@ -27,7 +27,7 @@
             "key": "hero_title",
             "label": "Hero Title",
             "type": "text",
-            "required": true,
+            "required": false,
             "default": "Welcome to Our Website"
         },
         {

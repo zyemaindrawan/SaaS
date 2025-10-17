@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WebsiteContent;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -75,6 +76,11 @@ class DraftController extends Controller
             session(['checkout_pricing' => $pricingDetails]);
         }
 
+        // Get associated payment if exists
+        $payment = Payment::where('website_content_id', $websiteContent->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
         return Inertia::render('Drafts/Show', [
             'websiteContent' => [
                 'id' => $websiteContent->id,
@@ -100,6 +106,14 @@ class DraftController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
             ],
+            'payment' => $payment ? [
+                'id' => $payment->id,
+                'code' => $payment->code,
+                'status' => $payment->status,
+                'gross_amount' => $payment->gross_amount,
+                'created_at' => $payment->created_at,
+                'expired_at' => $payment->expired_at,
+            ] : null,
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'href' => '/dashboard'],
                 ['name' => 'My Drafts', 'href' => '/drafts'],

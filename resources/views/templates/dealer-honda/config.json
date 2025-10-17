@@ -74,7 +74,7 @@
             "label": "Hero Title",
             "type": "text",
             "section": "hero",
-            "required": true,
+            "required": false,
             "max_length": 255,
             "placeholder": "Selamat Datang di Dealer Honda",
             "value": "Selamat Datang Honda Pradana"
@@ -84,7 +84,7 @@
             "label": "Hero Subtitle",
             "type": "textarea",
             "section": "hero",
-            "required": true,
+            "required": false,
             "max_length": 500,
             "placeholder": "Deskripsi promo dan layanan",
             "value": "Dapatkan diskon s\/d Rp 50 juta, bonus aksesoris, dan cicilan 0% untuk semua tipe Honda. Proses kredit cepat, unit siap stok."

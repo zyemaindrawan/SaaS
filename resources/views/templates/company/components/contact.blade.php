@@ -73,10 +73,23 @@
                 @endif
             </div>
             
-            <!-- Map or Additional Content -->
-            <div class="bg-gray-200 rounded-lg h-96 flex items-center justify-center">
-                <p class="text-gray-500">Map Integration (Optional)</p>
-            </div>
+                <!-- Map or Additional Content -->
+                @php
+                    $mapsEmbedUrl = $content['maps_embed_url'] ?? '';
+                @endphp
+
+                <!-- Map or Additional Content -->
+                @if($mapsEmbedUrl)
+                    <div class="bg-gray-200 rounded-lg h-96 flex items-center justify-center">
+                        <a href="{{ $mapsEmbedUrl }}" target="_blank" class="text-blue-600 hover:text-blue-800 font-semibold">
+                            View Map Location
+                        </a>
+                    </div>
+                @else
+                    <div class="bg-gray-200 rounded-lg h-96 flex items-center justify-center">
+                        <p class="text-gray-500">Map Integration (Optional)</p>
+                    </div>
+                @endif
         </div>
     </div>
 </section>
