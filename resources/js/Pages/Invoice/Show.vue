@@ -63,7 +63,7 @@
                         <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
                             <h3 class="text-lg font-semibold text-white flex items-center">
                                 <CreditCardIcon class="w-5 h-5 mr-2" />
-                                Order Summary
+                                INVOICE: {{ payment.code }}
                             </h3>
                         </div>
 
@@ -183,15 +183,10 @@
                                                 <span class="text-gray-500">{{ formatPrice(payment.fee) }}</span>
                                             </div>
 
-                                            <div class="flex justify-between text-sm">
-                                                <span class="text-gray-500">Voucher Discount</span>
-                                                <span class="text-gray-500">{{ formatPrice(payment.voucher_discount) }}</span>
-                                            </div>
-
                                             <!-- Subtotal -->
                                             <div class="flex justify-between text-sm border-t border-gray-100 pt-2">
                                                 <span class="text-gray-600 font-medium">Subtotal</span>
-                                                <span class="font-medium">{{ formatPrice(payment.gross_amount) }}</span>
+                                                <span class="font-medium">{{ formatPrice(subtotal) }}</span>
                                             </div>
 
                                             <!-- Voucher Discount -->
@@ -303,6 +298,10 @@ const isPaymentExpired = computed(() => {
 
 const isPaymentPaid = computed(() => {
     return props.payment.status === 'paid'
+})
+
+const subtotal = computed(() => {
+    return Number(props.payment.amount || 0) + Number(props.payment.fee || 0)
 })
 
 // Methods

@@ -30,15 +30,24 @@ class CheckoutController extends Controller
 
         $user = Auth::user();
 
-        // Check existing draft
+        // Check existing website content with this template
         $existingContent = WebsiteContent::where('user_id', $user->id)
             ->where('template_slug', $template->slug)
-            ->whereIn('status', ['draft', 'previewed'])
+            ->latest()
             ->first();
 
         if ($existingContent) {
-            return redirect()->route('content.edit', $existingContent)
-                ->with('info', 'You already have a draft with this template. Please complete it first.');
+            // If status is active, processing, expired, or suspended - redirect to dashboard
+            if (in_array($existingContent->status, ['active', 'processing', 'expired', 'suspended', 'paid'])) {
+                return redirect()->route('dashboard')
+                    ->with('info', "Website Anda sudah aktif dengan template: {$template->name}");
+            }
+            
+            // If status is draft or previewed - redirect to drafts page
+            if (in_array($existingContent->status, ['draft', 'previewed'])) {
+                return redirect()->route('drafts.show', $existingContent->id)
+                    ->with('info', 'You already have a draft with this template. Please complete it first.');
+            }
         }
 
         // Calculate pricing
@@ -676,7 +685,14 @@ class CheckoutController extends Controller
         Log::info('confirmPayment called', [
             'user_id' => $user->id,
             'website_content_id' => $websiteContent->id,
-            'status' => $websiteContent->status
+            'status' => $websiteContent->status,
+            'request_data' => $request->all()
+        ]);
+        
+        // Validate voucher data from request
+        $request->validate([
+            'voucher_code' => 'nullable|string|max:255',
+            'voucher_discount' => 'nullable|numeric|min:0',
         ]);
 
         // Verify ownership
@@ -689,13 +705,14 @@ class CheckoutController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        // Check if website content is in draft status
-        if ($websiteContent->status !== 'draft') {
-            Log::warning('Website content not in draft status', [
-                'status' => $websiteContent->status
+        // Check if website content is in draft or previewed status
+        if (!in_array($websiteContent->status, ['draft', 'previewed'])) {
+            Log::warning('Website content not in valid status for payment', [
+                'status' => $websiteContent->status,
+                'required_status' => ['draft', 'previewed']
             ]);
             return redirect()->route('drafts.show', $websiteContent->id)
-                ->with('error', 'Website content is not in draft status');
+                ->with('error', 'Website content must be in draft or previewed status to proceed with payment');
         }
 
         // Get pricing details from session
@@ -708,6 +725,57 @@ class CheckoutController extends Controller
             Log::warning('Pricing information not found in session');
             return redirect()->route('drafts.show', $websiteContent->id)
                 ->with('error', 'Pricing information not found. Please restart the checkout process.');
+        }
+        
+        // Update pricing details dengan data voucher dari request jika ada
+        $voucherCode = $request->input('voucher_code');
+        $voucherDiscount = $request->input('voucher_discount', 0);
+        
+        if ($voucherCode && $voucherDiscount > 0) {
+            Log::info('Processing voucher from request', [
+                'voucher_code' => $voucherCode,
+                'voucher_discount' => $voucherDiscount
+            ]);
+            
+            // Validate voucher masih berlaku
+            $voucher = \App\Models\Voucher::where('code', strtoupper(trim($voucherCode)))
+                ->active()
+                ->first();
+                
+            if ($voucher && $voucher->isValid()) {
+                // Update pricing details dengan voucher
+                $pricingDetails['voucher_code'] = $voucherCode;
+                $pricingDetails['voucher_discount'] = $voucherDiscount;
+                // Pastikan discount field ada (untuk regular discount)
+                if (!isset($pricingDetails['discount'])) {
+                    $pricingDetails['discount'] = 0;
+                }
+                $pricingDetails['total'] = max(0, $pricingDetails['subtotal'] + $pricingDetails['platform_fee'] - $voucherDiscount);
+                
+                Log::info('Voucher applied successfully', [
+                    'original_total' => $pricingDetails['subtotal'] + $pricingDetails['platform_fee'],
+                    'voucher_discount' => $voucherDiscount,
+                    'final_total' => $pricingDetails['total']
+                ]);
+            } else {
+                Log::warning('Invalid voucher code provided', [
+                    'voucher_code' => $voucherCode
+                ]);
+                // Reset voucher jika tidak valid
+                $voucherCode = null;
+                $voucherDiscount = 0;
+            }
+        }
+        
+        // Pastikan field voucher selalu ada di pricing details
+        if (!isset($pricingDetails['voucher_code'])) {
+            $pricingDetails['voucher_code'] = null;
+        }
+        if (!isset($pricingDetails['voucher_discount'])) {
+            $pricingDetails['voucher_discount'] = 0;
+        }
+        if (!isset($pricingDetails['discount'])) {
+            $pricingDetails['discount'] = 0;
         }
 
         DB::beginTransaction();
@@ -732,7 +800,10 @@ class CheckoutController extends Controller
             }
 
             Log::info('Processing paid template', [
-                'total' => $pricingDetails['total']
+                'total' => $pricingDetails['total'],
+                'voucher_code' => $pricingDetails['voucher_code'],
+                'voucher_discount' => $pricingDetails['voucher_discount'],
+                'complete_pricing' => $pricingDetails
             ]);
 
             // Create payment with Midtrans for paid templates

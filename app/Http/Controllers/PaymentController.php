@@ -6,6 +6,7 @@ use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -88,6 +89,45 @@ class PaymentController extends Controller
             ]);
 
             return response()->json(['status' => 'error'], 500);
+        }
+    }
+
+    /**
+     * Get payment by website content ID
+     */
+    public function getByWebsiteContentId($websiteContentId)
+    {
+        try {
+            $payment = Payment::where('website_content_id', $websiteContentId)
+                ->where('user_id', Auth::id()) // Ensure user owns this payment
+                ->latest()
+                ->first();
+
+            if (!$payment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment not found',
+                    'payment' => null
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'payment' => $payment
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching payment by website content ID: ' . $e->getMessage(), [
+                'website_content_id' => $websiteContentId,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching payment data',
+                'payment' => null
+            ], 500);
         }
     }
 }

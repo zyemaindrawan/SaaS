@@ -206,6 +206,7 @@
                             :loading="form.processing"
                             :website-status="websiteContent.status"
                             :payment="payment"
+                            :website-content-id="websiteContent.id"
                             @voucher-applied="handleVoucherApplied"
                             @confirm-payment="showConfirmation"
                         />
@@ -266,7 +267,10 @@ const showConfirmDialog = ref(false)
 const voucherDiscount = ref(0)
 const appliedVoucherCode = ref('')
 
-const form = useForm({})
+const form = useForm({
+    voucher_code: '',
+    voucher_discount: 0
+})
 
 // Computed untuk final pricing dengan voucher
 const finalPricing = computed(() => {
@@ -294,12 +298,21 @@ const showConfirmation = () => {
 
 const confirmPayment = () => {
     showConfirmDialog.value = false
+    
+    // Update form dengan data voucher sebelum dikirim
+    form.voucher_code = appliedVoucherCode.value
+    form.voucher_discount = voucherDiscount.value
+    
     form.post(`/drafts/${props.websiteContent.id}/confirm-payment`)
 }
 
 const handleVoucherApplied = (data) => {
     voucherDiscount.value = data.discount || 0
     appliedVoucherCode.value = data.code || ''
+    
+    // Update form data juga
+    form.voucher_code = data.code || ''
+    form.voucher_discount = data.discount || 0
 }
 
 const statusClass = (status) => {

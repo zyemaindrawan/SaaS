@@ -16,8 +16,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div class="text-sm">
-                            <p class="font-medium text-blue-800">Payment Pending</p>
-                            <p class="text-blue-600">Invoice #{{ payment?.code }}</p>
+                            <p class="font-medium text-blue-800">Payment Pending:</p>
+                            <p class="text-blue-600">Invoice #{{ actualPayment?.code || payment?.code }}</p>
                         </div>
                     </div>
                 </div>
@@ -27,19 +27,24 @@
                     <div class="flex justify-between">
                         <span class="text-gray-600">Template Price</span>
                         <span class="font-medium">
-                            {{ pricing.subtotal > 0 ? formatPrice(pricing.subtotal) : 'FREE' }}
+                            {{ getTemplatePrice() > 0 ? formatPrice(getTemplatePrice()) : 'FREE' }}
                         </span>
                     </div>
 
-                    <div v-if="pricing.subtotal > 0" class="flex justify-between text-sm">
+                    <div v-if="getTemplatePrice() > 0" class="flex justify-between text-sm">
                         <span class="text-gray-500">Platform Fee</span>
-                        <span class="text-gray-500">{{ formatPrice(pricing.platform_fee) }}</span>
+                        <span class="text-gray-500">{{ formatPrice(getPlatformFee()) }}</span>
+                    </div>
+
+                    <div v-if="getTemplatePrice() > 0" class="flex justify-between text-sm font-medium">
+                        <span class="text-gray-600">Subtotal</span>
+                        <span class="text-gray-600">{{ formatPrice(getSubtotal()) }}</span>
                     </div>
 
                     <!-- Voucher Discount -->
-                    <div v-if="localVoucherDiscount > 0 && voucherApplied" class="flex justify-between text-sm">
-                        <span class="text-green-600">Voucher ({{ appliedVoucher }})</span>
-                        <span class="text-green-600 font-medium">-{{ formatPrice(localVoucherDiscount) }}</span>
+                    <div v-if="displayVoucherDiscount > 0" class="flex justify-between text-sm">
+                        <span class="text-green-600">Voucher ({{ displayVoucherCode }})</span>
+                        <span class="text-green-600 font-medium">-{{ formatPrice(displayVoucherDiscount) }}</span>
                     </div>
 
                     <hr class="border-gray-200">
@@ -48,14 +53,11 @@
                     <div class="flex justify-between items-center">
                         <span class="text-lg font-bold text-gray-900">Final Amount</span>
                         <div class="text-right">
-                            <div v-if="localVoucherDiscount > 0" class="text-sm text-gray-500 line-through">
-                                {{ formatPrice(pricing.total) }}
-                            </div>
                             <div class="text-xl font-bold" :class="finalTotal > 0 ? 'text-green-600' : 'text-blue-600'">
                                 {{ finalTotal > 0 ? formatPrice(finalTotal) : 'FREE' }}
                             </div>
-                            <div v-if="localVoucherDiscount > 0" class="text-xs text-green-600 font-medium mt-1">
-                                💰 You save {{ formatPrice(localVoucherDiscount) }}
+                            <div v-if="displayVoucherDiscount > 0" class="text-xs text-green-600 font-medium mt-1">
+                                💰 You save {{ formatPrice(displayVoucherDiscount) }}
                             </div>
                         </div>
                     </div>
@@ -68,7 +70,7 @@
                             <path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clip-rule="evenodd" />
                             <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
                         </svg>
-                        Voucher Code
+                        Voucher Code:
                     </h5>
                     
                     <div class="space-y-3">
@@ -165,7 +167,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { ShoppingCartIcon } from '@heroicons/vue/24/outline'
 import axios from 'axios'
 
@@ -188,6 +190,10 @@ const props = defineProps({
     payment: {
         type: Object,
         default: null
+    },
+    websiteContentId: {
+        type: Number,
+        default: null
     }
 })
 
@@ -201,6 +207,10 @@ const appliedVoucher = ref('')
 const applyingVoucher = ref(false)
 const localVoucherDiscount = ref(props.voucherDiscount || 0)
 
+// Payment state for proper data fetching
+const actualPayment = ref(props.payment || null)
+const loadingPayment = ref(false)
+
 // Popular voucher codes for quick selection
 const popularVoucherCodes = ref([
     { code: 'WELCOME10', discount: 10 },
@@ -210,7 +220,26 @@ const popularVoucherCodes = ref([
 ])
 
 const finalTotal = computed(() => {
+    if (shouldShowInvoiceButton.value && actualPayment.value) {
+        // Use final_amount from payment (same as invoice Show.vue)
+        return Number(actualPayment.value.final_amount || actualPayment.value.amount || 0)
+    }
     return Math.max(0, props.pricing.total - localVoucherDiscount.value)
+})
+
+// Display voucher data from payment if available, otherwise from local state
+const displayVoucherDiscount = computed(() => {
+    if (shouldShowInvoiceButton.value && actualPayment.value && actualPayment.value.voucher_code) {
+        return Number(actualPayment.value.voucher_discount || 0)
+    }
+    return localVoucherDiscount.value
+})
+
+const displayVoucherCode = computed(() => {
+    if (shouldShowInvoiceButton.value && actualPayment.value) {
+        return actualPayment.value.voucher_code || ''
+    }
+    return appliedVoucher.value
 })
 
 const hasFormData = computed(() => {
@@ -218,7 +247,7 @@ const hasFormData = computed(() => {
 })
 
 const shouldShowInvoiceButton = computed(() => {
-    return props.websiteStatus === 'previewed' && props.payment && props.payment.code
+    return props.websiteStatus === 'previewed' && (actualPayment.value || props.payment) && (actualPayment.value?.code || props.payment?.code)
 })
 
 const buttonText = computed(() => {
@@ -247,8 +276,58 @@ const formatPrice = (price) => {
     }).format(price)
 }
 
+const getOriginalTotal = () => {
+    // This is the subtotal before voucher discount
+    return getSubtotal()
+}
+
+const getTemplatePrice = () => {
+    if (shouldShowInvoiceButton.value && actualPayment.value) {
+        // Template price = payment.amount (same as invoice Show.vue)
+        return Number(actualPayment.value.amount || 0)
+    }
+    return props.pricing.subtotal || 0
+}
+
+const getPlatformFee = () => {
+    if (shouldShowInvoiceButton.value && actualPayment.value) {
+        return Number(actualPayment.value.fee || 0)
+    }
+    return props.pricing.platform_fee || 0
+}
+
+const getSubtotal = () => {
+    if (shouldShowInvoiceButton.value && actualPayment.value) {
+        // Subtotal = payment.amount + payment.fee (same as invoice Show.vue)
+        return Number(actualPayment.value.amount || 0) + Number(actualPayment.value.fee || 0)
+    }
+    return props.pricing.total || 0
+}
+
 const handleImageError = (event) => {
     event.target.src = '/default-avatar.png'
+}
+
+// Fetch payment data based on website_content_id
+const fetchPaymentData = async () => {
+    if (!shouldShowInvoiceButton.value || !props.websiteContentId || loadingPayment.value) {
+        return
+    }
+
+    try {
+        loadingPayment.value = true
+        const response = await axios.get(`/api/payments/by-website/${props.websiteContentId}`)
+        
+        if (response.data && response.data.payment) {
+            actualPayment.value = response.data.payment
+        }
+    } catch (error) {
+        console.error('Failed to fetch payment data:', error)
+        // Fallback to props.payment if API fails
+        actualPayment.value = props.payment
+    } finally {
+        loadingPayment.value = false
+    }
 }
 
 const applyVoucher = async () => {
@@ -305,7 +384,10 @@ const removeVoucher = () => {
 const handleButtonClick = () => {
     if (shouldShowInvoiceButton.value) {
         // Redirect to invoice page
-        window.location.href = `/invoice/${props.payment.code}`
+        const paymentCode = actualPayment.value?.code || props.payment?.code
+        if (paymentCode) {
+            window.location.href = `/invoice/${paymentCode}`
+        }
     } else {
         // Emit confirm payment event
         emit('confirm-payment')
@@ -315,5 +397,19 @@ const handleButtonClick = () => {
 // Watch for external voucher discount changes
 watch(() => props.voucherDiscount, (newValue) => {
     localVoucherDiscount.value = newValue || 0
+})
+
+// Watch for changes that require fetching payment data
+watch(() => [props.websiteContentId, props.websiteStatus], () => {
+    if (shouldShowInvoiceButton.value) {
+        fetchPaymentData()
+    }
+}, { immediate: false })
+
+// Initialize on mount
+onMounted(() => {
+    if (shouldShowInvoiceButton.value && props.websiteContentId) {
+        fetchPaymentData()
+    }
 })
 </script>

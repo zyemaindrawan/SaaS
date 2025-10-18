@@ -231,13 +231,19 @@ const getDraftStatusText = (status) => {
                                         class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                                     >
                                         <EyeIcon class="w-4 h-4 mr-1" />
-                                        Preview
+                                        Preview Website
                                     </Link>
                                     <Link
                                         :href="`/website-builder/${draft.id}/edit`"
                                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                                     >
-                                        Continue
+                                        Edit Content
+                                    </Link>
+                                    <Link
+                                        :href="`/drafts/${draft.id}`"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    >
+                                        Continue Payment
                                     </Link>
                                 </div>
                             </div>
@@ -268,7 +274,7 @@ const getDraftStatusText = (status) => {
                 <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <DocumentTextIcon class="w-6 h-6 mr-3" />
-                        Your Websites
+                        Active Websites
                     </h2>
                 </div>
 
@@ -348,21 +354,10 @@ const getDraftStatusText = (status) => {
 
                     <div v-else class="text-center py-12">
                         <DocumentTextIcon class="mx-auto h-16 w-16 text-gray-400 mb-4" />
-
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">No active websites yet</h3>
                         <p class="text-gray-600 mb-6">
                             Your active websites will appear here once they are published.
                         </p>
-
-                        <Link
-                            href="/templates"
-                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition duration-200 shadow-sm hover:shadow-md"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                            </svg>
-                            Create Your First Website
-                        </Link>
                     </div>
                 </div>
             </div>

@@ -2,6 +2,7 @@
     $heroTitle = $content['about_title'] ?? 'Dealer Resmi Honda Terpercaya di Indonesia';
     $WebsiteName = $website->website_name ?? 'Nama Website';
     $heroBackground = $content['about_image'] ?? null;
+    $companyTagline = $content['company_tagline'] ?? 'Melayani dengan sepenuh hati untuk kepuasan Anda';
 @endphp
 
 <section id="home" class="relative bg-gray-900 text-white min-h-[700px] flex items-center">
@@ -19,10 +20,10 @@
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div class="max-w-3xl">
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-               Selamat Datang Di {{ $WebsiteName }}
+               Selamat Datang Di<br>{{ $WebsiteName }}
             </h1>
             <p class="text-xl md:text-2xl mb-8 text-gray-100">
-                Penjualan & Service Resmi Honda
+                {{ $companyTagline}}
             </p>
             <div class="flex flex-col sm:flex-row gap-4">
                 <a href="#contact" class="inline-flex items-center justify-center bg-white hover:bg-gray-100 text-honda-red font-bold px-8 py-4 rounded-lg transition duration-300 shadow-lg">

@@ -7,6 +7,7 @@ use App\Models\WebsiteContent;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class PaymentService
 {
@@ -22,6 +23,11 @@ class PaymentService
     public function createPayment(WebsiteContent $websiteContent, array $pricingDetails): Payment
     {
         $user = $websiteContent->user;
+
+        Log::info('PaymentService::createPayment called', [
+            'pricing_details' => $pricingDetails,
+            'website_content_id' => $websiteContent->id
+        ]);
 
         // Calculate amounts step by step
         $baseAmount = $pricingDetails['subtotal'] + $pricingDetails['platform_fee']; // Template price + platform fee
@@ -42,7 +48,7 @@ class PaymentService
             'website_content_id' => $websiteContent->id,
             'amount' => $pricingDetails['subtotal'],
             'fee' => $pricingDetails['platform_fee'],
-            'discount' => $pricingDetails['discount'],
+            'discount' => $pricingDetails['discount'] ?? 0,
             'gross_amount' => $grossAmount,
             'voucher_code' => $pricingDetails['voucher_code'] ?? null,
             'voucher_discount' => $pricingDetails['voucher_discount'] ?? 0,

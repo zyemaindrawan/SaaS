@@ -198,24 +198,24 @@ const features = [
 const plans = [
   {
     name: 'Landing Page',
-    slug: 'landing-page',
+    slug: '/',
     description: 'Template Website Landing Page Modern',
     price: 'Rp 2.000.000',
-    originalPrice: 'Rp 2.999.000',
+    originalPrice: 'Rp 3.999.000',
     features: [
-      'Sistem Pemesanan Online',
-      'Menu Digital Interaktif',
-      'Integrasi dengan Gofood/Grabfood',
-      'Gallery Foto Menu'
+      'Section Tentang Kami',
+      'Layanan & Produk',
+      'Testimonial Pelanggan',
+      'Kontak & Lokasi'
     ],
     popular: false
   },
   {
     name: 'Company Profile',
-    slug: 'corporate',
+    slug: '/',
     description: 'Template Website Company Profile',
-    price: 'Rp 1.950.000',
-    originalPrice: 'Rp 3.999.000',
+    price: 'Rp 2.950.000',
+    originalPrice: 'Rp 4.999.000',
     features: [
       'Desain Premium & Profesional',
       'Halaman Blog Terintegrasi',
@@ -226,7 +226,7 @@ const plans = [
   },
   {
     name: 'E-Commerce',
-    slug: 'e-commerce',
+    slug: '/',
     description: 'Template Toko Online Lengkap',
     price: 'Rp 5.250.000',
     originalPrice: 'Rp 7.999.000',

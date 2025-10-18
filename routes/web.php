@@ -153,6 +153,12 @@ Route::prefix('api')->group(function () {
         Route::get('/', [VoucherController::class, 'index']);
         Route::get('/{code}', [VoucherController::class, 'show']);
     });
+    
+    // Payment API routes
+    Route::prefix('payments')->group(function () {
+        Route::get('/by-website/{websiteContentId}', [PaymentController::class, 'getByWebsiteContentId'])
+            ->middleware('auth');
+    });
 });
 
 require __DIR__.'/auth.php';
