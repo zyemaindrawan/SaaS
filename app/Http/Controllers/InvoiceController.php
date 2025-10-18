@@ -27,11 +27,14 @@ class InvoiceController extends Controller
             abort(403);
         }
 
+        // Check and update expired status
+        $payment = $this->paymentService->checkAndUpdateExpiredStatus($payment);
+
         $snapToken = null;
         $error = null;
 
         try {
-            // Generate snap token if payment is still pending
+            // Generate snap token if payment is still pending and not expired
             if ($payment->status === 'pending') {
                 $snapToken = $this->paymentService->getSnapToken($payment);
             }

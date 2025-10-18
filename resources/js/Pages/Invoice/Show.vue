@@ -82,13 +82,6 @@
                                         <h4 class="font-bold text-xl text-gray-900 mb-2">
                                             {{ props.template.name }}
                                         </h4>
-
-                                        <p
-                                            v-if="props.template.description"
-                                            class="text-gray-600 leading-relaxed"
-                                        >
-                                            {{ props.template.description }}
-                                        </p>
                                     </div>
 
                                     <!-- Payment Button -->
@@ -120,6 +113,9 @@
                                         </span>
                                         <span v-else-if="isPaymentPaid">
                                             Payment Completed
+                                        </span>
+                                        <span v-else-if="isPaymentExpired">
+                                            Payment Expired
                                         </span>
                                         <span v-else-if="!props.snapToken">
                                             Generating Payment Token...
@@ -293,7 +289,7 @@ const isDevelopment = computed(() => {
 })
 
 const isPaymentExpired = computed(() => {
-    return new Date() > new Date(props.payment.expired_at)
+    return props.payment.status === 'expired' || new Date() > new Date(props.payment.expired_at)
 })
 
 const isPaymentPaid = computed(() => {

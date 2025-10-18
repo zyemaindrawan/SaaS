@@ -54,7 +54,7 @@ class PaymentService
             'voucher_discount' => $pricingDetails['voucher_discount'] ?? 0,
             'final_amount' => $finalAmount,
             'status' => 'pending',
-            'expired_at' => now()->addHours(2), // 2 Jam
+            'expired_at' => now()->addMinutes(5), // 5 Menit
         ]);
 
         // Log payment creation
@@ -63,9 +63,27 @@ class PaymentService
         return $payment;
     }
 
+    /**
+     * Check and update payment status if expired
+     */
+    public function checkAndUpdateExpiredStatus(Payment $payment): Payment
+    {
+        if ($payment->expired_at && now()->greaterThan($payment->expired_at) && $payment->status === 'pending') {
+            $this->markAsExpired($payment);
+            $payment->refresh(); // Reload payment data
+        }
+        
+        return $payment;
+    }
 
     public function getSnapToken(Payment $payment): string
     {
+        // Check if payment is expired
+        if ($payment->expired_at && now()->greaterThan($payment->expired_at)) {
+            $this->markAsExpired($payment);
+            throw new \Exception('Payment has expired');
+        }
+
         $user = $payment->user;
         $websiteContent = $payment->websiteContent;
         $template = $websiteContent->template;
@@ -113,7 +131,7 @@ class PaymentService
         $params = [
             'transaction_details' => [
                 'order_id' => $payment->code,
-                'gross_amount' => (int) $payment->final_amount, // Use final_amount that includes discount
+                'gross_amount' => (int) $payment->final_amount,
             ],
             'customer_details' => [
                 'first_name' => $user->name,
@@ -127,16 +145,22 @@ class PaymentService
                 'error' => route('payment.error', $payment->code),
             ],
             'expiry' => [
-                'duration' => 12,
-                'unit' => 'hours'
+                'duration' => 5,
+                'unit' => 'minutes'
             ]
         ];
 
         try {
             $snapToken = Snap::getSnapToken($params);
 
-            // Log snap token generation
-            $this->logPayment($payment, 'snap_token_generated', 'Snap token generated successfully');
+            // Only log if snap token hasn't been generated before for this payment
+            $existingLog = PaymentLog::where('payment_id', $payment->id)
+                ->where('action', 'snap_token_generated')
+                ->exists();
+                
+            if (!$existingLog) {
+                $this->logPayment($payment, 'snap_token_generated', 'Snap token generated successfully');
+            }
 
             return $snapToken;
         } catch (\Exception $e) {
@@ -200,7 +224,7 @@ class PaymentService
         // Update website content status
         $payment->websiteContent->update([
             'status' => 'active',
-            'expired_at' => now()->addDays(30) // 30 hari
+            'expired_at' => now()->addYear(1) // 1 tahun
         ]);
 
         $this->logPayment($payment, 'paid', 'Payment completed successfully');
@@ -213,6 +237,12 @@ class PaymentService
     {
         $payment->update(['status' => 'failed']);
         $this->logPayment($payment, 'failed', "Payment failed: {$reason}");
+    }
+
+    private function markAsExpired(Payment $payment): void
+    {
+        $payment->update(['status' => 'expired']);
+        $this->logPayment($payment, 'expired', 'Payment has expired');
     }
 
     private function logPayment(Payment $payment, string $action, string $description, array $data = []): void
