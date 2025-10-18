@@ -16,7 +16,12 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home/Index');
+    return Inertia::render('Home/Index', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        // 'laravelVersion' => Application::VERSION,
+        // 'phpVersion' => PHP_VERSION,
+    ]);
 })->name('home');
 
 Route::get('/{page}', fn () => inertia('404/Index'))
