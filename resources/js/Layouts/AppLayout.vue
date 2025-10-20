@@ -27,12 +27,12 @@
                             <NavLink href="/templates" :active="$page.url.startsWith('/templates')">
                                 Templates
                             </NavLink>
-                            <NavLink href="/pricing" :active="$page.url.startsWith('/pricing')">
+                            <!-- <NavLink href="/pricing" :active="$page.url.startsWith('/pricing')">
                                 Pricing
                             </NavLink>
                             <NavLink href="/about" :active="$page.url.startsWith('/about')">
                                 About
-                            </NavLink>
+                            </NavLink> -->
                         </div>
                     </div>
 

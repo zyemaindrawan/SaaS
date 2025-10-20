@@ -24,17 +24,17 @@ defineProps({
 
 // Countdown timer
 const countdown = ref({
-    days: 3,
+    days: 0,
     hours: 0,
-    minutes: 0,
-    seconds: 0
+    minutes: 5,
+    seconds: 10
 });
 
 let countdownInterval = null;
 
 const startCountdown = () => {
     const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 3);
+    endDate.setDate(endDate.getDate() + 1);
     
     countdownInterval = setInterval(() => {
         const now = new Date().getTime();
@@ -69,7 +69,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head title="Jasa Pembuatan Website Profesional - Siap dalam 1 Menit" />
+    <Head title="Jasa Pembuatan Website Profesional - Siap dalam 1 Jam" />
     <AppLayout>
 
         <!-- Hero Section -->
@@ -77,7 +77,7 @@ onUnmounted(() => {
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">
                     Jasa Pembuatan Website Profesional<br class="hidden sm:block">
-                    <span class="text-yellow-300">Siap dalam 1 Menit!</span>
+                    <span class="text-yellow-300">Siap dalam 1 Jam!</span>
                 </h1>
                 <p class="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 opacity-90 max-w-4xl mx-auto">
                     Solusi jasa landing page dan website tanpa coding tercepat untuk bisnis Anda.<br class="hidden sm:block">
@@ -112,7 +112,7 @@ onUnmounted(() => {
                                 <h3 class="text-lg md:text-xl font-bold text-green-600 mb-4">✅ Solusi Kami:</h3>
                                 <ul class="space-y-2 md:space-y-3 text-sm md:text-base text-gray-700">
                                     <li>• Jasa website murah yang hasilnya tidak murahan</li>
-                                    <li>• Website tanpa coding, siap dalam 1 menit</li>
+                                    <li>• Website tanpa coding, siap dalam 1 jam</li>
                                     <li>• Desain profesional dengan teknologi AI</li>
                                     <li>• Harga terjangkau untuk semua kalangan</li>
                                 </ul>
@@ -137,7 +137,7 @@ onUnmounted(() => {
                             <div class="bg-blue-100 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
                                 <span class="text-2xl md:text-3xl font-bold text-blue-600">1</span>
                             </div>
-                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-4">📝 Isi Detail Bisnis</h3>
+                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-4">Isi Detail Bisnis</h3>
                             <p class="text-sm md:text-base text-gray-600">Masukkan informasi bisnis Anda. Ini adalah inti dari jasa pembuatan website kami yang mudah dan cepat.</p>
                         </div>
                         
@@ -145,7 +145,7 @@ onUnmounted(() => {
                             <div class="bg-purple-100 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
                                 <span class="text-2xl md:text-3xl font-bold text-purple-600">2</span>
                             </div>
-                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-4">📷 Upload Materi</h3>
+                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-4">Upload Materi</h3>
                             <p class="text-sm md:text-base text-gray-600">Unggah foto produk dan logo bisnis Anda. AI kami akan mengatur semuanya dengan profesional.</p>
                         </div>
                         
@@ -153,7 +153,7 @@ onUnmounted(() => {
                             <div class="bg-green-100 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
                                 <span class="text-2xl md:text-3xl font-bold text-green-600">3</span>
                             </div>
-                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-4">🚀 Bayar & Live!</h3>
+                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-4">Bayar & Live!</h3>
                             <p class="text-sm md:text-base text-gray-600">Selesaikan pembayaran dan website Anda langsung online. Tidak ada waktu tunggu yang lama!</p>
                         </div>
                     </div>
@@ -170,12 +170,12 @@ onUnmounted(() => {
                 <div class="max-w-4xl mx-auto">
                     <!-- Countdown Timer -->
                     <div class="bg-red-600 text-white p-4 md:p-6 rounded-xl mb-6 md:mb-8 shadow-lg">
-                        <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">⏰ Penawaran Terbatas!</h3>
+                        <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Penawaran Terbatas!</h3>
                         <div class="flex justify-center space-x-4 md:space-x-8 text-center">
-                            <div>
+                            <!-- <div>
                                 <div class="text-2xl md:text-3xl font-bold">{{ countdown.days }}</div>
                                 <div class="text-xs md:text-sm opacity-80">Hari</div>
-                            </div>
+                            </div> -->
                             <div>
                                 <div class="text-2xl md:text-3xl font-bold">{{ countdown.hours }}</div>
                                 <div class="text-xs md:text-sm opacity-80">Jam</div>
@@ -213,11 +213,11 @@ onUnmounted(() => {
                                     </li>
                                     <li class="flex items-start text-sm md:text-base">
                                         <span class="text-green-500 mr-2 flex-shrink-0">✓</span>
-                                        <span>Siap dalam 1 Menit (Solusi jasa bikin website tercepat)</span>
+                                        <span>Siap dalam 1 Jam (solusi jasa bikin website tercepat)</span>
                                     </li>
                                     <li class="flex items-start text-sm md:text-base">
                                         <span class="text-green-500 mr-2 flex-shrink-0">✓</span>
-                                        <span>Sangat Terjangkau (Bukti jasa website murah berkualitas)</span>
+                                        <span>Sangat terjangkau (jasa website murah berkualitas)</span>
                                     </li>
                                 </ul>
                             </div>
@@ -260,7 +260,7 @@ onUnmounted(() => {
         <section class="py-12 md:py-20 bg-gray-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12 md:mb-16">
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 md:mb-6">FAQ: Menjawab Keraguan Anda</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 md:mb-6">FAQ</h2>
                     <p class="text-lg md:text-xl text-gray-600">Pertanyaan yang sering ditanyakan tentang layanan kami</p>
                 </div>
                 
@@ -272,23 +272,23 @@ onUnmounted(() => {
                         </div>
                         
                         <div class="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">🤖 Apakah saya benar-benar bisa punya website tanpa coding?</h3>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">❓ Apakah saya benar-benar bisa punya website tanpa coding?</h3>
                             <p class="text-sm md:text-base text-gray-600">Absolutely! Sistem website tanpa coding kami menggunakan AI untuk membuat website profesional. Anda hanya perlu mengisi data bisnis dan upload foto.</p>
                         </div>
                         
                         <div class="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">💰 Apakah jasa pembuatan website ini ada biaya bulanan lainnya?</h3>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">❓ Apakah jasa pembuatan website ini ada biaya bulanan lainnya?</h3>
                             <p class="text-sm md:text-base text-gray-600">Tidak ada biaya tersembunyi! Harga Rp 499.000 sudah termasuk semuanya. Hosting dan domain gratis selamanya untuk paket ini.</p>
                         </div>
                         
                         <div class="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">✏️ Apakah website dapat saya edit sendiri?</h3>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">❓ Apakah website dapat saya edit sendiri?</h3>
                             <p class="text-sm md:text-base text-gray-600">Ya! Anda mendapat akses penuh untuk mengedit konten website kapan saja melalui dashboard yang mudah digunakan, tanpa perlu keahlian teknis.</p>
                         </div>
                         
                         <div class="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">⚡ Benarkah website siap dalam 1 menit?</h3>
-                            <p class="text-sm md:text-base text-gray-600">Ya benar! Setelah Anda melengkapi data dan upload materi, AI kami akan generate website profesional dalam hitungan menit, bukan hari atau minggu.</p>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">❓ Benarkah website siap dalam 1 jam?</h3>
+                            <p class="text-sm md:text-base text-gray-600">Ya benar! Setelah Anda melengkapi data dan upload materi, AI kami akan generate website profesional dalam hitungan jam, bukan hari atau minggu.</p>
                         </div>
                     </div>
                 </div>
@@ -308,7 +308,7 @@ onUnmounted(() => {
                         <div>
                             <div class="text-3xl md:text-4xl mb-2">⚡</div>
                             <div class="font-bold text-sm md:text-base">Proses Cepat</div>
-                            <div class="text-xs md:text-sm opacity-80">Siap dalam 1 menit</div>
+                            <div class="text-xs md:text-sm opacity-80">Siap dalam 1 jam</div>
                         </div>
                         <div>
                             <div class="text-3xl md:text-4xl mb-2">💰</div>
@@ -328,10 +328,10 @@ onUnmounted(() => {
                 </div>
                 
                 <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 md:p-6 max-w-2xl mx-auto">
-                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">💬 Masih Ada Pertanyaan?</h3>
+                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Masih Ada Pertanyaan?</h3>
                     <p class="mb-3 md:mb-4 text-sm md:text-base">Masih ada pertanyaan seputar jasa bikin website kami?</p>
                     <button @click="openWhatsApp" class="bg-green-500 text-white font-bold px-4 md:px-8 py-2 md:py-3 rounded-full hover:bg-green-600 transition-all duration-300 shadow-lg text-sm md:text-base">
-                        📱 Hubungi Tim Kami di WhatsApp: +62 811-935-0608
+                        📱 Hubungi Kami di WhatsApp: +62 811-935-0608
                     </button>
                 </div>
             </div>
@@ -350,15 +350,15 @@ onUnmounted(() => {
                         <div class="flex mb-3 md:mb-4">
                             <span class="text-yellow-400 text-sm md:text-base">★★★★★</span>
                         </div>
-                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Website saya jadi dalam hitungan menit! Benar-benar mudah dan hasilnya sangat profesional. Recommended banget untuk yang butuh website cepat!"</p>
-                        <div class="font-bold text-sm md:text-base text-gray-800">- Budi Santoso, Toko Online Fashion</div>
+                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Website saya jadi dalam hitungan jam! Benar-benar mudah dan hasilnya sangat profesional. Recommended banget untuk yang butuh website cepat."</p>
+                        <div class="font-bold text-sm md:text-base text-gray-800">- Chandra Sahita, Owner Travel</div>
                     </div>
                     
                     <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg">
                         <div class="flex mb-3 md:mb-4">
                             <span class="text-yellow-400 text-sm md:text-base">★★★★★</span>
                         </div>
-                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Awalnya ragu dengan harga yang murah, tapi ternyata kualitasnya luar biasa! Customer service juga sangat responsif."</p>
+                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Awalnya ragu dengan harga yang murah, tapi ternyata kualitasnya luar biasa! Customer service juga sangat responsif. Proses instan dan mudah, thanks ya..."</p>
                         <div class="font-bold text-sm md:text-base text-gray-800">- Sari Dewi, Wedding Organizer</div>
                     </div>
                     
@@ -366,7 +366,7 @@ onUnmounted(() => {
                         <div class="flex mb-3 md:mb-4">
                             <span class="text-yellow-400 text-sm md:text-base">★★★★★</span>
                         </div>
-                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Sebagai pemula yang tidak ngerti coding sama sekali, layanan ini sangat membantu. Website company profile saya langsung jadi!"</p>
+                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Sebagai pemula yang tidak ngerti coding sama sekali, layanan ini sangat membantu. Website company profile saya langsung jadi dengan waktu instan."</p>
                         <div class="font-bold text-sm md:text-base text-gray-800">- Ahmad Rizky, Konsultan Bisnis</div>
                     </div>
                 </div>
