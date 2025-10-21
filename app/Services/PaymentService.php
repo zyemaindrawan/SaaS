@@ -8,6 +8,7 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class PaymentService
 {
@@ -54,7 +55,7 @@ class PaymentService
             'voucher_discount' => $pricingDetails['voucher_discount'] ?? 0,
             'final_amount' => $finalAmount,
             'status' => 'pending',
-            'expired_at' => now()->addMinutes(5), // 5 Menit
+            'expired_at' => now()->addHours(8), // 8 Jam
         ]);
 
         // Log payment creation
@@ -170,26 +171,51 @@ class PaymentService
         }
     }
 
-
     public function handleNotification(array $notificationData): void
     {
         $orderId = $notificationData['order_id'] ?? null;
         $transactionStatus = $notificationData['transaction_status'] ?? null;
         $fraudStatus = $notificationData['fraud_status'] ?? null;
 
+        Log::info('Processing Midtrans notification', [
+            'order_id' => $orderId,
+            'transaction_status' => $transactionStatus,
+            'fraud_status' => $fraudStatus
+        ]);
+
         if (!$orderId) {
+            Log::warning('Midtrans notification missing order_id', $notificationData);
             return;
         }
 
         $payment = Payment::where('code', $orderId)->first();
         if (!$payment) {
+            Log::warning('Payment not found for order_id: ' . $orderId, [
+                'order_id' => $orderId,
+                'available_payments' => Payment::pluck('code')->toArray()
+            ]);
             return;
         }
 
-        $payment->update([
-            'midtrans_data' => $notificationData,
-            'payment_type' => $notificationData['payment_type'] ?? null,
-        ]);
+        // Update payment with Midtrans data
+        try {
+            $payment->update([
+                'midtrans_data' => $notificationData,
+                'payment_type' => $notificationData['payment_type'] ?? null,
+            ]);
+
+            Log::info('Payment updated with Midtrans data', [
+                'payment_id' => $payment->id,
+                'order_id' => $orderId
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to update payment with Midtrans data', [
+                'error' => $e->getMessage(),
+                'payment_id' => $payment->id ?? null,
+                'order_id' => $orderId
+            ]);
+            // Continue processing even if update fails
+        }
 
         switch ($transactionStatus) {
             case 'capture':
@@ -211,26 +237,59 @@ class PaymentService
             case 'cancel':
                 $this->markAsFailed($payment, $transactionStatus);
                 break;
+
+            default:
+                Log::warning('Unknown transaction status', [
+                    'status' => $transactionStatus,
+                    'order_id' => $orderId
+                ]);
+                break;
         }
     }
 
     private function markAsPaid(Payment $payment): void
     {
-        $payment->update([
-            'status' => 'paid',
-            'paid_at' => now(),
-        ]);
+        try {
+            $payment->update([
+                'status' => 'paid',
+                'paid_at' => now(),
+            ]);
 
-        // Update website content status
-        $payment->websiteContent->update([
-            'status' => 'active',
-            'expired_at' => now()->addYear(1) // 1 tahun
-        ]);
+            Log::info('Payment marked as paid', [
+                'payment_id' => $payment->id,
+                'payment_code' => $payment->code
+            ]);
 
-        $this->logPayment($payment, 'paid', 'Payment completed successfully');
+            // Update website content status
+            if ($payment->websiteContent) {
+                $payment->websiteContent->update([
+                    'status' => 'processing',
+                    'activated_at' => now(),
+                    'expires_at' => now()->addYear(1) // 1 tahun
+                ]);
 
-        // Dispatch activation job (will be created in next step)
-        // ActivateWebsiteJob::dispatch($payment->websiteContent)->delay(now()->addHours(6));
+                Log::info('Website content activated', [
+                    'website_content_id' => $payment->websiteContent->id,
+                    'payment_id' => $payment->id
+                ]);
+            } else {
+                Log::warning('No website content found for payment', [
+                    'payment_id' => $payment->id
+                ]);
+            }
+
+            $this->logPayment($payment, 'paid', 'Payment completed successfully');
+
+            // Dispatch activation job (will be created in next step)
+            // ActivateWebsiteJob::dispatch($payment->websiteContent)->delay(now()->addHours(6));
+        } catch (\Exception $e) {
+            Log::error('Error marking payment as paid', [
+                'payment_id' => $payment->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
 
     private function markAsFailed(Payment $payment, string $reason): void

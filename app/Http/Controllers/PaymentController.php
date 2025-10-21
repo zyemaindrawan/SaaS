@@ -68,27 +68,42 @@ class PaymentController extends Controller
     {
         try {
             $notificationBody = json_decode($request->getContent(), true);
-            $notificationHeader = $request->server('HTTP_X_CALLBACK_TOKEN');
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('Invalid JSON in Midtrans notification', [
+                    'raw_content' => $request->getContent(),
+                    'json_error' => json_last_error_msg()
+                ]);
+                return response()->json(['status' => 'error', 'message' => 'Invalid JSON'], 400);
+            }
 
-            // Verify notification signature if needed
-            // You can add signature verification here for security
+            $notificationHeader = $request->server('HTTP_X_CALLBACK_TOKEN');
 
             Log::info('Midtrans notification received', [
                 'order_id' => $notificationBody['order_id'] ?? null,
-                'status' => $notificationBody['transaction_status'] ?? null
+                'transaction_status' => $notificationBody['transaction_status'] ?? null,
+                'gross_amount' => $notificationBody['gross_amount'] ?? null,
+                'payment_type' => $notificationBody['payment_type'] ?? null
             ]);
 
             // Handle the notification
             $this->paymentService->handleNotification($notificationBody);
 
-            return response()->json(['status' => 'success']);
-
-        } catch (\Exception $e) {
-            Log::error('Midtrans notification error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::info('Midtrans notification processed successfully', [
+                'order_id' => $notificationBody['order_id'] ?? null
             ]);
 
-            return response()->json(['status' => 'error'], 500);
+            return response()->json(['status' => 'success']);
+
+        } catch (\Throwable $e) {
+            Log::error('Midtrans notification error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request_content' => $request->getContent()
+            ]);
+
+            return response()->json(['status' => 'error', 'message' => 'Internal server error'], 500);
         }
     }
 

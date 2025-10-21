@@ -69,15 +69,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head title="Jasa Pembuatan Website Profesional - Siap dalam 1 Jam" />
+    <Head title="Jasa Pembuatan Website Profesional - Siap dalam 15 Menit" />
     <AppLayout>
 
         <!-- Hero Section -->
         <section class="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white py-12 md:py-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">
-                    Jasa Pembuatan Website Profesional<br class="hidden sm:block">
-                    <span class="text-yellow-300">Siap dalam 1 Jam!</span>
+                    Jasa Pembuatan Website Profesional <br class="hidden sm:block">
+                    <span class="text-yellow-300">Siap dalam 15 Menit!</span>
                 </h1>
                 <p class="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 opacity-90 max-w-4xl mx-auto">
                     Solusi jasa landing page dan website tanpa coding tercepat untuk bisnis Anda.<br class="hidden sm:block">
@@ -112,7 +112,7 @@ onUnmounted(() => {
                                 <h3 class="text-lg md:text-xl font-bold text-green-600 mb-4">✅ Solusi Kami:</h3>
                                 <ul class="space-y-2 md:space-y-3 text-sm md:text-base text-gray-700">
                                     <li>• Jasa website murah yang hasilnya tidak murahan</li>
-                                    <li>• Website tanpa coding, siap dalam 1 jam</li>
+                                    <li>• Website tanpa coding, siap dalam 15 menit</li>
                                     <li>• Desain profesional dengan teknologi AI</li>
                                     <li>• Harga terjangkau untuk semua kalangan</li>
                                 </ul>
@@ -213,7 +213,7 @@ onUnmounted(() => {
                                     </li>
                                     <li class="flex items-start text-sm md:text-base">
                                         <span class="text-green-500 mr-2 flex-shrink-0">✓</span>
-                                        <span>Siap dalam 1 Jam (solusi jasa bikin website tercepat)</span>
+                                        <span>Siap dalam 15 Menit (solusi jasa bikin website tercepat)</span>
                                     </li>
                                     <li class="flex items-start text-sm md:text-base">
                                         <span class="text-green-500 mr-2 flex-shrink-0">✓</span>
@@ -287,8 +287,8 @@ onUnmounted(() => {
                         </div>
                         
                         <div class="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">❓ Benarkah website siap dalam 1 jam?</h3>
-                            <p class="text-sm md:text-base text-gray-600">Ya benar! Setelah Anda melengkapi data dan upload materi, AI kami akan generate website profesional dalam hitungan jam, bukan hari atau minggu.</p>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">❓ Benarkah website siap dalam 15 menit?</h3>
+                            <p class="text-sm md:text-base text-gray-600">Ya benar! Setelah Anda melengkapi data dan upload materi, AI kami akan generate website profesional dalam hitungan menit, bukan hari atau minggu.</p>
                         </div>
                     </div>
                 </div>
@@ -308,7 +308,7 @@ onUnmounted(() => {
                         <div>
                             <div class="text-3xl md:text-4xl mb-2">⚡</div>
                             <div class="font-bold text-sm md:text-base">Proses Cepat</div>
-                            <div class="text-xs md:text-sm opacity-80">Siap dalam 1 jam</div>
+                            <div class="text-xs md:text-sm opacity-80">Siap dalam 15 menit</div>
                         </div>
                         <div>
                             <div class="text-3xl md:text-4xl mb-2">💰</div>
@@ -350,7 +350,7 @@ onUnmounted(() => {
                         <div class="flex mb-3 md:mb-4">
                             <span class="text-yellow-400 text-sm md:text-base">★★★★★</span>
                         </div>
-                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Website saya jadi dalam hitungan jam! Benar-benar mudah dan hasilnya sangat profesional. Recommended banget untuk yang butuh website cepat."</p>
+                        <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4">"Website saya jadi dalam hitungan menit! Benar-benar mudah dan hasilnya sangat profesional. Recommended banget untuk yang butuh website cepat."</p>
                         <div class="font-bold text-sm md:text-base text-gray-800">- Chandra Sahita, Owner Travel</div>
                     </div>
                     

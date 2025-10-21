@@ -70,14 +70,14 @@ class CreateWebsiteContent extends CreateRecord
         $websiteContent = $this->record;
         
         // Log the creation
-        activity()
-            ->causedBy(auth()->user())
-            ->performedOn($websiteContent)
-            ->withProperties([
-                'template_slug' => $websiteContent->template_slug,
-                'status' => $websiteContent->status,
-            ])
-            ->log('Website content created');
+        // activity()
+        //     ->causedBy(auth()->user())
+        //     ->performedOn($websiteContent)
+        //     ->withProperties([
+        //         'template_slug' => $websiteContent->template_slug,
+        //         'status' => $websiteContent->status,
+        //     ])
+        //     ->log('Website content created');
     }
 
     private function generateUniqueSubdomain(array $data): string
