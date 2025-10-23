@@ -14,12 +14,11 @@
                     <div class="flex items-center">
                         <!-- Logo -->
                         <Link href="/" class="flex-shrink-0 flex items-center group">
-                            <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                <span class="text-white font-bold text-sm">{{ ($page.props.app?.name || 'SaaS').charAt(0) }}</span>
-                            </div>
-                            <span class="ml-2 text-xl font-bold text-gray-900 group-hover:text-blue-600 transition duration-200">
-                                {{ $page.props.app?.name || 'SaaS' }}
-                            </span>
+                            <img 
+                                src="https://web.dewarangga.com/storage/logo.webp"
+                                alt="Logo"
+                                class="h-6 w-auto sm:h-8 object-contain"
+                            >
                         </Link>
 
                         <!-- Navigation Links -->

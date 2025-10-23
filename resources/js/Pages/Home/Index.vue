@@ -54,7 +54,7 @@ const scrollToSection = (sectionId) => {
 };
 
 const openWhatsApp = () => {
-    window.open('https://wa.me/6281193506085?text=Halo, saya tertarik dengan jasa pembuatan website profesional Anda!', '_blank');
+    window.open('https://wa.me/628118185852?text=Halo, saya tertarik dengan jasa pembuatan website profesional Anda!', '_blank');
 };
 
 onMounted(() => {
@@ -245,7 +245,7 @@ onUnmounted(() => {
                         </div>
 
                         <Link :href="route('register')" class="bg-gradient-to-r from-green-500 to-green-600 text-white font-bold text-lg md:text-xl px-8 md:px-12 py-3 md:py-4 rounded-full hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-300 shadow-lg inline-block">
-                            💎 Ya, Saya Mau Website Rp 499rb!
+                            🚀 Ya, Saya Mau Website Rp 499rb!
                         </Link>
                         
                         <p class="mt-4 text-sm text-gray-600">
@@ -328,10 +328,10 @@ onUnmounted(() => {
                 </div>
                 
                 <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 md:p-6 max-w-2xl mx-auto">
-                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Masih Ada Pertanyaan?</h3>
+                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Ada Pertanyaan?</h3>
                     <p class="mb-3 md:mb-4 text-sm md:text-base">Masih ada pertanyaan seputar jasa bikin website kami?</p>
                     <button @click="openWhatsApp" class="bg-green-500 text-white font-bold px-4 md:px-8 py-2 md:py-3 rounded-full hover:bg-green-600 transition-all duration-300 shadow-lg text-sm md:text-base">
-                        📱 Hubungi Kami di WhatsApp: +62 811-935-0608
+                        Hubungi Kami di WhatsApp: 0811-818-5852
                     </button>
                 </div>
             </div>
