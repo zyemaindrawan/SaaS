@@ -199,7 +199,6 @@ const props = defineProps({
 
 const emit = defineEmits(['voucherApplied', 'confirm-payment'])
 
-// Voucher state
 const voucherCode = ref('')
 const voucherApplied = ref(false)
 const voucherError = ref('')
@@ -207,27 +206,24 @@ const appliedVoucher = ref('')
 const applyingVoucher = ref(false)
 const localVoucherDiscount = ref(props.voucherDiscount || 0)
 
-// Payment state for proper data fetching
 const actualPayment = ref(props.payment || null)
 const loadingPayment = ref(false)
 
-// Popular voucher codes for quick selection
+// voucher codes for quick selection
 const popularVoucherCodes = ref([
-    { code: 'WELCOME10', discount: 10 },
-    { code: 'SAVE20', discount: 20 },
-    { code: 'PROMO15%', discount: 15 },
-    { code: 'NEW15', discount: 10 }
+    // { code: 'WELCOME10', discount: 10 },
+    // { code: 'SAVE20', discount: 20 },
+    // { code: 'PROMO15%', discount: 15 },
+    { code: 'WEBSUPERFLAZZ', discount: 10 }
 ])
 
 const finalTotal = computed(() => {
     if (shouldShowInvoiceButton.value && actualPayment.value) {
-        // Use final_amount from payment (same as invoice Show.vue)
         return Number(actualPayment.value.final_amount || actualPayment.value.amount || 0)
     }
     return Math.max(0, props.pricing.total - localVoucherDiscount.value)
 })
 
-// Display voucher data from payment if available, otherwise from local state
 const displayVoucherDiscount = computed(() => {
     if (shouldShowInvoiceButton.value && actualPayment.value && actualPayment.value.voucher_code) {
         return Number(actualPayment.value.voucher_discount || 0)
@@ -277,13 +273,11 @@ const formatPrice = (price) => {
 }
 
 const getOriginalTotal = () => {
-    // This is the subtotal before voucher discount
     return getSubtotal()
 }
 
 const getTemplatePrice = () => {
     if (shouldShowInvoiceButton.value && actualPayment.value) {
-        // Template price = payment.amount (same as invoice Show.vue)
         return Number(actualPayment.value.amount || 0)
     }
     return props.pricing.subtotal || 0
@@ -298,7 +292,6 @@ const getPlatformFee = () => {
 
 const getSubtotal = () => {
     if (shouldShowInvoiceButton.value && actualPayment.value) {
-        // Subtotal = payment.amount + payment.fee (same as invoice Show.vue)
         return Number(actualPayment.value.amount || 0) + Number(actualPayment.value.fee || 0)
     }
     return props.pricing.total || 0
@@ -308,7 +301,6 @@ const handleImageError = (event) => {
     event.target.src = '/default-avatar.png'
 }
 
-// Fetch payment data based on website_content_id
 const fetchPaymentData = async () => {
     if (!shouldShowInvoiceButton.value || !props.websiteContentId || loadingPayment.value) {
         return
@@ -323,7 +315,6 @@ const fetchPaymentData = async () => {
         }
     } catch (error) {
         console.error('Failed to fetch payment data:', error)
-        // Fallback to props.payment if API fails
         actualPayment.value = props.payment
     } finally {
         loadingPayment.value = false
@@ -347,7 +338,6 @@ const applyVoucher = async () => {
             appliedVoucher.value = voucherCode.value.trim()
             voucherApplied.value = true
             
-            // Emit the voucher data to parent
             emit('voucherApplied', {
                 code: appliedVoucher.value,
                 discount: localVoucherDiscount.value
@@ -374,7 +364,6 @@ const removeVoucher = () => {
     appliedVoucher.value = ''
     localVoucherDiscount.value = 0
     
-    // Emit empty voucher data to parent
     emit('voucherApplied', {
         code: '',
         discount: 0
@@ -383,30 +372,25 @@ const removeVoucher = () => {
 
 const handleButtonClick = () => {
     if (shouldShowInvoiceButton.value) {
-        // Redirect to invoice page
         const paymentCode = actualPayment.value?.code || props.payment?.code
         if (paymentCode) {
             window.location.href = `/invoice/${paymentCode}`
         }
     } else {
-        // Emit confirm payment event
         emit('confirm-payment')
     }
 }
 
-// Watch for external voucher discount changes
 watch(() => props.voucherDiscount, (newValue) => {
     localVoucherDiscount.value = newValue || 0
 })
 
-// Watch for changes that require fetching payment data
 watch(() => [props.websiteContentId, props.websiteStatus], () => {
     if (shouldShowInvoiceButton.value) {
         fetchPaymentData()
     }
 }, { immediate: false })
 
-// Initialize on mount
 onMounted(() => {
     if (shouldShowInvoiceButton.value && props.websiteContentId) {
         fetchPaymentData()
