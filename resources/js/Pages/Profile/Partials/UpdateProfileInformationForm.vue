@@ -4,6 +4,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 
 defineProps({
     mustVerifyEmail: {
@@ -19,7 +20,41 @@ const user = usePage().props.auth.user;
 const form = useForm({
     name: user.name,
     email: user.email,
+    phone: user.phone || '',
 });
+
+const phoneError = ref('');
+
+// Watch phone field for real-time validation
+watch(() => form.phone, (newPhone) => {
+    if (newPhone && newPhone.length > 0) {
+        // Remove any non-digit characters for validation
+        const cleanPhone = newPhone.replace(/\D/g, '');
+        
+        // Check format
+        if (!/^(628|08)\d{8,11}$/.test(cleanPhone)) {
+            phoneError.value = 'Nomor telepon tidak valid. Format 08xxxxxx atau 628xxxxxx';
+        } else {
+            phoneError.value = '';
+        }
+        
+        // Update form with clean phone number
+        if (cleanPhone !== newPhone) {
+            form.phone = cleanPhone;
+        }
+    } else {
+        phoneError.value = '';
+    }
+});
+
+const submitForm = () => {
+    // Check if there are any phone validation errors
+    if (phoneError.value) {
+        return;
+    }
+    
+    form.patch(route('profile.update'));
+};
 </script>
 
 <template>
@@ -28,14 +63,10 @@ const form = useForm({
             <h2 class="text-lg font-medium text-gray-900">
                 Profile Information
             </h2>
-
-            <p class="mt-1 text-sm text-gray-600">
-                Update your account's profile information and email address.
-            </p>
         </header>
 
         <form
-            @submit.prevent="form.patch(route('profile.update'))"
+            @submit.prevent="submitForm"
             class="mt-6 space-y-6"
         >
             <div>
@@ -67,6 +98,26 @@ const form = useForm({
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <div>
+                <InputLabel for="phone" value="Phone Number" />
+
+                <TextInput
+                    id="phone"
+                    type="tel"
+                    class="mt-1 block w-full"
+                    v-model="form.phone"
+                    required
+                    autocomplete="tel"
+                    placeholder="081234567890"
+                    :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': phoneError || form.errors.phone }"
+                />
+
+                <InputError class="mt-2" :message="phoneError || form.errors.phone" />
+                <p class="mt-1 text-xs text-gray-500">
+                    <span v-if="form.phone && !phoneError && form.phone.length >= 10" class="text-green-600 ml-2">✓ Format valid</span>
+                </p>
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">

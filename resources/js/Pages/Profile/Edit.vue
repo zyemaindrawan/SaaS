@@ -12,7 +12,25 @@ defineProps({
     status: {
         type: String,
     },
+    user: {
+        type: Object,
+        default: () => ({}),
+    },
 });
+
+// Function to format date to Indonesian format
+const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    
+    return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+};
 </script>
 
 <template>
@@ -155,19 +173,13 @@ defineProps({
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm text-gray-600">Member Since</span>
                                     <span class="text-sm font-medium text-gray-900">
-                                        {{ new Date($page.props.auth.user?.created_at).toLocaleDateString() }}
+                                        {{ formatDate(user?.created_at || $page.props.auth.user?.created_at) }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm text-gray-600">Account Status</span>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                         Active
-                                    </span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-600">Email Verified</span>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="$page.props.auth.user?.email_verified_at ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
-                                        {{ $page.props.auth.user?.email_verified_at ? 'Verified' : 'Pending' }}
                                     </span>
                                 </div>
                             </div>

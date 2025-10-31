@@ -25,6 +25,25 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^(628|08)\d{8,11}$/',
+                Rule::unique(User::class)->ignore($this->user()?->id),
+            ],
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'phone.regex' => 'Format nomor telepon tidak valid. Gunakan format 6281234567890 atau 081234567890',
+            'phone.unique' => 'Nomor telepon sudah terdaftar',
         ];
     }
 }
