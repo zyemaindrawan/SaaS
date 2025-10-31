@@ -211,8 +211,10 @@ class PreviewController extends Controller
     {
         $user = Auth::user();
 
-        // Verify ownership for authenticated users
-        if ($user && $websiteContent->user_id !== $user->id) {
+        // Use authorization policy to check access (allows admins to view all content)
+        try {
+            $this->authorize('view', $websiteContent);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             abort(403, 'Unauthorized access to preview');
         }
 
@@ -222,8 +224,8 @@ class PreviewController extends Controller
                 ->with('error', 'Website content not available for preview');
         }
 
-        // Update status to 'previewed' if it's currently 'draft'
-        if ($websiteContent->status === 'draft') {
+        // Update status to 'previewed' if it's currently 'draft' (only for content owners, not admins)
+        if ($websiteContent->status === 'draft' && (!$user || !$user->is_admin)) {
             $websiteContent->update(['status' => 'previewed']);
         }
 

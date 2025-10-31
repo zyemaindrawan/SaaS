@@ -16,8 +16,9 @@ class WebsiteContentPolicy
     public function view(?User $user, WebsiteContent $websiteContent): bool
     {
         return $websiteContent->is_published 
-            || ($user && $user->id === $websiteContent->user_id)
-            || $websiteContent->status === 'preview';
+            || ($user && $user->id === $websiteContent->user_id) // Content owner can view
+            || ($user && $user->is_admin) // Admins can view all content (for /preview/{id} access)
+            || $websiteContent->status === 'preview'; // Public preview status
     }
 
     public function create(User $user): bool

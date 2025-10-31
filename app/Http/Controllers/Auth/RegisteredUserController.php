@@ -56,7 +56,7 @@ class RegisteredUserController extends Controller
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ], [
-            'phone.regex' => 'Format nomor telepon tidak valid. Gunakan format 6281234567890 atau 081234567890',
+            'phone.regex' => 'Nomor telepon tidak valid. Format: 08xxxxxx atau 628xxxxxx',
             'phone.unique' => 'Nomor telepon sudah terdaftar',
         ]);
 
