@@ -5,6 +5,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
     redirect: {
@@ -16,12 +17,42 @@ const props = defineProps({
 const form = useForm({
     name: '',
     email: '',
+    phone: '',
     password: '',
     password_confirmation: '',
     redirect: props.redirect,
 });
 
+const phoneError = ref('');
+
+// Watch phone field for real-time validation
+watch(() => form.phone, (newPhone) => {
+    if (newPhone && newPhone.length > 0) {
+        // Remove any non-digit characters for validation
+        const cleanPhone = newPhone.replace(/\D/g, '');
+        
+        // Check format
+        if (!/^(628|08)\d{8,11}$/.test(cleanPhone)) {
+            phoneError.value = 'Nomor telepon tidak valid. Format 08xxxxxxx atau 628xxxxxxx';
+        } else {
+            phoneError.value = '';
+        }
+        
+        // Update form with clean phone number
+        if (cleanPhone !== newPhone) {
+            form.phone = cleanPhone;
+        }
+    } else {
+        phoneError.value = '';
+    }
+});
+
 const submit = () => {
+    // Final validation before submit
+    if (phoneError.value) {
+        return;
+    }
+    
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
@@ -69,6 +100,24 @@ const submit = () => {
                             class="mt-2 w-full"
                         />
                         <InputError :message="form.errors.email" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <InputLabel for="phone" value="Phone Number" class="text-gray-700 font-medium" />
+                        <TextInput
+                            id="phone"
+                            type="tel"
+                            v-model="form.phone"
+                            required
+                            autocomplete="tel"
+                            placeholder="081234567890"
+                            class="mt-2 w-full"
+                            :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': phoneError || form.errors.phone }"
+                        />
+                        <InputError :message="phoneError || form.errors.phone" class="mt-2" />
+                        <p class="mt-1 text-sm text-gray-500">
+                            <span v-if="form.phone && !phoneError && form.phone.length >= 10" class="text-green-600 ml-2">✓ Format valid</span>
+                        </p>
                     </div>
 
                     <div>

@@ -23,9 +23,14 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        // Generate Indonesian phone number format
+        $phonePrefix = fake()->randomElement(['628', '081', '082', '083', '085', '087', '089']);
+        $phoneNumber = $phonePrefix . fake()->numerify('#########');
+        
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'phone' => $phoneNumber,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

@@ -21,6 +21,8 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         // 'laravelVersion' => Application::VERSION,
         // 'phpVersion' => PHP_VERSION,
+        'heroBackground' => resolveAssetPath('website-assets/hero-backgrounds/bg_hero_001.webp'),
+        'testimonialImage' => resolveAssetPath('website-assets/testimonials/blank.webp'),
     ]);
 })->name('home');
 
